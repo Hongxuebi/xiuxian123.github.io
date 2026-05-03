@@ -1,0 +1,3634 @@
+﻿/* ========== 全局重置 ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 主题变量 */
+:root {
+  /* 默认主题（清爽白） */
+  --主色: #2c3e50;
+  --强调色: #3b82f6;
+  --背景色: #f0f2f5;
+  --内容底色: #ffffff;
+  --文字主色: #111827;
+  --文字辅色: #667085;
+  --边框色: #e5e7eb;
+  --成功色: #27ae60;
+  --警告色: #f59e0b;
+  --错误色: #ef4444;
+  --暖灰色: #f3f4f6;
+  --助理消息背景: #e9e9eb;
+  --助理消息文字: #111827;
+  --用户消息背景: #3b82f6;
+  --用户消息文字: #ffffff;
+}
+
+/* 主题：清爽白 */
+body.主题-清爽白 {
+  --主色: #2c3e50;
+  --强调色: #3b82f6;
+  --背景色: #f0f2f5;
+  --内容底色: #ffffff;
+  --文字主色: #111827;
+  --文字辅色: #667085;
+  --边框色: #e5e7eb;
+  --助理消息背景: #e9e9eb;
+  --助理消息文字: #111827;
+  --用户消息背景: #3b82f6;
+  --用户消息文字: #ffffff;
+}
+
+/* 主题：浅海蓝 */
+body.主题-浅海蓝 {
+  --主色: #1e3a5f;
+  --强调色: #3b82f6;
+  --背景色: #f0f7ff;
+  --内容底色: #ffffff;
+  --文字主色: #111827;
+  --文字辅色: #667085;
+  --边框色: #dbeafe;
+  --助理消息背景: #e0eaff;
+  --助理消息文字: #111827;
+  --用户消息背景: #3b82f6;
+  --用户消息文字: #ffffff;
+}
+
+/* 主题：草木绿 */
+body.主题-草木绿 {
+  --主色: #166534;
+  --强调色: #22c55e;
+  --背景色: #f0fdf4;
+  --内容底色: #ffffff;
+  --文字主色: #111827;
+  --文字辅色: #667085;
+  --边框色: #dcfce7;
+  --助理消息背景: #dcfce7;
+  --助理消息文字: #111827;
+  --用户消息背景: #22c55e;
+  --用户消息文字: #ffffff;
+}
+
+/* 主题：暖米橙 */
+body.主题-暖米橙 {
+  --主色: #78350f;
+  --强调色: #f59e0b;
+  --背景色: #fef9ef;
+  --内容底色: #fffbf5;
+  --文字主色: #292524;
+  --文字辅色: #78716c;
+  --边框色: #fde68a;
+  --助理消息背景: #fef3c7;
+  --助理消息文字: #292524;
+  --用户消息背景: #f59e0b;
+  --用户消息文字: #ffffff;
+}
+
+/* 主题：东方美学 */
+body.主题-东方美学 {
+  --主色: #4a6a6f;
+  --强调色: #b95f49;
+  --背景色: #ede0c8;
+  --内容底色: #f8f5e6;
+  --文字主色: #3a4a4f;
+  --文字辅色: #6a5a4f;
+  --边框色: #d6c8a7;
+  --助理消息背景: #e8dfc8;
+  --助理消息文字: #3a4a4f;
+  --用户消息背景: #b95f49;
+  --用户消息文字: #fef9e6;
+}
+
+/* 主题：深色夜 */
+body.主题-深色夜 {
+  --主色: #e2e8f0;
+  --强调色: #3b82f6;
+  --背景色: #1f2937;
+  --内容底色: #111827;
+  --文字主色: #f9fafb;
+  --文字辅色: #9ca3af;
+  --边框色: #374151;
+  --助理消息背景: #374151;
+  --助理消息文字: #f9fafb;
+  --用户消息背景: #2563eb;
+  --用户消息文字: #ffffff;
+}
+
+/* 主题：渐变幻境 */
+body.主题-渐变幻境 {
+  --主色: #4c1d95;
+  --强调色: #667eea;
+  --背景色: #667eea;
+  --内容底色: rgba(255,255,255,0.95);
+  --文字主色: #1f2937;
+  --文字辅色: #6b7280;
+  --边框色: #e5e7eb;
+  --助理消息背景: #e5e7eb;
+  --助理消息文字: #1f2937;
+  --用户消息背景: #667eea;
+  --用户消息文字: #ffffff;
+}
+
+body.主题-暗夜星河 {
+  --主色: #1a1a2e;
+  --强调色: #7c3aed;
+  --背景色: #0f0f1a;
+  --内容底色: #1a1a2e;
+  --文字主色: #e2e8f0;
+  --文字辅色: #94a3b8;
+  --边框色: #2d2d44;
+  --助理消息背景: #252540;
+  --助理消息文字: #e2e8f0;
+  --用户消息背景: #7c3aed;
+  --用户消息文字: #ffffff;
+  --暖灰色: #2d2d44;
+  --成功色: #27ae60;
+  --警告色: #f39c12;
+  --错误色: #e74c3c;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  background-color: var(--背景色);
+  color: var(--文字主色);
+  line-height: 1.5;
+}
+
+#应用容器 {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: var(--内容底色);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========== 顶部栏 ========== */
+.顶部栏 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--边框色);
+  flex-shrink: 0;
+}
+
+.左侧区 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.右侧区 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+}
+
+/* 右侧按钮扩大点击区域，防误触 */
+.右侧区 > * {
+  padding: 4px;
+}
+
+.右侧区 > .图标按钮 {
+  min-width: 36px;
+  min-height: 36px;
+}
+
+/* ========== 备忘录更多菜单 ========== */
+.备忘录更多菜单 {
+  position: relative;
+  display: inline-block;
+}
+
+#备忘录更多按钮 {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  color: var(--文字辅色);
+  display: none; /* 默认隐藏 */
+}
+
+#备忘录更多按钮:hover {
+  color: var(--强调色);
+}
+
+.全局浮动菜单 {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--内容底色);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0;
+  z-index: 1000;
+  min-width: 160px;
+  max-height: 60vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.全局浮动菜单.显示 {
+  display: block;
+}
+
+.菜单项 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.菜单项:hover {
+  background: var(--暖灰色);
+}
+
+.菜单项 .菜单图标 {
+  font-size: 1rem;
+  color: var(--文字辅色);
+}
+
+.菜单项 .菜单文本 {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--文字主色);
+}
+
+.菜单项.菜单分组标题 {
+  cursor: default;
+  padding-top: 0.5rem;
+}
+.菜单项.菜单分组标题 .菜单文本 {
+  font-size: 0.75rem;
+  color: var(--文字副色);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.菜单项.排序选项 {
+  padding-left: 2rem;
+}
+
+.排序选项列表 {
+  display: none;
+}
+.排序选项列表.展开 {
+  display: block;
+}
+
+.日期分组树 {
+  padding: 0.25rem 0;
+}
+.菜单项.日期年份项 {
+  padding-left: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.菜单项.日期月份项 {
+  padding-left: 3rem;
+}
+
+/* ========== 导出分组树（与日期分组树共用样式） ========== */
+.导出分组树 {
+  padding: 0.25rem 0;
+}
+.菜单项.导出年份项 {
+  padding-left: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.菜单项.导出月份项 {
+  padding-left: 3rem;
+}
+
+.菜单项.菜单分隔线 {
+  height: 1px;
+  padding: 0;
+  margin: 0.25rem 0.75rem;
+  background: var(--暖灰色);
+  min-height: unset;
+  cursor: default;
+}
+
+.子菜单 {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 8px;
+  background: var(--内容底色);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0;
+  min-width: 120px;
+  z-index: 1001;
+}
+
+.菜单项:hover .子菜单 {
+  display: block;
+}
+
+.子菜单项 {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.85rem;
+  color: var(--文字主色);
+}
+
+.子菜单项:hover {
+  background: var(--暖灰色);
+}
+
+.子菜单项.分隔线 {
+  border-top: 1px solid var(--暖灰色);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  margin-bottom: 0;
+  padding-bottom: 0.5rem;
+}
+
+.菜单图标 {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  color: var(--文字辅色);
+}
+
+.菜单图标:hover {
+  color: var(--强调色);
+}
+
+.标签页容器 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  background: transparent;
+}
+
+.标签页按钮 {
+  padding: 0.4rem 1rem;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 2rem;
+  cursor: pointer;
+  color: var(--文字辅色);
+  transition: all 0.2s;
+}
+
+.标签页按钮.激活 {
+  color: var(--强调色);
+  background-color: var(--暖灰色);
+}
+
+/* ========== 主内容区 ========== */
+#主内容区 {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.内容面板 {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.内容面板.激活 {
+  display: block;
+}
+
+/* 备忘录面板：完全独立 flex 容器，避免百分比高度传参不确定性 */
+#备忘录面板.内容面板.激活 {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#备忘录面板.内容面板 .备忘录界面 {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== 对话区域 ========== */
+.对话布局 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.对话区域 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--内容底色);
+  overflow: hidden;
+}
+
+/* 上下文占用率按钮 */
+.上下文占用率 {
+  background: transparent;
+  border: 1px solid;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.15rem 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.上下文占用率.安全 {
+  color: #4caf50;
+  border-color: #4caf50;
+}
+.上下文占用率.安全:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.上下文占用率.警告 {
+  color: #ff9800;
+  border-color: #ff9800;
+}
+.上下文占用率.警告:hover {
+  background: #ff9800;
+  color: white;
+}
+
+.上下文占用率.危险 {
+  color: #f44336;
+  border-color: #f44336;
+}
+.上下文占用率.危险:hover {
+  background: #f44336;
+  color: white;
+}
+
+/* 压缩确认对话框 */
+.压缩对话框遮罩 {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.压缩对话框卡片 {
+  background: var(--卡片背景色, white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 320px;
+  width: 85%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.压缩对话框标题 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: var(--文字主色);
+}
+
+.压缩对话框描述 {
+  font-size: 0.9rem;
+  color: var(--文字辅色);
+  margin-bottom: 0.5rem;
+}
+
+.压缩对话框说明 {
+  font-size: 0.8rem;
+  color: var(--文字辅色);
+  margin-bottom: 1.2rem;
+  line-height: 1.4;
+}
+
+.压缩对话框按钮组 {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: flex-end;
+}
+
+.压缩对话框按钮 {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.压缩对话框按钮.取消 {
+  background: var(--暖灰色, #f0f0f0);
+  color: var(--文字辅色);
+}
+.压缩对话框按钮.取消:hover {
+  background: var(--边框色, #e0e0e0);
+}
+
+.压缩对话框按钮.确认 {
+  background: var(--主题色, #6c5ce7);
+  color: white;
+}
+.压缩对话框按钮.确认:hover {
+  opacity: 0.85;
+}
+
+/* ========== 会话右键菜单 ========== */
+.会话右键菜单 {
+  background: var(--卡片背景色, #fff);
+  border: 1px solid var(--边框色, #e8e8e8);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 120px;
+  z-index: 20000;
+  overflow: hidden;
+}
+
+.会话右键菜单-项 {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: var(--文字主色);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.会话右键菜单-项:hover {
+  background: var(--暖灰色, #f5f5f5);
+}
+
+.会话右键菜单-项:not(:last-child) {
+  border-bottom: 1px solid var(--边框色, #e8e8e8);
+}
+
+.会话右键菜单-危险 {
+  color: #e74c3c;
+}
+
+.会话右键菜单-危险:hover {
+  background: #fdecea !important;
+}
+
+/* ========== 删除会话确认卡片 ========== */
+.确认遮罩 {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30000;
+}
+
+.确认卡片 {
+  background: var(--卡片背景色, white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 300px;
+  width: 85%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.确认卡片-标题 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: var(--文字主色);
+}
+
+.确认卡片-正文 {
+  font-size: 0.88rem;
+  color: var(--文字辅色);
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+.确认卡片-按钮区 {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: flex-end;
+}
+
+.确认卡片-按钮区 button {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.确认卡片-取消 {
+  background: var(--暖灰色, #f0f0f0);
+  color: var(--文字辅色);
+}
+
+.确认卡片-取消:hover {
+  background: var(--边框色, #e0e0e0);
+}
+
+.确认卡片-确认 {
+  background: var(--主题色, #6c5ce7);
+  color: white;
+}
+
+.确认卡片-确认:hover {
+  opacity: 0.85;
+}
+
+.确认卡片-危险 {
+  background: #e74c3c !important;
+}
+
+.确认卡片-危险:hover {
+  background: #c0392b !important;
+  opacity: 1 !important;
+}
+
+.图标按钮.简洁按钮 {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 0.3rem;
+  color: var(--文字辅色);
+}
+
+.图标按钮.简洁按钮:hover {
+  color: var(--文字主色);
+  background: var(--暖灰色);
+}
+
+/* 消息列表 */
+.消息列表 {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.消息 {
+  max-width: 85%;
+  padding: 0.6rem 1rem;
+  border-radius: 1.2rem;
+  position: relative;
+}
+
+.用户消息 {
+  align-self: flex-end;
+  background-color: var(--用户消息背景, var(--暖灰色));
+  color: var(--用户消息文字, var(--文字主色));
+  border-bottom-right-radius: 0.2rem;
+}
+
+.助理消息 {
+  align-self: flex-start;
+  background-color: var(--助理消息背景, var(--暖灰色));
+  color: var(--助理消息文字, var(--文字主色));
+  border-bottom-left-radius: 0.2rem;
+}
+
+.消息时间 {
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+  opacity: 0.6;
+  color: var(--文字辅色);
+}
+
+.记忆引用栏 {
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--边框色, #e5e7eb);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.记忆引用标签 {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 0.75rem;
+  background: var(--暖灰色, #f5f5f5);
+  color: var(--文字辅色, #6b7280);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.记忆引用更多 {
+  font-size: 0.7rem;
+  color: var(--文字辅色, #6b7280);
+  opacity: 0.5;
+}
+
+
+/* 输入区域 */
+.输入区域 {
+  border-top: 1px solid var(--边框色);
+  padding: 0.8rem;
+  background: var(--内容底色);
+}
+
+#用户输入框 {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--边框色);
+  border-radius: 1rem;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border 0.2s;
+  background-color: var(--内容底色);
+  color: var(--文字主色);
+}
+
+#用户输入框:focus {
+  outline: none;
+  border-color: var(--强调色);
+}
+
+.输入工具条 {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  justify-content: flex-start;
+}
+
+/* 发送按钮固定在右侧 */
+#发送消息按钮 {
+  margin-left: auto;
+}
+
+.功能开关 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--文字辅色);
+  cursor: pointer;
+  background: var(--暖灰色);
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+  transition: background 0.2s;
+}
+
+.功能开关:hover {
+  background: var(--边框色);
+}
+
+.功能开关 input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.文件状态 {
+  font-size: 0.75rem;
+  background: var(--暖灰色);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  color: var(--强调色);
+  display: inline-block;
+}
+
+.更多菜单 {
+  position: relative;
+  display: inline-block;
+}
+
+.下拉内容 {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.3rem 0;
+  z-index: 100;
+  min-width: 120px;
+}
+
+.下拉内容 button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--文字主色);
+}
+
+.下拉内容 label.下拉菜单项 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--文字主色);
+  white-space: nowrap;
+}
+
+.下拉内容 label.下拉菜单项:hover,
+.下拉内容 button:hover {
+  background: var(--暖灰色);
+}
+
+.下拉内容 label.禁用菜单项 {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.下拉内容 label.禁用菜单项:hover {
+  background: transparent;
+}
+
+.下拉内容.显示 {
+  display: block;
+}
+
+.无痕标记 {
+  font-size: 0.75rem;
+  background: var(--暖灰色);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  color: var(--文字辅色);
+}
+
+/* ========== 抽屉 ========== */
+.抽屉 {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100%;
+  background: var(--内容底色);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.抽屉.打开 {
+  left: 0;
+}
+
+.抽屉内容 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.抽屉头部 {
+  padding: 1rem;
+  border-bottom: 1px solid var(--边框色);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.抽屉头部 h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--文字主色);
+}
+
+/* 新抽屉头部：正方形头像 + 智能体名 */
+.抽屉头像区 {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--hover色);
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.抽屉头像-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.抽屉智能体名 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--文字主色);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+  color: #fff;
+  text-align: center;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  padding: 14px 2px 3px;
+  word-break: break-all;
+  pointer-events: none;
+  /* 最多显示2行，每行约4个字 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.抽屉智能体名-emoji {
+  font-size: 28px;
+  line-height: 50px;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* 头像图片显示时，emoji名字浮在图片底部 */
+.抽屉头像区.has-img .抽屉智能体名-emoji {
+  display: none;
+}
+.抽屉头像区.has-img .抽屉智能体名 {
+  display: -webkit-box;
+}
+.抽屉头像区:not(.has-img) .抽屉智能体名 {
+  display: none;
+}
+
+/* 抽屉头像区可点击 */
+.抽屉头像区 {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.抽屉头像区:active {
+  transform: scale(0.95);
+}
+.抽屉头像区:hover {
+  box-shadow: 0 0 0 2px var(--主色, #8b5cf6);
+}
+
+.抽屉头像占位 {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--hover色);
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.抽屉头像区.has-img .抽屉头像占位,
+.抽屉头像区:has(.抽屉智能体名-emoji) .抽屉头像占位 {
+  display: none;
+}
+
+
+.简洁按钮 {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+
+.主要按钮.简洁按钮 {
+  color: var(--强调色);
+}
+
+.主要按钮.简洁按钮:hover {
+  background: var(--暖灰色);
+}
+
+.次要按钮.简洁按钮 {
+  color: var(--文字辅色);
+}
+
+.次要按钮.简洁按钮:hover {
+  background: var(--暖灰色);
+}
+
+.会话列表 {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0.5rem;
+}
+
+.会话项 {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.会话项:hover {
+  background: var(--暖灰色);
+}
+
+.会话项.当前会话 {
+  background: var(--暖灰色);
+  font-weight: 500;
+}
+
+.会话名称 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+  font-size: 0.9rem;
+  color: var(--文字主色);
+}
+
+.会话时间 {
+  font-size: 0.7rem;
+  color: var(--文字辅色);
+}
+
+/* ========== 筛选内容 ========== */
+.筛选内容 {
+  padding: 1rem;
+  border-bottom: 1px solid var(--暖灰色);
+  margin-bottom: 1rem;
+}
+
+.筛选按钮 {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--暖灰色);
+  border-radius: 0.5rem;
+  background: var(--内容底色);
+  color: var(--文字主色);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.筛选按钮:last-child {
+  margin-bottom: 0;
+}
+
+.筛选按钮:hover {
+  border-color: var(--强调色);
+  color: var(--强调色);
+}
+
+.筛选按钮.激活 {
+  background: var(--强调色);
+  color: white;
+  border-color: var(--强调色);
+}
+
+/* 筛选按钮计数徽章 */
+.筛选按钮 .filter-count {
+  font-size: 0.7rem;
+  color: var(--文字辅色);
+  margin-left: 4px;
+}
+.筛选按钮.激活 .filter-count {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 回收站卡片样式 */
+.备忘录卡片滑动容器.回收站卡片 .备忘录卡片 {
+  opacity: 0.7;
+  background: var(--暖灰色);
+}
+.备忘录卡片滑动容器.回收站卡片 .卡片删除信息 {
+  font-size: 0.75rem;
+  color: var(--文字辅色);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--边框色);
+}
+.备忘录卡片滑动容器.回收站卡片 .删除时间 {
+  font-style: italic;
+}
+
+/* 回收站操作栏 */
+.卡片操作栏.回收站操作栏 {
+  background: linear-gradient(to right, #4a5568, #2d3748);
+}
+
+/* 全局浮动菜单计数 */
+.全局浮动菜单 .菜单计数 {
+  font-size: 0.75rem;
+  color: var(--文字辅色);
+  margin-left: auto;
+  padding: 0.1rem 0.4rem;
+  background: var(--暖灰色);
+  border-radius: 0.8rem;
+}
+
+/* ========== 多选功能样式 ========== */
+
+/* 多选复选框 */
+.多选复选框 {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--边框色);
+  border-radius: 4px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 14px;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.多选复选框.选中 {
+  background: var(--主色);
+  border-color: var(--主色);
+}
+
+/* 多选模式下的卡片 */
+.备忘录卡片滑动容器.多选模式 {
+  padding-left: 36px;
+}
+
+.备忘录卡片滑动容器.多选模式 .备忘录卡片 {
+  pointer-events: none; /* 禁用卡片点击，只允许点击复选框 */
+}
+
+/* 多选操作栏 */
+.多选操作栏 {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid var(--边框色);
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.多选操作栏.显示 {
+  transform: translateY(0);
+}
+
+.多选操作栏内容 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.多选左侧, .多选右侧 {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.多选按钮 {
+  padding: 8px 14px;
+  border: 1px solid var(--边框色);
+  border-radius: 6px;
+  background: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.多选按钮:hover:not(:disabled) {
+  background: var(--暖灰色);
+}
+
+.多选按钮:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.多选按钮.危险 {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.多选按钮.危险:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+.多选按钮.次要 {
+  background: var(--暖灰色);
+  border-color: var(--边框色);
+}
+
+/* ========== 文件夹树样式 ========== */
+.文件夹树 {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  min-height: 0; /* 确保flex子元素正确收缩 */
+}
+
+.folder-tree-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* 黄色文件夹图标 */
+.text-yellow-400 {
+  color: #FFD100;
+}
+
+.抽屉底部 {
+  padding: 1rem;
+  border-top: 1px solid var(--边框色);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--内容底色);
+}
+
+.抽屉底部按钮 {
+  background: transparent;
+  border: none;
+  padding: 0.6rem;
+  text-align: left;
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--文字主色);
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.抽屉底部按钮:hover {
+  background: var(--暖灰色);
+}
+
+.抽屉遮罩 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  display: none;
+}
+
+.抽屉遮罩.显示 {
+  display: block;
+}
+
+/* ========== 设置浮层 ========== */
+.浮层 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.浮层内容 {
+  background: var(--内容底色);
+  width: 90%;
+  max-width: 480px;
+  border-radius: 1rem;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.浮层头部 {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--边框色);
+}
+
+.设置主体 {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* ========== 备忘录面板样式 ========== */
+.备忘录界面, .记忆库界面 {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.备忘录头部, .记忆库头部 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.备忘录头部按钮组 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.备忘录头部按钮组 button {
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  background: var(--暖灰色);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.备忘录头部按钮组 button:hover {
+  background: var(--边框色);
+}
+
+.备忘录头部 h2, .记忆库头部 h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--文字主色);
+}
+
+.备忘录列表空状态, .记忆库列表空状态 {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--文字辅色);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ========== 记忆库面板样式 ========== */
+
+/* 智能体信息卡 */
+.记忆库-智能体卡 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--暖灰色);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.记忆库-智能体头像 {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--卡片背景);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.记忆库-智能体信息 {
+  flex: 1;
+  min-width: 0;
+}
+
+.记忆库-智能体名称 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--文字主色);
+  margin-bottom: 2px;
+}
+
+.记忆库-智能体签名 {
+  font-size: 0.78rem;
+  color: var(--文字辅色);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.记忆库-智能体元信息 {
+  font-size: 0.7rem;
+  color: var(--文字辅色);
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.记忆库-编辑按钮,
+.记忆库-管理按钮 {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 6px;
+  border-radius: 8px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.记忆库-编辑按钮:hover,
+.记忆库-管理按钮:hover {
+  opacity: 1;
+  background: var(--hover背景);
+}
+
+/* 标签切换栏 */
+.记忆库-标签栏 {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  background: var(--暖灰色);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.记忆库-标签 {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--文字辅色);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.记忆库-标签.激活 {
+  background: var(--卡片背景);
+  color: var(--文字主色);
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* 记忆列表区 */
+.记忆库-列表区 {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.记忆库-列表 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.记忆库-记忆项 {
+  background: var(--暖灰色);
+  border-radius: 10px;
+  padding: 10px 12px;
+  position: relative;
+}
+
+.记忆库-记忆-头部 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.记忆库-标签-类型 {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e0e0e0;
+  color: #666;
+  font-weight: 500;
+}
+
+.类型事实 { background: #e3f2fd; color: #1565c0; }
+.类型事件 { background: #fce4ec; color: #c62828; }
+.类型偏好 { background: #e8f5e9; color: #2e7d32; }
+.类型提醒 { background: #fff3e0; color: #e65100; }
+
+.记忆库-记忆-重要性 {
+  font-size: 0.65rem;
+  color: #f59e0b;
+  letter-spacing: -1px;
+}
+
+.记忆库-记忆-时间 {
+  font-size: 0.7rem;
+  color: var(--文字辅色);
+  margin-left: auto;
+}
+
+.记忆库-记忆-内容 {
+  font-size: 0.85rem;
+  color: var(--文字主色);
+  line-height: 1.5;
+  word-break: break-word;
+  padding-right: 32px;
+}
+
+.记忆库-记忆-操作 {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.记忆库-记忆项:hover .记忆库-记忆-操作 {
+  opacity: 1;
+}
+
+.记忆库-删除按钮 {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.记忆库-删除按钮:hover {
+  opacity: 1;
+  background: #fee2e2;
+}
+
+/* 详情区 */
+.记忆库-详情区 {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.记忆库-详情空白 {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--文字辅色);
+  font-size: 0.9rem;
+  min-height: 200px;
+}
+
+.记忆库-详情-卡 {
+  background: var(--暖灰色);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.记忆库-详情-标题 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--文字主色);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--分隔线);
+}
+
+.记忆库-详情-字段 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 6px 0;
+}
+
+.记忆库-详情-字段.字段多行 {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.记忆库-详情-字段 label {
+  font-size: 0.78rem;
+  color: var(--文字辅色);
+  min-width: 60px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.记忆库-详情-值 {
+  font-size: 0.85rem;
+  color: var(--文字主色);
+  word-break: break-word;
+}
+
+.记忆库-详情-值.可编辑 {
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.记忆库-详情-值.可编辑:hover {
+  background: var(--hover背景);
+  outline: 1px dashed var(--文字辅色);
+}
+
+.记忆库-详情-提示词框 {
+  font-size: 0.78rem;
+  color: var(--文字辅色);
+  background: var(--卡片背景);
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-family: monospace;
+  line-height: 1.4;
+}
+
+/* ========== 记忆库编辑弹窗 ========== */
+.记忆库编辑遮罩 {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.记忆库编辑弹窗 {
+  background: var(--内容底色);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+.记忆库编辑弹窗-头部 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--暖灰色);
+  background: var(--内容底色);
+  border-radius: 12px 12px 0 0;
+}
+.记忆库编辑弹窗-关闭 {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: var(--文字辅色);
+  border-radius: 6px;
+}
+.记忆库编辑弹窗-关闭:hover {
+  background: var(--暖灰色);
+}
+.记忆库编辑弹窗-文本域 {
+  flex: 1;
+  min-height: 260px;
+  padding: 14px 18px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  font-family: var(--字体等宽, monospace);
+  background: var(--内容底色);
+  color: var(--文字主色);
+  tab-size: 2;
+}
+.记忆库编辑弹窗-底部 {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--暖灰色);
+  background: var(--内容底色);
+  border-radius: 0 0 12px 12px;
+}
+.记忆库编辑弹窗-取消 {
+  background: var(--暖灰色);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--文字主色);
+}
+.记忆库编辑弹窗-确认 {
+  background: var(--主题色);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 500;
+}
+.记忆库编辑弹窗-取消:hover {
+  opacity: 0.8;
+}
+.记忆库编辑弹窗-确认:hover {
+  opacity: 0.9;
+}
+
+/* ========== 智能体选择器样式 ========== */
+.智能体选择器 {
+  position: relative;
+}
+
+.智能体选择按钮 {
+  background: var(--暖灰色);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--文字主色);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.智能体选择按钮:hover {
+  background: var(--边框色);
+}
+
+.智能体下拉菜单 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 160px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.智能体选项 {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.智能体选项:hover {
+  background: #f5f5f5;
+}
+
+/* ========== 响应式适配 ========== */
+@media (max-width: 768px) {
+  .抽屉 {
+    width: 260px;
+    left: -260px;
+  }
+  .消息 {
+    max-width: 95%;
+  }
+  .输入工具条 {
+    gap: 0.3rem;
+  }
+  .功能开关 {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  .备忘录头部 h2, .记忆库头部 h2 {
+    font-size: 1rem;
+  }
+  .编辑标题 {
+    font-size: 1.5rem;
+  }
+  .编辑页面内容 {
+    padding: 1rem;
+  }
+  .编辑页面元数据 {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+}
+
+/* ========== 编辑页面样式 ========== */
+.编辑页面 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--内容底色);
+}
+
+.编辑页面头部 {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--边框色);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--内容底色);
+}
+
+.编辑页面按钮 {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--文字主色);
+  transition: background 0.2s;
+}
+
+.编辑页面按钮:hover {
+  background: var(--暖灰色);
+}
+
+/* AI整理按钮 - 醒目样式 */
+.AI整理按钮 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+.AI整理按钮:hover {
+  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+  transform: translateY(-1px);
+}
+.AI整理按钮:active {
+  transform: translateY(0);
+}
+
+.编辑页面按钮组 {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.编辑页面主要按钮 {
+  padding: 0.5rem 1.5rem;
+  background: var(--强调色);
+  color: white;
+  border: none;
+  border-radius: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.编辑页面主要按钮:hover {
+  background: var(--强调色暗);
+}
+
+.编辑页面内容 {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.编辑标题 {
+  width: 100%;
+  font-size: 1.8rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--文字主色);
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+.编辑页面元数据 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.文件夹选择器 {
+  position: relative;
+  z-index: 1000;
+}
+
+.标签选择器 {
+  position: relative;
+  z-index: 1001; /* 稍微高于文件夹选择器 */
+}
+
+.文件夹选择按钮 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--强调色);
+  color: white;
+  border: none;
+  border-radius: 1.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.文件夹选择按钮:hover {
+  background: var(--强调色暗);
+}
+
+.文件夹下拉菜单 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  background: var(--内容底色);
+  border: 1px solid var(--边框色);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999; /* 提高z-index确保显示在最上层 */
+  display: none;
+}
+
+.文件夹下拉菜单.显示 {
+  display: block;
+}
+
+.文件夹选项 {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.文件夹选项:hover {
+  background: var(--暖灰色);
+}
+
+.编辑时间戳 {
+  font-size: 0.9rem;
+  color: var(--文字辅色);
+  flex-shrink: 0; /* 防止被压缩 */
+  min-width: 80px; /* 最小宽度确保可见 */
+}
+
+.标签按钮 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--暖灰色);
+  color: var(--文字主色);
+  border: none;
+  border-radius: 1.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.标签按钮:hover {
+  background: var(--边框色);
+}
+
+/* 已选标签数量角标 */
+.已选标签数 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--强调色);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 标签选择页（微信风格，独立页面滑入） */
+.标签选择页 {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 2000;
+  background: #F7F7F7;
+  color: #121212;
+  font-size: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.标签选择页导航 {
+  height: 44px;
+  background: #F7F7F7;
+  border-bottom: 1px solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.标签选择页返回, .标签选择页确认 {
+  font-size: 17px;
+  color: var(--强调色);
+  cursor: pointer;
+  min-width: 60px;
+}
+.标签选择页确认 { text-align: right; }
+.标签选择页标题 {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* 已选标签区 */
+.标签选择页已选区 {
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+}
+.标签选择页已选标题 {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 12px;
+}
+.标签选择页已选列表 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  min-height: 28px;
+}
+.标签选择页已选胶囊 {
+  height: 28px;
+  line-height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  background: #E6F4FF;
+  color: var(--强调色);
+  position: relative;
+  padding-right: 32px;
+  transition: background 0.2s;
+}
+.标签选择页已选胶囊:active {
+  background: #D4EBFF;
+}
+.标签选择页已选胶囊 .删除叉 {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+.标签选择页已选胶囊 .删除叉::before,
+.标签选择页已选胶囊 .删除叉::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 1px;
+  background: var(--强调色);
+  top: 50%; left: 0;
+}
+.已选标签计数 {
+  font-size: 12px;
+  color: #999;
+  line-height: 28px;
+  margin-right: 4px;
+}
+.标签选择页已选胶囊 .删除叉::before { transform: rotate(45deg); }
+.标签选择页已选胶囊 .删除叉::after { transform: rotate(-45deg); }
+
+/* 搜索条 */
+.标签搜索条 {
+  position: relative;
+}
+.标签搜索输入 {
+  width: 100%;
+  height: 36px;
+  border-radius: 18px;
+  border: none;
+  background: #F7F7F7;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #121212;
+  outline: none;
+}
+.标签搜索输入::placeholder {
+  color: #BBB;
+}
+
+/* 全部标签标题 */
+.标签选择页全部标题 {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #888;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+}
+.标签选择页全部标题 span:last-child {
+  color: var(--强调色);
+  cursor: pointer;
+}
+
+/* 卡片区（默认视图） */
+.标签选择页卡片区 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+}
+.标签卡 {
+  height: 32px;
+  line-height: 32px;
+  padding: 0 16px;
+  border-radius: 16px;
+  font-size: 15px;
+  background: #FFFFFF;
+  border: 1px solid #DCDCDC;
+  color: #121212;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.标签卡:active {
+  border-color: #B8B8B8;
+  background: #FAFAFA;
+}
+.标签卡.已选 {
+  border-color: var(--强调色);
+  color: var(--强调色);
+  background: #E6F4FF;
+}
+.标签卡.已选:active {
+  background: #D4EBFF;
+}
+.标签卡 .勾角标 {
+  display: none;
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 16px;
+  height: 16px;
+  background: var(--强调色);
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+.标签卡.已选 .勾角标 {
+  display: flex;
+}
+.标签卡 .勾角标::after {
+  content: '';
+  width: 5px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-left: 1px;
+}
+
+/* 列表区（编辑模式） */
+.标签选择页列表区 {
+  background: #fff;
+}
+.标签列表项 {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #F0F0F0;
+  font-size: 16px;
+  cursor: pointer;
+}
+.标签列表项:active { background: #F5F5F5; }
+.标签列表项 span { flex: 1; }
+.标签列表项 .计数 { color: #888; font-size: 14px; }
+.标签列表项::after { content: '>'; color: #BBB; font-size: 16px; }
+
+/* 标签操作菜单 */
+.标签操作项:hover { background: #F5F5F5; }
+.标签操作项:active { background: #E8E8E8; }
+
+/* 新建标签 */
+.标签新建按钮 {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--强调色);
+  background: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.标签新建按钮:active { background: #F5F5F5; }
+
+/* 标签选择面板 */
+.标签面板 {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 140px;
+  max-width: 220px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 6px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 标签面板项 */
+.标签面板项 {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--文字主色);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+.标签面板项:hover {
+  background: var(--暖灰色);
+}
+.标签面板项.已选 {
+  background: color-mix(in srgb, var(--强调色) 15%, transparent);
+  color: var(--强调色);
+  font-weight: 500;
+}
+.标签勾 {
+  width: 16px;
+  color: var(--强调色);
+  font-weight: bold;
+  text-align: center;
+}
+
+#编辑内容, #编辑内容区 {
+  flex: 1;
+  width: 100%;
+  min-height: 50vh;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--文字主色);
+  resize: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* contenteditable placeholder */
+#编辑内容区:empty::before {
+  content: attr(placeholder);
+  color: var(--文字辅色);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 选区工具条 */
+.选区工具条 {
+  position: fixed;
+  background: var(--内容底色);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  transition: opacity 0.15s;
+}
+
+.工具条按钮 {
+  background: transparent;
+  border: 1px solid var(--边框色);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--文字主色);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.工具条按钮:hover {
+  background: var(--暖灰色);
+}
+
+.工具条按钮[data-action="bold"] {
+  font-weight: bold;
+}
+
+/* 颜色面板 */
+.颜色面板 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--内容底色);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  gap: 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  margin-top: 4px;
+}
+
+.颜色按钮 {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.颜色按钮:hover {
+  transform: scale(1.15);
+  border-color: var(--边框色);
+}
+
+.主题色按钮 {
+  background: var(--主题色) !important;
+}
+
+/* 字号滑块区 */
+.字号滑块区 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--边框色);
+}
+
+.字号滑块 {
+  width: 60px;
+  height: 4px;
+  appearance: none;
+  background: var(--边框色);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.字号滑块::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--主题色);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#字号显示 {
+  font-size: 12px;
+  color: var(--文字辅色);
+  min-width: 32px;
+}
+
+/* 待办事项 */
+.todo-item {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  transition: none;
+  position: relative;
+  padding-left: 28px; /* 给checkbox留空间 */
+  min-height: 24px;
+}
+
+.todo-item:hover {
+  background: transparent;
+}
+
+.todo-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--边框色);
+  appearance: none;
+  cursor: pointer;
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  transition: all 0.15s;
+}
+
+.todo-checkbox:checked {
+  background: var(--主题色);
+  border-color: var(--主题色);
+}
+
+.todo-checkbox:checked::after {
+  content: '✓';
+  color: #fff;
+  font-size: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.todo-text {
+  display: inline;
+  outline: none;
+  width: 100%;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* 待办截止时间显示 */
+.todo-deadline {
+  font-size: 12px;
+  color: var(--文字色, #333);
+  margin-left: 24px;
+  opacity: 0.7;
+}
+.todo-deadline.过期 {
+  color: #e74c3c;
+  opacity: 1;
+  font-weight: 500;
+}
+.todo-item.completed .todo-deadline {
+  opacity: 0.4;
+}
+
+.todo-delete {
+  display: none;
+}
+
+/* 附件 */
+.attachment-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--暖灰色);
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin: 2px 0;
+  font-size: 13px;
+}
+
+.attach-icon {
+  font-size: 14px;
+}
+
+.attach-name {
+  color: var(--主题色);
+  font-weight: 500;
+}
+
+.attach-size {
+  color: var(--文字辅色);
+  font-size: 11px;
+}
+
+/* 浮动菜单（格式/颜色） */
+.浮动格式菜单, .浮动颜色菜单 {
+  display: flex;
+  gap: 4px;
+  background: var(--内容底色);
+  padding: 6px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+.浮动格式菜单 button {
+  background: transparent;
+  border: 1px solid var(--边框色);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--文字主色);
+  font-size: 14px;
+}
+
+.浮动格式菜单 button:hover {
+  background: var(--暖灰色);
+}
+
+.浮动颜色菜单 button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.浮动颜色菜单 button:hover {
+  transform: scale(1.15);
+  border-color: var(--边框色);
+}
+
+/* ========== 字号抽屉（底部滑出） ========== */
+.字号抽屉 {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--内容底色);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  z-index: 10001; /* 必须高于标签面板的9999 */
+  transform: translateY(100%);
+  transition: transform 0.25s ease-out;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.字号抽屉.显示 {
+  transform: translateY(0);
+}
+
+.抽屉头部 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--边框色);
+  font-weight: 500;
+}
+
+.抽屉关闭按钮 {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: var(--文字辅色);
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.抽屉内容 {
+  padding: 20px 16px 24px;
+}
+
+.抽屉内容 input[type="range"] {
+  width: 100%;
+  height: 8px;
+  appearance: none;
+  background: linear-gradient(to right, #667eea, #764ba2);
+  border-radius: 4px;
+  outline: none;
+}
+
+.抽屉内容 input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.字号标注 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  color: var(--文字辅色);
+  font-size: 13px;
+}
+
+.字号标注 #抽屉字号显示 {
+  font-weight: 600;
+  color: var(--主题色);
+  font-size: 16px;
+}
+
+/* 遮罩层 */
+.抽屉遮罩 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+
+.抽屉遮罩.显示 {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.编辑页面工具栏 {
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--边框色);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--内容底色);
+}
+
+.工具栏按钮 {
+  background: transparent;
+  border: none;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--文字主色);
+  font-size: 1.2rem;
+  transition: background 0.2s;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.工具栏按钮:hover {
+  background: var(--暖灰色);
+}
+
+.工具栏按钮:active {
+  transform: scale(0.92);
+}
+
+/* 工具栏AI按钮高亮 */
+.工具栏按钮[data-tool="ai"] {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+.工具栏按钮[data-tool="ai"]:hover {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+/* ========== 文件夹下拉选中样式 ========== */
+.文件夹下拉菜单 .文件夹选项.选中 {
+  background: rgba(102, 126, 234, 0.12);
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* ========== 文件夹树样式（层级展开） ========== */
+.folder-tree-container {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.folder-tree-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px 10px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 2px 8px;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.folder-tree-item:hover {
+  background: var(--暖灰色);
+}
+
+.folder-tree-item.选中 {
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+}
+
+.folder-tree-item.选中 .folder-name {
+  font-weight: 600;
+}
+
+.folder-tree-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  /* 层级缩进由 inline style 的 padding-left 控制 */
+}
+
+.folder-toggle {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: #999;
+  margin-right: 4px;
+  transition: transform 0.2s;
+}
+
+.folder-toggle-placeholder {
+  width: 18px;
+  min-width: 18px;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+.folder-tree-item .folder-name {
+  font-size: 0.9rem;
+  color: var(--文字主色);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-tree-item .folder-count {
+  font-size: 0.7rem;
+  color: var(--文字辅色);
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/* 备忘录界面 */
+
+
+/* 备忘录头部 - 移入顶部栏，此处隐藏 */
+.备忘录头部 {
+  display: none;
+}
+
+/* 搜索框 */
+.备忘录搜索框 {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.备忘录搜索框 i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--文字辅色);
+  font-size: 1rem;
+}
+
+.备忘录搜索框 input {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.5rem;
+  border: 1px solid var(--边框色);
+  border-radius: 2rem;
+  background: var(--内容底色);
+  color: var(--文字主色);
+  font-size: 0.9rem;
+}
+
+.备忘录搜索框 input:focus {
+  outline: none;
+  border-color: var(--强调色);
+  box-shadow: 0 0 0 2px rgba(var(--强调色-rgb), 0.2);
+}
+
+/* 筛选按钮样式统一使用顶部定义，此处不再重复 */
+
+/* 卡片列表容器 */
+.备忘录卡片列表 {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* 确保每个卡片容器正确显示 */
+.备忘录卡片滑动容器 {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  height: auto;
+  min-height: 120px;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 卡片项 */
+.备忘录卡片 {
+  background: var(--内容底色);
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--边框色);
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  min-height: 100px;
+  /* 按压反馈 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.备忘录卡片:active {
+  transform: scale(0.985);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.05s ease;
+}
+
+/* hover 效果只保留给非触屏设备 */
+@media (hover: hover) {
+  .备忘录卡片:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-color: var(--强调色);
+  }
+}
+
+.卡片内容 {
+  flex: 1;
+  min-width: 0;
+}
+
+.卡片头部 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
+}
+
+.卡片标题 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--文字主色);
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.卡片内容区域 {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.卡片日期内容 {
+  line-height: 1.5;
+  max-height: 3em; /* 最多显示2行 */
+  overflow: hidden;
+  margin-top: 0.15rem;
+}
+
+.卡片日期 {
+  font-size: 0.8rem;
+  color: var(--文字辅色);
+  white-space: nowrap;
+  display: inline;
+  margin-right: 0.3rem;
+  opacity: 0.75;
+}
+
+.卡片内容预览 {
+  font-size: 0.82rem;
+  color: var(--文字辅色);
+  display: inline;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.卡片图片容器 {
+  flex-shrink: 0;
+  width: 80px;
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.卡片缩略图 {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.卡片标签区 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.55rem;
+}
+
+.卡片标签 {
+  background: var(--暖灰色);
+  padding: 0.2rem 0.55rem;
+  border-radius: 1rem;
+  font-size: 0.68rem;
+  color: var(--文字辅色);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.卡片标签:active {
+  background: var(--边框色);
+  transform: scale(0.95);
+}
+
+.卡片标签:hover {
+  background: var(--边框色);
+}
+
+/* 卡片截止提示气泡 */
+.卡片截止提示 {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--文字色, #333);
+  opacity: 0.6;
+  line-height: 1.2;
+}
+.卡片截止提示.过期 {
+  color: #e74c3c;
+  opacity: 1;
+  font-weight: 500;
+}
+
+.卡片操作 {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.备忘录卡片:hover .卡片操作 {
+  opacity: 1;
+}
+
+.卡片操作按钮 {
+  padding: 0.2rem 0.4rem;
+  border: none;
+  border-radius: 0.3rem;
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--文字辅色);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.卡片操作按钮:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* 空状态 */
+.备忘录列表空状态 {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  animation: 空状态淡入 0.35s ease;
+  user-select: none;
+}
+
+@keyframes 空状态淡入 {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.空状态图标 {
+  font-size: 3rem;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: var(--暖灰色);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  color: var(--文字辅色);
+  opacity: 0.5;
+}
+
+.空状态文本 {
+  color: var(--文字辅色);
+  margin-bottom: 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.空状态副文本 {
+  color: var(--文字辅色);
+  font-size: 0.85rem;
+  margin-bottom: 1.2rem;
+  opacity: 0.7;
+}
+
+.空状态按钮 {
+  background: var(--强调色);
+  color: white;
+  border: none;
+  padding: 0.55rem 1.4rem;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.空状态按钮:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.15);
+}
+
+/* 悬浮新建按钮 FAB */
+.悬浮新建按钮 {
+  position: fixed;
+  bottom: 2rem;
+  right: 1.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--强调色);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  font-size: 1.6rem;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+  z-index: 100;
+  /* 适配底部安全区 */
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.悬浮新建按钮:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 768px) {
+  .悬浮新建按钮 {
+    bottom: 2.5rem;
+    right: 2.5rem;
+    width: 3.8rem;
+    height: 3.8rem;
+    font-size: 1.8rem;
+  }
+  .悬浮新建按钮:hover {
+    transform: scale(1.06);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* 滚动条样式 */
+.备忘录卡片列表::-webkit-scrollbar {
+  width: 6px;
+}
+
+.备忘录卡片列表::-webkit-scrollbar-track {
+  background: var(--背景色);
+  border-radius: 3px;
+}
+
+.备忘录卡片列表::-webkit-scrollbar-thumb {
+  background: var(--边框色);
+  border-radius: 3px;
+}
+
+.备忘录卡片列表::-webkit-scrollbar-thumb:hover {
+  background: var(--文字辅色);
+}
+
+/* ==================== 卡片滑动效果 ==================== */
+
+/* 滑动容器 */
+.备忘录卡片滑动容器 {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  height: auto;
+  min-height: 120px;
+  touch-action: pan-y pinch-zoom; /* 鸿蒙WebView兼容：允许垂直滚动，禁止水平滚动被父容器接管 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 操作栏（在卡片后方） */
+.卡片操作栏 {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1rem;
+  gap: 0.5rem;
+  background: linear-gradient(90deg, transparent, var(--暖灰色) 20%);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* 操作栏按钮 */
+.操作栏按钮 {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--内容底色);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--文字主色);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.操作栏按钮:hover {
+  background: var(--暖灰色);
+  transform: scale(1.05);
+}
+
+.操作栏按钮:active {
+  transform: scale(0.95);
+  background: var(--边框色);
+}
+
+/* 卡片内容（可滑动） */
+.备忘录卡片 {
+  position: relative;
+  background: var(--内容底色);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+  z-index: 2;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.备忘录卡片:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+/* 置顶卡片样式 — 左侧色条 + 极淡背景 */
+.备忘录卡片.置顶卡片 {
+  border: none;
+  border-left: 3px solid var(--强调色);
+  background: color-mix(in srgb, var(--强调色) 4%, var(--内容底色));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.备忘录卡片滑动容器.已置顶 .备忘录卡片 {
+  border: none;
+  border-left: 3px solid var(--强调色);
+  background: color-mix(in srgb, var(--强调色) 4%, var(--内容底色));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.备忘录卡片滑动容器.已置顶 {
+  position: relative;
+}
+
+.备忘录卡片滑动容器.已置顶::before {
+  content: '📌';
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 0.75rem;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* 滑动状态 */
+.备忘录卡片滑动容器.滑动中 .备忘录卡片 {
+  transition: none;
+}
+
+/* 展开状态 - 完全由CSS控制transform，避免JS内联样式冲突 */
+.备忘录卡片滑动容器.展开 .备忘录卡片 {
+  transform: translateX(-300px);
+}
+
+.备忘录卡片滑动容器.展开 .卡片操作栏 {
+  opacity: 1;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .备忘录界面 {
+    padding: 0.75rem;
+  }
+  
+  .备忘录卡片滑动容器 {
+    min-height: 100px;
+  }
+  
+  .备忘录卡片 {
+    padding: 0.75rem;
+  }
+  
+  .操作栏按钮 {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+  
+  .备忘录卡片滑动容器.展开 .备忘录卡片 {
+    transform: translateX(-300px);
+  }
+  
+  .悬浮新建按钮 {
+    bottom: 1rem;
+    right: 1rem;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+  }
+  
+  .卡片操作 {
+    opacity: 1; /* 移动端始终显示操作按钮 */
+  }
+}
+/* 返回按钮强化样式 - 确保清晰可见 */
+.返回按钮强化 {
+  background: var(--暖灰色) !important;
+  border-radius: 2rem !important;
+  padding: 0.4rem 0.8rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: var(--强调色) !important;
+  border: 1px solid var(--边框色) !important;
+  transition: all 0.2s ease;
+}
+
+.返回按钮强化:hover {
+  background: var(--强调色) !important;
+  color: white !important;
+  border-color: var(--强调色) !important;
+}
+
+/* ========== 文件夹右键菜单样式 ========== */
+.folder-context-menu {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  user-select: none;
+}
+
+.folder-context-menu .context-menu-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--文字主色);
+  transition: background 0.15s ease;
+}
+
+.folder-context-menu .context-menu-item:hover {
+  background: var(--暖灰色);
+}
+
+.folder-context-menu .context-menu-item.危险 {
+  color: var(--错误色);
+}
+
+.folder-context-menu .context-menu-item.危险:hover {
+  background: #fee;
+}
+
+.folder-context-menu .context-menu-divider {
+  height: 1px;
+  background: var(--边框色);
+  margin: 4px 0;
+}
+
+.folder-context-menu .context-menu-item i {
+  width: 16px;
+  text-align: center;
+  color: var(--文字辅色);
+}
+
+.folder-context-menu .context-menu-item.危险 i {
+  color: var(--错误色);
+}
+
+/* ========== 深度思索 UI ========== */
+
+/* 思考区域基础样式 */
+.思考区域 {
+  margin-bottom: 8px;
+  border-left: 3px solid #a78bfa;
+  padding: 8px 12px;
+  background: rgba(167, 139, 250, 0.06);
+  border-radius: 0 8px 8px 0;
+  transition: background 0.3s ease;
+}
+
+.思考区域:hover {
+  background: rgba(167, 139, 250, 0.1);
+}
+
+/* 思考标题行 */
+.思考标题 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #8b5cf6;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+}
+
+.思考标题 .思考图标 {
+  font-size: 0.85rem;
+}
+
+.思考标题 .思考展开标记 {
+  font-size: 0.65rem;
+  transition: transform 0.25s ease;
+  display: inline-block;
+}
+
+.思考标题 .思考展开标记.展开 {
+  transform: rotate(90deg);
+}
+
+/* 思考内容区 */
+.思考预览 {
+  font-size: 0.8rem;
+  color: #6b7280;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  max-height: 60px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.35s ease;
+}
+
+.思考全文 {
+  font-size: 0.8rem;
+  color: #6b7280;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+.思考全文::-webkit-scrollbar {
+  width: 4px;
+}
+
+.思考全文::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 2px;
+}
+
+/* 流式思考区域（正在思考中） */
+.流式思考区域 {
+  margin-bottom: 8px;
+  border-left: 3px solid #a78bfa;
+  padding: 8px 12px;
+  background: rgba(167, 139, 250, 0.06);
+  border-radius: 0 8px 8px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.流式思考区域 .思考标题 {
+  margin-bottom: 4px;
+}
+
+.流式思考区域 .思考内容 {
+  font-size: 0.8rem;
+  color: #6b7280;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.流式思考区域 .思考内容::-webkit-scrollbar {
+  width: 4px;
+}
+
+.流式思考区域 .思考内容::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 2px;
+}
+
+/* 思考中脉动动画 */
+@keyframes 思考脉动 {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.思考脉动指示器 {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #a78bfa;
+  border-radius: 50%;
+  animation: 思考脉动 1.2s ease-in-out infinite;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* 思考完成后隐藏脉动 */
+.流式思考区域.思考完成 .思考脉动指示器 {
+  display: none;
+}
+
+/* 折叠态的最大高度过渡 */
+.思考全文.展开 {
+  display: block;
+  animation: 思考展开 0.3s ease;
+}
+
+@keyframes 思考展开 {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 200px; }
+}
+
+/* 日期分组标题 */
+.备忘录日期分组标题 {
+  font-size: 0.8rem;
+  color: var(--文字辅色);
+  padding: 0.4rem 0 0.2rem 0.25rem;
+  font-weight: 600;
+  user-select: none;
+  border-bottom: 1px solid var(--边框色);
+  margin-bottom: 0.25rem;
+}
+
+/* 菜单副文本（显示当前排序方式） */
+.菜单副文本 {
+  font-size: 0.75rem;
+  color: var(--文字辅色);
+  margin-left: auto;
+}
+
+/* ========== AI 筛选模式条 ========== */
+.AI筛选模式条 {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 0;
+  flex-wrap: wrap;
+  position: relative;
+}
+.AI筛选模式条 .AI筛选标题 {
+  font-weight: 600;
+  flex: 1;
+}
+.AI筛选模式条 .AI筛选数量 {
+  opacity: 0.9;
+  font-size: 12px;
+}
+.清除AI筛选按钮 {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.清除AI筛选按钮:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+
+/* ===== 备忘录标题（顶部栏左侧） - CSS类控制显隐 ===== */
+#备忘录标题 {
+  display: none !important;
+}
+#备忘录标题.面板可见 {
+  display: inline !important;
+}
+
+
+
+/* Phase D: 禁用按钮样式 */
+.工具栏按钮_禁用 {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}

@@ -1,0 +1,467 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>私人AI助理 · 鸿蒙原生</title>
+  <link rel="stylesheet" href="css/样式.css?v=20260430i">
+  <link rel="stylesheet" href="css/智能体编辑面板-样式.css">
+  <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+  
+  <!-- 核心模块：存储适配器必须最先加载 -->
+  <script src="js模块/存储适配器.js"></script>
+  
+  <!-- 调试日志工具 -->
+  <script src="js模块/调试日志.js"></script>
+  
+  <!-- 智能体管理模块 -->
+  <script src="js模块/智能体管理.js?v=20260502a"></script>
+  
+  <!-- 记忆管理模块 -->
+  <script src="js模块/AI记忆管理器.js?v=20260501e"></script>
+  <script src="js模块/记忆压缩.js?v=20260501a"></script>
+  <script src="js模块/智能提取.js?v=20260502a"></script>
+  <script src="js模块/生成周报.js?v=20260501f"></script>
+  <script src="js模块/数据备份.js?v=20260502a"></script>
+  <script src="js模块/API调用.js?v=20260502a"></script>
+  <script src="js模块/对话管理.js?v=20260502b"></script>
+    <!-- 备忘录管理模块（拆分） -->
+  <script src="js模块/多选状态管理器.js"></script>
+  <script src="js模块/备忘录数据.js?v=20260501d"></script>
+  <script src="js模块/备忘录管理器.js"></script>
+  <script src="js模块/备忘录渲染.js?v=20260423b"></script>
+  <script src="js模块/卡片滑动.js"></script>
+  <script src="js模块/备忘录事件.js?v=20260423b"></script>
+  <script src="js模块/备忘录接口.js"></script>
+      <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+      <script src="js模块/jszip.min.js"></script>
+  <script src="js模块/导出功能.js?v=20260423b"></script>
+  <script>
+    console.log('[DEBUG v4] 对话管理.js 加载了吗？', typeof window.添加消息到界面);
+  </script>
+
+  <script src="js模块/设置管理.js?v=20260430i"></script>
+  
+  <!-- 主入口拆分模块（UI事件绑定） -->
+  <script src="js模块/全局函数.js"></script>
+  <script src="js模块/智能体选择器.js?v=20260423b"></script>
+  <script src="js模块/抽屉.js?v=20260423b"></script>
+  <script src="js模块/标签页.js"></script>
+  <script src="js模块/对话面板.js"></script>
+  <script src="js模块/抽屉底部.js"></script>
+  <script src="js模块/文件上传.js"></script>
+  <script src="js模块/更多菜单.js"></script>
+  <script src="js模块/设置浮层.js?v=20260430i"></script>
+  <script src="js模块/备忘录UI.js?v=20260423b"></script>
+  <script src="js模块/智能体编辑面板.js?v=20260502b"></script>
+  
+  <!-- 最后加载初始化 -->
+  <script src="js模块/初始化.js?v=20260430e"></script>
+</head>
+<body>
+<div id="应用容器">
+  <!-- 顶部栏 -->
+  <header class="顶部栏">
+    <div class="左侧区">
+      <button id="抽屉开关" class="菜单图标">☰</button>
+      <span id="备忘录标题" style="font-size:0.9rem;font-weight:500;color:var(--文字辅色);">我的备忘录 (<span id="备忘录计数">0</span>)</span>
+    </div>
+    <div class="标签页容器">
+      <button class="标签页按钮 激活" data-面板="对话面板">对话</button>
+      <button class="标签页按钮" data-面板="备忘录面板">备忘录</button>
+    </div>
+    <div class="右侧区">
+      <button id="上下文占用率按钮" class="上下文占用率 安全" title="点击压缩对话历史">0%</button>
+      <button id="清空对话按钮" class="图标按钮 简洁按钮" title="新建会话">+</button>
+      <div class="备忘录更多菜单">
+        <button id="备忘录更多按钮" class="菜单图标">⋯</button>
+        <div id="全局浮动菜单" class="全局浮动菜单"></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="主内容区">
+    <!-- 对话面板 -->
+    <div id="对话面板" class="内容面板 激活">
+      <div class="对话布局">
+        <section class="对话区域">
+          <div id="消息列表" class="消息列表"></div>
+          <div class="输入区域">
+            <textarea id="用户输入框" rows="2" placeholder="输入你的问题… (支持换行)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('发送消息按钮').click()}"></textarea>
+            <div class="输入工具条">
+              <!-- 深度思索已移至下拉菜单 -->
+              
+              <button id="上传文件按钮" class="次要按钮 简洁按钮">上传文件</button>
+              <input type="file" id="文件选择器" style="display: none;" accept=".html,.htm,.md,.js,.css,.txt,.json,.xml,.docx,.xlsx,.xls,.pptx">
+              <span id="文件状态" class="文件状态" style="display: none;"></span>
+              
+              <div class="更多菜单">
+                <button id="更多按钮" class="次要按钮 简洁按钮">⋯</button>
+                <div class="下拉内容">
+                  <label class="下拉菜单项 禁用菜单项">
+                    <input type="checkbox" id="联网搜索开关" disabled> 联网搜索
+                  </label>
+                  <button id="无痕会话按钮">无痕模式</button>
+                  <label class="下拉菜单项">
+                    <input type="checkbox" id="深度思索开关-下拉"> 深度思索
+                  </label>
+                </div>
+              </div>
+              <label class="无痕标记" id="无痕标记提示" style="display: none;">无痕模式</label>
+              <button id="发送消息按钮" class="主要按钮 简洁按钮">发送</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 备忘录面板 -->
+    <div id="备忘录面板" class="内容面板">
+      <div class="备忘录界面">
+        <div class="备忘录头部">
+          <h2>我的备忘录</h2>
+          <div id="AI筛选模式条" class="AI筛选模式条">
+            <span class="AI筛选标题"></span>
+            <span class="AI筛选数量"></span>
+            <button id="清除AI筛选" class="清除AI筛选按钮" title="清除AI筛选，恢复正常视图">×</button>
+          </div>
+          <div class="备忘录头部按钮组"></div>
+        </div>
+        
+        <div class="备忘录搜索框">
+          <i class="fa fa-search"></i>
+          <input type="text" id="备忘录搜索框" placeholder="搜索标题或内容...">
+        </div>
+        
+        <div id="备忘录卡片列表" class="备忘录卡片列表"></div>
+        
+        <div class="备忘录列表空状态" id="备忘录空状态">
+          <div class="空状态图标">📝</div>
+          <p class="空状态文本">还没有备忘录</p>
+          <p class="空状态副文本">点击下方按钮创建第一条备忘录</p>
+          <button id="空状态新建按钮" class="空状态按钮">+ 创建第一条</button>
+        </div>
+      </div>
+      <button id="悬浮新建按钮" class="悬浮新建按钮">+</button>
+    </div>
+
+    <!-- 备忘录编辑页面 -->
+    <div id="编辑页面" class="内容面板">
+      <div class="编辑页面">
+        <header class="编辑页面头部">
+          <button id="返回按钮" class="编辑页面按钮 返回按钮强化">← 返回</button>
+          <div class="编辑页面按钮组">
+            <button id="撤销按钮" class="编辑页面按钮"><i class="fa fa-undo text-xl"></i></button>
+            <button id="重做按钮" class="编辑页面按钮"><i class="fa fa-repeat text-xl"></i></button>
+            <button id="编辑页面AI整理按钮" class="编辑页面按钮 AI整理按钮" title="让AI帮你整理标题、标签和分类">AI整理</button>
+            <button id="导出当前篇按钮" class="编辑页面按钮" title="导出当前这篇备忘录">导出</button>
+          </div>
+          <button id="保存按钮" class="编辑页面主要按钮">完成</button>
+        </header>
+        <main class="编辑页面内容">
+          <input id="编辑标题" type="text" placeholder="标题" class="编辑标题">
+          <div class="编辑页面元数据">
+            <div class="文件夹选择器">
+              <button id="文件夹选择按钮" class="文件夹选择按钮">
+                <i class="fa fa-folder-open-o"></i>
+                <span id="当前文件夹名称">默认</span>
+                <i class="fa fa-chevron-down text-xs"></i>
+              </button>
+              <div id="文件夹下拉菜单" class="文件夹下拉菜单"></div>
+            </div>
+            <span id="编辑时间戳" class="编辑时间戳"></span>
+            <div class="标签选择器">
+              <button id="标签按钮" class="标签按钮" type="button">
+                <i class="fa fa-tags"></i> 标签
+                <span id="已选标签数" class="已选标签数" style="display:none"></span>
+              </button>
+            </div>
+            <div id="标签选择页" class="标签选择页" style="display:none">
+              <!-- 导航栏 -->
+              <div class="标签选择页导航">
+                <span class="标签选择页返回" id="关闭标签页">取消</span>
+                <span class="标签选择页标题">标签</span>
+                <span class="标签选择页确认" id="确认标签选择">完成</span>
+              </div>
+              <!-- 已选标签 + 搜索 -->
+              <div class="标签选择页已选区">
+                <div class="标签选择页已选标题">已选标签</div>
+                <div class="标签选择页已选列表" id="已选标签列表"></div>
+                <div class="标签搜索条">
+                  <input id="标签搜索框" type="text" class="标签搜索输入" placeholder="搜索标签">
+                </div>
+              </div>
+              <!-- 全部标签 -->
+              <div class="标签选择页全部标题">
+                <span>全部标签</span>
+                <span id="编辑标签按钮">编辑</span>
+              </div>
+              <div class="标签选择页卡片区" id="标签卡片容器"></div>
+              <div class="标签选择页列表区" id="标签列表容器" style="display:none"></div>
+              <div class="标签新建按钮" id="新建标签按钮">+ 新建标签</div>
+            </div>
+          </div>
+          <div id="编辑内容" class="编辑内容区" contenteditable="true" placeholder="开始书写你的灵感..."></div>
+          
+          <!-- 选区工具条（选文字后弹出） -->
+          <div id="选区工具条" class="选区工具条" style="display: none;">
+            <button data-action="bold" class="工具条按钮" title="加粗">B</button>
+            <button data-action="color" class="工具条按钮" title="颜色">🎨</button>
+            <div id="颜色面板" class="颜色面板" style="display: none;">
+              <button data-color="#e74c3c" class="颜色按钮" style="background: #e74c3c;"></button>
+              <button data-color="#f1c40f" class="颜色按钮" style="background: #f1c40f;"></button>
+              <button data-color="#2ecc71" class="颜色按钮" style="background: #2ecc71;"></button>
+              <button data-color="#3498db" class="颜色按钮" style="background: #3498db;"></button>
+              <button data-color="#9b59b6" class="颜色按钮" style="background: #9b59b6;"></button>
+              <button data-color="#333333" class="颜色按钮" style="background: #333333;"></button>
+              <button data-color="theme" class="颜色按钮 主题色按钮" title="主题色">T</button>
+            </div>
+          </div>
+          <!-- 字号抽屉（从底部滑上来） -->
+          <div id="字号抽屉" class="字号抽屉" style="display: none;">
+            <div class="抽屉头部">
+              <span>调整字号</span>
+              <button id="关闭字号抽屉" class="抽屉关闭按钮">×</button>
+            </div>
+            <div class="抽屉内容">
+              <input type="range" id="抽屉字号滑块" min="12" max="32" value="16" step="1">
+              <div class="字号标注">
+                <span>12</span>
+                <span id="抽屉字号显示">16px</span>
+                <span>32</span>
+              </div>
+            </div>
+          </div>
+        </main>
+        <div class="编辑页面工具栏">
+          <button data-tool="format" class="工具栏按钮" title="格式">Aa</button>
+          <button data-tool="size" class="工具栏按钮" title="字号">字</button>
+          <button data-tool="todoList" class="工具栏按钮" title="待办">O</button>
+          <button data-tool="image" class="工具栏按钮" title="图片">图</button>
+          <button data-tool="attach" class="工具栏按钮" title="附件">附</button>
+          <button data-tool="ai" class="工具栏按钮" title="AI辅助">AI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 智能体编辑面板（双面板） -->
+    <div id="记忆库面板" class="内容面板">
+      <div class="智能体编辑面板">
+        <div class="智能体编辑-左列" id="智能体编辑-左列"></div>
+        <div class="智能体编辑-右列" id="智能体编辑-右列"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 会话抽屉 -->
+  <div id="会话抽屉" class="抽屉">
+    <div class="抽屉内容">
+      <div class="抽屉头部">
+        <div class="抽屉头像区" id="抽屉头像区">
+          <img id="抽屉智能体头像" class="抽屉头像-img" alt="avatar">
+          <div id="抽屉智能体名" class="抽屉智能体名"></div>
+          <div class="抽屉头像占位" id="抽屉头像占位">
+            <span>📷</span>
+          </div>
+        </div>
+        <button id="新建会话按钮抽屉" class="主要按钮 简洁按钮">+ 新建</button>
+      </div>
+      <ul id="会话列表" class="会话列表">
+        <li class="会话项 当前会话" data-会话id="default">
+          <span class="会话名称">默认会话</span>
+          <span class="会话时间">刚刚</span>
+        </li>
+      </ul>
+      <div class="抽屉底部">
+        <button id="打开记忆库按钮" class="抽屉底部按钮">记忆库管理</button>
+
+        <button id="打开设置按钮抽屉" class="抽屉底部按钮">设置</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 备忘录抽屉 -->
+  <div id="备忘录抽屉" class="抽屉">
+    <div class="抽屉内容">
+      <div class="筛选内容" id="筛选内容">
+        <!-- 由 备忘录渲染.js 动态渲染 -->
+      </div>
+      <div class="抽屉头部">
+        <h3>文件夹</h3>
+        <button id="新建文件夹按钮抽屉" class="主要按钮 简洁按钮">+ 新建文件夹</button>
+      </div>
+      <div id="文件夹树" class="文件夹树">
+        <div id="folderTreeContainer" class="folder-tree-container"></div>
+      </div>
+      <div class="抽屉底部">
+        <!-- 文件夹管理功能已整合到右键菜单 -->
+      </div>
+    </div>
+  </div>
+  
+  <div id="抽屉遮罩" class="抽屉遮罩"></div>
+
+  <!-- 添加智能体浮层 -->
+  <div id="添加智能体浮层" class="浮层" style="display: none;">
+    <div class="浮层内容" style="max-width: 480px;">
+      <div class="浮层头部">
+        <h3>添加新智能体</h3>
+        <button id="关闭添加智能体浮层" class="关闭按钮">✖</button>
+      </div>
+      <div style="padding: 1.5rem;">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">名称</label>
+          <input type="text" id="新智能体名称" placeholder="给智能体起个名字" style="width: 100%; padding: 0.6rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.9rem;" maxlength="20">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">图标</label>
+          <div id="新智能体图标选择" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="图标选项" data-icon="🤖" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#f5f5f5;">🤖</button>
+            <button class="图标选项" data-icon="🧙" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">🧙</button>
+            <button class="图标选项" data-icon="🦊" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">🦊</button>
+            <button class="图标选项" data-icon="🦉" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">🦉</button>
+            <button class="图标选项" data-icon="🐱" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">🐱</button>
+            <button class="图标选项" data-icon="🌟" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">🌟</button>
+            <button class="图标选项" data-icon="📚" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">📚</button>
+            <button class="图标选项" data-icon="🎯" style="padding:0.4rem 0.8rem; border:1px solid #e0e0e0; border-radius:0.5rem; cursor:pointer; font-size:1.2rem; background:#fff;">🎯</button>
+          </div>
+        </div>
+        <div style="margin-bottom: 1rem; padding: 0.6rem; background: #f0f5ff; border-radius: 0.5rem; font-size: 0.8rem; color: #555;">
+          💡 新建角色默认无权查看你的备忘录。后续可在智能体设置中为其开放特定文件夹的访问权限。
+        </div>
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+          <button id="确认添加智能体" class="主要按钮 简洁按钮" style="flex:1;">确认创建</button>
+          <button id="取消添加智能体" class="次要按钮 简洁按钮" style="flex:1;">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置浮层 -->
+  <div id="设置浮层" class="浮层" style="display: none;">
+    <div class="浮层内容">
+      <div class="浮层头部">
+        <h3>设置</h3>
+        <button id="关闭设置按钮" class="关闭按钮">✖</button>
+      </div>
+      <div class="设置主体">
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="margin-bottom: 0.5rem;">API设置</h4>
+          <label style="display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: #6c757d;">DeepSeek API密钥</label>
+          <input type="password" id="API密钥输入" placeholder="请输入DeepSeek API密钥（sk-开头）" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+          <label style="display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: #6c757d;">百度搜索 API密钥（<a href="https://console.bce.baidu.com/ai-search/qianfan/ais/console/apiKey" target="_blank" style="color: #4a90d9;">点击申请</a>）</label>
+          <input type="password" id="百度搜索密钥输入" placeholder="千帆智能搜索 API Key" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+          <button id="保存API密钥按钮" class="主要按钮 简洁按钮" style="margin-top: 0.5rem;">保存</button>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="margin-bottom: 0.5rem;">数据备份</h4>
+          <p style="font-size: 0.8rem; color: #6c757d; margin-bottom: 0.5rem;">每日自动备份到应用内，最多保留 7 份。可恢复、导出分享或删除。</p>
+          <div id="备份状态容器" style="margin-bottom: 0.5rem;"></div>
+          <div id="备份按钮容器" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button id="立即备份按钮" class="次要按钮 简洁按钮" data-操作="立即备份" style="border-color: #4CAF50; color: #4CAF50;">立即备份</button>
+            <button id="导出当前列表按钮" class="次要按钮 简洁按钮" onclick="window.导出当前列表?.()">导出全部</button>
+            <button id="恢复备份按钮" class="次要按钮 简洁按钮" onclick="window.导入备份文件?.()">从备份恢复</button>
+          </div>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="margin-bottom: 0.5rem;">主题设置</h4>
+          <select id="主题选择" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem;">
+            <option value="默认主题">默认主题</option>
+            <option value="现代简约">现代简约</option>
+            <option value="东方美学">东方美学</option>
+            <option value="活力多彩">活力多彩</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <h4 style="margin-bottom: 0.5rem;">人物关系映射 
+            <span style="font-size: 0.75rem; color: #999; font-weight: normal;">（可自定义关系词→类别）</span>
+          </h4>
+          <p style="font-size: 0.8rem; color: #6c757d; margin-bottom: 0.5rem;">
+            一行一个，格式：<code>关系词 → 类别</code>，如：<code>导师 → 🎓 师长</code>。
+            AI 检测到关系词会自动追加到对应类别备忘录。
+          </p>
+          <textarea id="关系映射编辑框"
+            style="width: 100%; height: 120px; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.85rem; font-family: monospace; resize: vertical;"
+            placeholder="导师 → 🎓 师长&#10;学长 → 🤝 朋友&#10;教练 → 🎓 师长"></textarea>
+          <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
+            <button id="保存关系映射按钮" class="次要按钮 简洁按钮" style="border-color: #6366f1; color: #6366f1;">保存映射</button>
+            <span id="关系映射状态" style="font-size: 0.8rem; color: #6c757d;"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 冲突解决浮层（用于记忆更新时的用户确认） -->
+  <div id="冲突解决浮层" class="浮层" style="display: none;">
+    <div class="浮层内容" style="max-width: 600px;">
+      <div class="浮层头部">
+        <h3>⚠️ 记忆冲突检测</h3>
+        <button id="关闭冲突浮层按钮" class="关闭按钮">✖</button>
+      </div>
+      <div class="设置主体" style="max-height: 60vh; overflow-y: auto;">
+        <p>检测到以下记忆与现有记忆相似，请选择处理方式：</p>
+        <div class="冲突内容对比" style="margin: 1rem 0;"></div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+          <button class="冲突合并按钮" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">合并</button>
+          <button class="冲突替换按钮" style="background: #e67e22; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">替换旧记忆</button>
+          <button class="冲突跳过按钮" style="background: #95a5a6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">跳过（不添加）</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 头像预览浮层 -->
+  <div id="头像预览浮层" class="浮层" style="display: none;">
+    <div class="浮层内容" style="max-width: 360px; text-align: center;">
+      <div style="padding: 1.5rem;">
+        <img id="头像预览图片" style="width: 200px; height: 200px; border-radius: 12px; object-fit: cover; margin-bottom: 1rem;" alt="头像">
+        <div id="头像预览名字" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;"></div>
+        <div style="display: flex; gap: 0.75rem; justify-content: center;">
+          <button id="更换头像按钮" class="主要按钮 简洁按钮">📷 更换头像</button>
+          <button id="关闭头像预览" class="次要按钮 简洁按钮">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐藏的文件选择框 -->
+  <input type="file" id="头像文件选择" accept="image/*" style="display: none;">
+</div>
+
+<script>
+  // 冲突浮层关闭功能
+  (function() {
+    const 冲突浮层 = document.getElementById('冲突解决浮层');
+    const 关闭冲突按钮 = document.getElementById('关闭冲突浮层按钮');
+    if (关闭冲突按钮) {
+      关闭冲突按钮.addEventListener('click', () => {
+        冲突浮层.style.display = 'none';
+        document.dispatchEvent(new CustomEvent('冲突浮层关闭'));
+      });
+    }
+    冲突浮层.addEventListener('click', (e) => {
+      if (e.target === 冲突浮层) 冲突浮层.style.display = 'none';
+    });
+  })();
+</script>
+  <!-- 调试服务器检测 -->
+  <script>
+    // 页面加载时检测调试服务器
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        fetch('http://localhost:3777/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ level: 'info', tag: '应用启动', data: { message: '备忘录应用已启动' } })
+        }).then(() => {
+          console.log('[调试服务器] 连接成功');
+        }).catch(() => {
+          console.warn('[调试服务器] 未启动，日志将只输出到控制台');
+          console.warn('[调试服务器] 启动命令: node debug-server.js');
+        });
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
