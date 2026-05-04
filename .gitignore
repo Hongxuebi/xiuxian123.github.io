@@ -1,14 +1,14 @@
-# OS
-.DS_Store
-Thumbs.db
 
 # IDE
+# OS
+# 临时/日志
+*.bak.*
+*.swo
+*.swp
+*.tmp
+.DS_Store
 .idea/
 .vscode/
-*.swp
-*.swo
-
-# 临时/日志
+Thumbs.db
 debug-logs.json
 nohup.out
-*.tmp

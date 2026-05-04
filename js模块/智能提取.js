@@ -216,7 +216,15 @@ function 话题推断(所有用户句) {
 /**
  * 智能提取记忆 - 核心入口（从最近对话中萃取四类信息）
  */
+let _正在提取 = false;
+
 window.智能提取记忆 = async function() {
+  if (_正在提取) {
+    console.log('[萃取] 上一次尚未完成，跳过');
+    return { facts: [], preferences: [], relationships: [], events: [], 类型数: 0, 总数: 0 };
+  }
+  _正在提取 = true;
+  try {
   const 管理器 = window.AI记忆管理器;
   if (!管理器) throw new Error('记忆系统未初始化');
   
@@ -302,4 +310,7 @@ window.智能提取记忆 = async function() {
   结果.类型数 = Object.keys(结果).filter(k => 结果[k].length > 0).length;
   结果.总数 = 总数;
   return 结果;
+  } finally {
+    _正在提取 = false;
+  }
 };

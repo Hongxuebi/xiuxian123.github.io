@@ -694,6 +694,14 @@ async function 保存配置(智能体ID, 新配置) {
   const 最终 = { ...现有, ...新配置, updated_at: new Date().toISOString() };
   await 存储.写文件(路径, JSON.stringify(最终, null, 2));
 
+  // 同步更新 AI记忆管理器 的 ai_identity 名称（保持三套身份一致）
+  if (新配置.name && window.AI记忆管理器 && window.AI记忆管理器.ai身份) {
+    try {
+      window.AI记忆管理器.ai身份.名称 = 新配置.name;
+      await window.AI记忆管理器._saveConfig('ai_identity', window.AI记忆管理器.ai身份);
+    } catch(e) { console.warn('同步AI身份名称失败', e); }
+  }
+
   if (window.加载智能体) await window.加载智能体(智能体ID);
 }
 

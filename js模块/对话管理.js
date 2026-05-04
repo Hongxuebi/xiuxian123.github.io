@@ -18,7 +18,11 @@ function 加载会话列表FromStorage(agentId) {
   return null;
 }
 function 保存会话列表ToStorage(agentId, 列表) {
-  localStorage.setItem(`agent_sessions_${agentId}`, JSON.stringify(列表));
+  try {
+    localStorage.setItem(`agent_sessions_${agentId}`, JSON.stringify(列表));
+  } catch(e) {
+    console.warn('[会话列表] localStorage 写入失败，可能已满:', e);
+  }
 }
 
 // 内存中维护当前会话的对话历史（role/content 数组，不含 system）
@@ -849,7 +853,14 @@ async function 发送消息(用户输入) {
 
   } catch (错误) {
     移除加载消息(加载元素);
-    添加消息到界面('助理', '❌ 发送失败：' + (错误.message || '请检查网络和API配置'));
+    // 防刷：5秒内同类错误只通知一次
+    const 错误键 = 'api_error_' + (错误.message || '').slice(0, 20);
+    const 上次通知 = window._错误通知时间?.[错误键] || 0;
+    if (Date.now() - 上次通知 > 5000) {
+      添加消息到界面('助理', '❌ 发送失败：' + (错误.message || '请检查网络和API配置'));
+      if (!window._错误通知时间) window._错误通知时间 = {};
+      window._错误通知时间[错误键] = Date.now();
+    }
     console.error('消息发送失败', 错误);
   }
 }
@@ -864,19 +875,21 @@ async function 获取系统提示词(用户输入 = '') {
   let 当前用户输入 = 用户输入;
   const 部分 = [];
 
-  // 1. 全局宪法（最高优先级）
-  try {
-    const 存储 = window.获取存储();
-    if (await 存储.文件存在('全局记忆宪法.md')) {
-      部分.push(await 存储.读文件('全局记忆宪法.md'));
-    }
-  } catch (e) { /* 无全局宪法则跳过 */ }
+  // 1. 全局宪法（暂未启用，未来可通过 IndexedDB 存储全局记忆宪法.md 实现动态规则）
 
   // 2. 智能体设定（名字、性格、行为规则）
   try {
     const 系统提示词 = window.获取当前系统提示词 ? window.获取当前系统提示词() : '';
     if (系统提示词) 部分.push(系统提示词);
   } catch (e) { /* 无设定则跳过 */ }
+
+  // 2.1 当前身份声明：确保 AI 知道自己的名字（即使 system.md 中名字过时）
+  try {
+    const 当前名字 = window.当前智能体名 ? window.当前智能体名() : '';
+    if (当前名字 && 当前名字 !== 'default') {
+      部分.push(`## 当前身份\n你的名字是「${当前名字}」。在对话中始终以「${当前名字}」自称。`);
+    }
+  } catch (e) { /* 忽略 */ }
 
   // 2.5 用户画像摘要（从 AI记忆管理器 获取）
   try {
@@ -976,6 +989,20 @@ ${相关记忆.slice(0, 3).map((m, i) => `- ${m.内容}`).join('\n')}`);
     console.log('[系统提示词] 会话概览注入跳过:', e.message);
   }
 
+  // 2.59 人物关系映射表注入（用户自定义关系词→类别，让AI识别时自动归类）
+  try {
+    const 映射 = window.获取用户关系映射 ? window.获取用户关系映射() : {};
+    const 映射条目 = Object.entries(映射);
+    if (映射条目.length > 0) {
+      const 映射文本 = 映射条目.map(([词, 类别]) => `- ${词} → ${类别}`).join('\n');
+      部分.push(`## 人物关系映射表（用户自定义）
+当对话中出现以下关键词时，应将其视为对应的人物关系类别。请使用 ${'`'}record_person${'`'} 工具记录时，${'`'}category${'`'} 参数使用右侧标注的类别。
+${映射文本}`);
+    }
+  } catch (e) {
+    console.log('[系统提示词] 关系映射注入跳过:', e.message);
+  }
+
   // 2.6 AI使用说明书（用户累积的偏好、习惯、纠错记录）
   // 这个备忘录在用户每次表达偏好/纠错时自动追加，让 AI 跨会话记住用户习惯
   try {
@@ -1036,7 +1063,7 @@ async function 获取记忆管理规则() {
   return `
 ## 你的能力与记忆管理系统
 
-你是 ${window.获取当前智能体名称?.() || 'AI助手'}，可以管理用户的备忘录知识库。
+你是 ${window.当前智能体名?.() || 'AI助手'}，可以管理用户的备忘录知识库。
 
 ### 核心工具组
 - **写入类工具**：${'`'}note${'`'}（新笔记）、${'`'}update_note${'`'}（更新）、${'`'}append_to_note${'`'}（追加）、${'`'}remember${'`'}（记住）、${'`'}create_memo${'`'}（创建备忘录）、${'`'}organize_to_knowledge${'`'}（整理到知识库）
@@ -1290,7 +1317,39 @@ async function 加载对话历史(会话ID) {
   }
 }
 
+// ========== DOM 裁剪（防止长会话卡顿）==========
+const 最大渲染消息数 = 60;
+
+/**
+ * 裁剪消息容器，保留最近 N 条消息，在顶部插入折叠提示
+ */
+function 裁剪消息容器() {
+  const 容器 = document.getElementById('消息列表');
+  if (!容器) return;
+  const 超出 = 容器.children.length - 最大渲染消息数;
+  if (超出 <= 0) return;
+
+  for (let i = 0; i < 超出; i++) {
+    if (容器.children[0]) 容器.removeChild(容器.children[0]);
+  }
+
+  let 提示条 = 容器.querySelector('.folded-notice');
+  if (!提示条) {
+    提示条 = document.createElement('div');
+    提示条.className = 'folded-notice';
+    提示条.style.cssText = 'text-align:center; padding:14px 12px; color:#888; font-size:13px; cursor:default; width:100%;';
+    容器.prepend(提示条);
+  }
+  提示条.textContent = `⋯ 以上还有 ${超出} 条消息已折叠 · 需要搜索历史可以问我`;
+}
+
 // ========== UI 辅助函数 ==========
+
+function 转义HTML(文本) {
+  const div = document.createElement('div');
+  div.textContent = 文本;
+  return div.innerHTML;
+}
 
 function 添加消息到界面(角色, 内容, 思考 = '') {
   const 列表 = document.getElementById('消息列表');
@@ -1308,8 +1367,8 @@ function 添加消息到界面(角色, 内容, 思考 = '') {
           <span>思考过程</span>
           <span class="思考展开标记">▶</span>
         </div>
-        <div class="思考预览">${思考预览.replace(/\n/g, '<br>')}</div>
-        <div class="思考全文">${思考.replace(/\n/g, '<br>')}</div>
+        <div class="思考预览">${转义HTML(思考预览).replace(/\n/g, '<br>')}</div>
+        <div class="思考全文">${转义HTML(思考).replace(/\n/g, '<br>')}</div>
       </div>`;
   }
 
@@ -1320,7 +1379,7 @@ function 添加消息到界面(角色, 内容, 思考 = '') {
   元素.dataset.role = 角色键;
   元素.dataset.index = 序号;
 
-  元素.innerHTML = `<div class="消息内容">${内容.replace(/\n/g, '<br>')}</div><div class="消息时间">${new Date().toLocaleTimeString()}</div>`;
+  元素.innerHTML = `<div class="消息内容">${转义HTML(内容).replace(/\n/g, '<br>')}</div><div class="消息时间">${new Date().toLocaleTimeString()}</div>`;
 
   // 记忆引用标记（仅助理消息，且本次有注入记忆）
   if (角色 !== '用户') {
@@ -1328,7 +1387,7 @@ function 添加消息到界面(角色, 内容, 思考 = '') {
   }
   if (角色 !== '用户' && window._本次注入记忆 && window._本次注入记忆.length > 0) {
     const 引用项 = window._本次注入记忆.slice(0, 2).map(m =>
-      `<span class="记忆引用标签">💡 ${m.内容.length > 10 ? m.内容.slice(0, 10) + '…' : m.内容}</span>`
+      `<span class="记忆引用标签">💡 ${转义HTML(m.内容.length > 10 ? m.内容.slice(0, 10) + '…' : m.内容)}</span>`
     ).join(' ');
     const 标签 = document.createElement('div');
     标签.className = '记忆引用栏';
@@ -1344,6 +1403,7 @@ function 添加消息到界面(角色, 内容, 思考 = '') {
 
   列表.appendChild(元素);
   列表.scrollTop = 列表.scrollHeight;
+  裁剪消息容器();
 }
 
 let 当前加载元素 = null;
@@ -1453,7 +1513,7 @@ function 更新回复区域(元素, 累积内容, 累积思考) {
   // 更新回复内容
   const 回复区 = 元素.querySelector('.流式回复内容');
   if (回复区) {
-    回复区.innerHTML = 累积内容.replace(/\n/g, '<br>');
+    回复区.innerHTML = 转义HTML(累积内容).replace(/\n/g, '<br>');
   }
   const 列表 = document.getElementById('消息列表');
   if (列表) 列表.scrollTop = 列表.scrollHeight;
@@ -1470,12 +1530,12 @@ function 最终化回复气泡(元素, 最终内容, 思考内容) {
   }
   // 确保最终内容完整
   const 回复区 = 元素.querySelector('.流式回复内容');
-  if (回复区) 回复区.innerHTML = 最终内容.replace(/\n/g, '<br>');
+  if (回复区) 回复区.innerHTML = 转义HTML(最终内容).replace(/\n/g, '<br>');
 
   // 流式模式的记忆引用栏（非流式走添加消息到界面，流式在此补）
   if (window._本次注入记忆 && window._本次注入记忆.length > 0) {
     const 引用项 = window._本次注入记忆.slice(0, 2).map(m =>
-      `<span class="记忆引用标签">💡 ${m.内容.length > 10 ? m.内容.slice(0, 10) + '…' : m.内容}</span>`
+      `<span class="记忆引用标签">💡 ${转义HTML(m.内容.length > 10 ? m.内容.slice(0, 10) + '…' : m.内容)}</span>`
     ).join(' ');
     const 标签 = document.createElement('div');
     标签.className = '记忆引用栏';
@@ -1531,6 +1591,7 @@ async function 切换会话(新会话ID) {
       m.content
     );
   });
+  裁剪消息容器();
   console.log('[切换会话] 渲染完成');
 }
 
@@ -1680,6 +1741,13 @@ window.显示删除会话确认 = function(会话ID) {
     if (索引 === -1) return;
     会话列表.splice(索引, 1);
     保存会话列表ToStorage(智能体ID, 会话列表);
+    
+    // 清理 IndexedDB 中的对话历史文件和摘要文件
+    try {
+      const 存储 = window.获取存储();
+      存储.删除文件(`agents/${智能体ID}/对话历史/${会话ID}.json`).catch(() => {});
+      存储.删除文件(`agents/${智能体ID}/对话历史/${会话ID}_summaries.json`).catch(() => {});
+    } catch(e) { /* 存储不可用则跳过 */ }
     
     // 如果删除的是当前会话，切到第一个可用会话或新建
     if (会话ID === 当前会话ID) {

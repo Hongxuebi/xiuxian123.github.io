@@ -144,4 +144,41 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.注册自动备份();
     console.log('[初始化] 自动备份已注册');
   }
+
+  // === P1-2: 断网提示条 ===
+  // 创建顶部提示条（默认隐藏）
+  const 网络提示条 = document.createElement('div');
+  网络提示条.id = '网络状态提示条';
+  网络提示条.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#e74c3c;color:#fff;text-align:center;padding:8px 16px;font-size:14px;display:none;';
+  网络提示条.textContent = '网络连接已断开，部分功能不可用';
+  document.body.appendChild(网络提示条);
+
+  function 更新网络状态() {
+    if (navigator.onLine) {
+      网络提示条.style.display = 'none';
+    } else {
+      网络提示条.style.display = 'block';
+    }
+  }
+  window.addEventListener('online', 更新网络状态);
+  window.addEventListener('offline', 更新网络状态);
+  // 初始检测
+  更新网络状态();
+
+  // === P1-3: 首次使用 Key 引导 ===
+  // 检测 API Key 是否为空且对话区无内容，显示引导消息
+  setTimeout(() => {
+    const apiKey = localStorage.getItem('deepseek_api_key') || '';
+    const 对话区 = document.getElementById('对话消息区');
+    const 无对话 = !对话区 || 对话区.children.length === 0;
+    if (!apiKey.trim() && 无对话 && window.添加消息到界面) {
+      window.添加消息到界面('助理', '👋 欢迎使用爱助手！请先点击右上角 ☰ 打开侧栏，进入「设置」配置 API 密钥，然后我就可以为你服务了。');
+    }
+  }, 800);
+
+  // === 联网搜索开关 ===
+  // 开关始终可点击，用户自行决定是否启用
+  // （之前按百度Key有无设disabled，但Key可能存在而JS读取时机不对，导致开关永远灰色）
+  const 开关 = document.getElementById('联网搜索开关');
+  if (开关) 开关.disabled = false;
 });

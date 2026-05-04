@@ -98,8 +98,8 @@
               <div class="更多菜单">
                 <button id="更多按钮" class="次要按钮 简洁按钮">⋯</button>
                 <div class="下拉内容">
-                  <label class="下拉菜单项 禁用菜单项">
-                    <input type="checkbox" id="联网搜索开关" disabled> 联网搜索
+                  <label class="下拉菜单项">
+                    <input type="checkbox" id="联网搜索开关"> 联网搜索
                   </label>
                   <button id="无痕会话按钮">无痕模式</button>
                   <label class="下拉菜单项">
@@ -366,10 +366,7 @@
         <div style="margin-bottom: 1.5rem;">
           <h4 style="margin-bottom: 0.5rem;">主题设置</h4>
           <select id="主题选择" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem;">
-            <option value="默认主题">默认主题</option>
-            <option value="现代简约">现代简约</option>
-            <option value="东方美学">东方美学</option>
-            <option value="活力多彩">活力多彩</option>
+            <!-- 由 设置浮层.js 刷新主题选择器() 动态填充 -->
           </select>
         </div>
         <div style="margin-bottom: 1rem;">
@@ -387,6 +384,14 @@
             <button id="保存关系映射按钮" class="次要按钮 简洁按钮" style="border-color: #6366f1; color: #6366f1;">保存映射</button>
             <span id="关系映射状态" style="font-size: 0.8rem; color: #6c757d;"></span>
           </div>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="margin-bottom: 0.5rem;">输出模式</h4>
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem;">
+            <input type="checkbox" id="流式输出开关">
+            <span>流式输出</span>
+            <span style="font-size: 0.75rem; color: #999; margin-left: 0.25rem;">（实时显示回复，关闭后支持函数调用）</span>
+          </label>
         </div>
       </div>
     </div>
