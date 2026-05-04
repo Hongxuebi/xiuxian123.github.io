@@ -70,7 +70,10 @@ class IndexedDB存储适配器 extends 存储适配器基类 {
       const 存储 = 事务.objectStore(this.存储名);
       回调(存储, 事务);
       事务.oncomplete = () => 成功();
-      事务.onerror = () => 失败(事务.error);
+      事务.onerror = (事件) => {
+        const 错误 = 事务.error || 事件.target?.error || new Error('IndexedDB 事务失败');
+        失败(错误);
+      };
     });
   }
 
@@ -101,7 +104,18 @@ class IndexedDB存储适配器 extends 存储适配器基类 {
 
   async 写文件(路径, 内容) {
     const 记录 = { 路径, 内容, 类型: 'file', 修改时间: Date.now() };
-    await this._执行读写事务((存储) => { 存储.put(记录); });
+    try {
+      await this._执行读写事务((存储) => { 存储.put(记录); });
+    } catch (错误) {
+      // QuotaExceededError：IndexedDB 存储空间满
+      if (错误.name === 'QuotaExceededError' || 错误.code === 22) {
+        console.error('[存储] IndexedDB 写入失败：存储空间不足', 路径);
+        const 事件 = new CustomEvent('存储错误', { detail: { type: 'quota', path: 路径, message: '存储空间不足，请清理旧会话或备份后删除不用的数据' } });
+        window.dispatchEvent(事件);
+      } else {
+        throw 错误; // 非配额错误继续抛
+      }
+    }
   }
 
   async 追加文件(路径, 内容) {

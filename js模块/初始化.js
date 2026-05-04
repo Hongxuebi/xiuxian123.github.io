@@ -117,6 +117,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 注册存储错误监听（IndexedDB 配额不足提示）
+  window.addEventListener('存储错误', (e) => {
+    const { message } = e.detail || {};
+    if (message && window.添加消息到界面) {
+      window.添加消息到界面?.('助理', `⚠️ ${message}\n\n建议：导出备份旧会话后，在设置中删除不必要的会话以释放空间。`);
+    }
+  });
+
   console.log('主入口初始化完成');
 
   // 注册周报定时器（每周日 22:00 自动生成周报）

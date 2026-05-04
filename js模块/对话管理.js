@@ -190,7 +190,11 @@ ${历史文本}
 
     const 压缩前消息数 = 当前对话历史.length;
     // 替换内存中的对话历史为摘要
-    当前对话历史 = [{ role: 'user', content: '[对话摘要]' }, { role: 'assistant', content: 摘要内容 }];
+    const _compTs = new Date().toISOString();
+    当前对话历史 = [
+      { id: crypto.randomUUID(), role: 'user', content: '[对话摘要]', timestamp: _compTs },
+      { id: crypto.randomUUID(), role: 'assistant', content: 摘要内容, timestamp: _compTs }
+    ];
 
     // 更新对话文件的 messages（在原始文件末尾追加摘要标记）
     if (存储) {
@@ -206,8 +210,8 @@ ${历史文本}
             isCompressionMarker: true
           });
           数据.messages.push(
-            { role: 'user', content: '[对话摘要]', timestamp: new Date().toISOString() },
-            { role: 'assistant', content: 摘要内容, timestamp: new Date().toISOString() }
+            { id: crypto.randomUUID(), role: 'user', content: '[对话摘要]', timestamp: new Date().toISOString() },
+            { id: crypto.randomUUID(), role: 'assistant', content: 摘要内容, timestamp: new Date().toISOString() }
           );
           await 存储.写文件(文件路径, JSON.stringify(数据, null, 2));
         }
@@ -342,6 +346,8 @@ async function 对话后处理(用户输入, AI回复) {
 let _待整理会话缓存 = null; // { sessionId, memoId, 条数 }
 let _对话计数器 = 0; // 自动提取记忆计数器，每5次触发一次
 let _本轮已写入备忘录 = false;
+// 会话概览缓存（惰性刷新，避免每次发送消息都重新构造）
+let _会话概览缓存 = null; // { 文本, 时间戳 }
 
 async function 写入待整理(用户输入, AI回复) {
   const manager = window.备忘录管理器;
@@ -938,6 +944,38 @@ ${相关记忆.slice(0, 3).map((m, i) => `- ${m.内容}`).join('\n')}`);
     console.log('[系统提示词] 记忆检索注入跳过:', e.message);
   }
 
+  // 2.55 其他会话概览（跨会话感知：静态层 - 标题+首条摘要+时间衰减）
+  // 使用惰性缓存：会话列表变更后由保存/切换会话时刷新缓存
+  try {
+    const 当前AgentID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+    const 会话列表 = 所有会话列表[当前AgentID] || [];
+    // 缓存命中考量：5 秒内且当前AgentID一致
+    const 缓存有效 = _会话概览缓存 && _会话概览缓存.agentID === 当前AgentID &&
+      _会话概览缓存.sessionCount === 会话列表.length &&
+      (Date.now() - _会话概览缓存.timestamp) < 5000;
+    if (!缓存有效) {
+      // 排除当前会话，取有摘要的会话，按时间倒序
+      const 其他会话 = 会话列表
+        .filter(s => s.id !== 当前会话ID && s.首条摘要)
+        .sort((a, b) => (b.最后活跃时间 || 0) - (a.最后活跃时间 || 0));
+      let 概览文本 = '';
+      if (其他会话.length > 0) {
+        概览文本 = 其他会话.slice(0, 10).map(s => {
+          const 天数差 = Math.floor((Date.now() - (s.最后活跃时间 || 0)) / 86400000);
+          const 时效标注 = 天数差 === 0 ? '今天' : 天数差 === 1 ? '昨天' : 天数差 < 7 ? `${天数差}天前` : `${Math.floor(天数差 / 7)}周前`;
+          const 显示名 = (s.名称 || '').trim() || '未命名会话';
+          return `- [${时效标注}] ${显示名}：${s.首条摘要}`;
+        }).join('\n');
+      }
+      _会话概览缓存 = { text: 概览文本, agentID: 当前AgentID, sessionCount: 会话列表.length, timestamp: Date.now() };
+    }
+    if (_会话概览缓存.text) {
+      部分.push(`## 其他会话概览（你可能需要参考的跨会话上下文）\n以下是用户与你的其他对话摘要，当用户提到“之前说过”“上次聊过”时可能需要参考：\n${_会话概览缓存.text}`);
+    }
+  } catch (e) {
+    console.log('[系统提示词] 会话概览注入跳过:', e.message);
+  }
+
   // 2.6 AI使用说明书（用户累积的偏好、习惯、纠错记录）
   // 这个备忘录在用户每次表达偏好/纠错时自动追加，让 AI 跨会话记住用户习惯
   try {
@@ -1175,9 +1213,10 @@ window.显示压缩对话框 = async function() {
 window.保存对话历史 = 保存对话历史;
 
 function 追加对话历史(用户输入, AI回复) {
+  const _ts = new Date().toISOString();
   当前对话历史.push(
-    { role: 'user', content: 用户输入 },
-    { role: 'assistant', content: AI回复 }
+    { id: crypto.randomUUID(), role: 'user', content: 用户输入, timestamp: _ts },
+    { id: crypto.randomUUID(), role: 'assistant', content: AI回复, timestamp: _ts }
   );
   if (当前对话历史.length > 最大历史条数) {
     当前对话历史 = 当前对话历史.slice(-最大历史条数);
@@ -1201,9 +1240,10 @@ async function 保存对话历史(会话ID, 用户输入, AI回复) {
     数据.updatedAt = new Date().toISOString();
 
     if (用户输入 !== null && AI回复 !== undefined) {
+      const _ts = new Date().toISOString();
       数据.messages.push(
-        { role: 'user', content: 用户输入, timestamp: new Date().toISOString() },
-        { role: 'assistant', content: AI回复, timestamp: new Date().toISOString() }
+        { id: crypto.randomUUID(), role: 'user', content: 用户输入, timestamp: _ts },
+        { id: crypto.randomUUID(), role: 'assistant', content: AI回复, timestamp: _ts }
       );
     }
     await 存储.写文件(文件路径, JSON.stringify(数据, null, 2));
@@ -1222,10 +1262,25 @@ async function 加载对话历史(会话ID) {
     const 文件路径 = `agents/${智能体ID}/对话历史/${会话ID}.json`;
     if (await 存储.文件存在(文件路径)) {
       const 数据 = JSON.parse(await 存储.读文件(文件路径));
+      // 检查是否有消息缺 ID（在过滤前检查，覆盖所有角色）
+      const 需要补ID = (数据.messages || []).some(m => !m.id);
+      // 先统一补 ID 并写回（一次 I/O，避免重复读文件）
+      if (需要补ID && 数据.messages) {
+        数据.messages = 数据.messages.map(m => ({
+          ...m,
+          id: m.id || crypto.randomUUID()
+        }));
+        存储.写文件(文件路径, JSON.stringify(数据, null, 2)).catch(() => {});
+      }
       // 过滤掉压缩标记（isCompressionMarker），只保留 user/assistant 消息
       const 原始消息 = (数据.messages || [])
         .filter(m => m.role !== 'system')
-        .map(m => ({ role: m.role, content: m.content }));
+        .map(m => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          ...(m.timestamp ? { timestamp: m.timestamp } : {})
+        }));
       当前对话历史 = 原始消息.slice(-最大历史条数);
       console.log(`[对话历史] 已加载 ${当前对话历史.length} 条历史消息`);
     }
@@ -1416,6 +1471,22 @@ function 最终化回复气泡(元素, 最终内容, 思考内容) {
   // 确保最终内容完整
   const 回复区 = 元素.querySelector('.流式回复内容');
   if (回复区) 回复区.innerHTML = 最终内容.replace(/\n/g, '<br>');
+
+  // 流式模式的记忆引用栏（非流式走添加消息到界面，流式在此补）
+  if (window._本次注入记忆 && window._本次注入记忆.length > 0) {
+    const 引用项 = window._本次注入记忆.slice(0, 2).map(m =>
+      `<span class="记忆引用标签">💡 ${m.内容.length > 10 ? m.内容.slice(0, 10) + '…' : m.内容}</span>`
+    ).join(' ');
+    const 标签 = document.createElement('div');
+    标签.className = '记忆引用栏';
+    if (window._本次注入记忆.length > 2) {
+      标签.innerHTML = `${引用项} <span class="记忆引用更多">+${window._本次注入记忆.length - 2}</span>`;
+    } else {
+      标签.innerHTML = 引用项;
+    }
+    元素.appendChild(标签);
+    window._本次注入记忆 = null;
+  }
 }
 
 // ========== 会话管理 ==========
