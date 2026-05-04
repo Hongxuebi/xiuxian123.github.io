@@ -8,7 +8,13 @@ window.切换无痕模式 = function() {
     const 当前 = window.无痕模式激活 || false;
     window.无痕模式激活 = !当前;
     标记.style.display = window.无痕模式激活 ? 'inline-block' : 'none';
-    alert(window.无痕模式激活 ? '已开启无痕模式，对话不会保存' : '已关闭无痕模式');
+    if (window.无痕模式激活) {
+      标记.textContent = '无痕模式 · 切换会话后不保留记录';
+      alert('已开启无痕模式\n\n⚠️ 切换会话后，当前对话内容不会被保留。\nAI 仍可能从备忘录中记住你的信息。');
+    } else {
+      标记.textContent = '无痕模式';
+      alert('已关闭无痕模式，对话将正常保存');
+    }
   }
 };
 

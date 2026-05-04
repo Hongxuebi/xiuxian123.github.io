@@ -7,7 +7,8 @@
 let 当前会话ID = 'default';
 // 按智能体ID隔离的会话列表（持久化到 localStorage）
 let 所有会话列表 = {};  // { [agentId]: [{ id, 名称, 最后活跃时间, parent_session_id, 首条摘要 }] }
-let 无痕模式 = false;
+// 无痕模式：读取 window.无痕模式激活（由 全局函数.js 设置）
+const 获取无痕状态 = () => !!window.无痕模式激活;
 
 // ========== 会话列表持久化 ==========
 function 加载会话列表FromStorage(agentId) {
@@ -655,8 +656,13 @@ window.检测并记录人物关系显式 = 检测并记录人物关系显式;
  * 消息列表结构：[system(完整提示词), ...history, user(本次输入)]
  * 所有关于"该不该查记忆"、"该记什么"的问题，由 AI 自主判断。
  */
+let _发送中 = false; // 防重复提交锁
+
 async function 发送消息(用户输入) {
   if (!用户输入.trim()) return;
+  // 防重复提交：检查并立即置位
+  if (_发送中) { console.warn('[发送消息] 上一轮尚未完成，忽略重复请求'); return; }
+  _发送中 = true;
 
   // 自动创建会话（兜底：如果还没有会话，但走到发送消息说明应该新建了）
   const 当前AgentID = window.当前智能体ID ? window.当前智能体ID() : 'default';
@@ -807,7 +813,7 @@ async function 发送消息(用户输入) {
     追加对话历史(完整用户输入, AI回复);
 
     // 持久化
-    if (!无痕模式) {
+    if (!获取无痕状态()) {
       await 保存对话历史(当前会话ID, 用户输入, AI回复);
       // 每次发消息后更新最近会话ID，确保刷新后恢复到最后活跃的会话
       try {
@@ -862,6 +868,8 @@ async function 发送消息(用户输入) {
       window._错误通知时间[错误键] = Date.now();
     }
     console.error('消息发送失败', 错误);
+  } finally {
+    _发送中 = false; // 无论成功失败都清锁
   }
 }
 
@@ -1255,7 +1263,7 @@ function 清空对话历史() {
 }
 
 async function 保存对话历史(会话ID, 用户输入, AI回复) {
-  if (无痕模式) return;
+  if (获取无痕状态()) return;
   try {
     const 存储 = window.获取存储();
     const 智能体ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
@@ -1501,7 +1509,7 @@ function 更新回复区域(元素, 累积内容, 累积思考) {
     区域.classList.add('思考完成');
     if (元素._思考动画) clearInterval(元素._思考动画);
     // 替换为折叠态
-    const 思考HTML = 累积思考.replace(/\n/g, '<br>');
+    const 思考HTML = 转义HTML(累积思考).replace(/\n/g, '<br>');
     区域.innerHTML = `
       <div class="思考标题" onclick="this.parentElement.classList.toggle('思考展开');this.querySelector('.思考展开标记').classList.toggle('展开');this.querySelector('.思考全文').classList.toggle('展开');">
         <span class="思考图标">🧠</span>

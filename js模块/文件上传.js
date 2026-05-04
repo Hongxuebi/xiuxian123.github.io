@@ -23,6 +23,14 @@ window.绑定文件上传事件 = function() {
       return;
     }
     
+    // 文件大小硬限制：5MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (文件.size > MAX_FILE_SIZE) {
+      alert(`文件过大（${(文件.size / 1024 / 1024).toFixed(1)}MB），上限5MB。大文件会消耗大量API费用且影响回复质量。`);
+      文件选择器.value = '';
+      return;
+    }
+    
     try {
       let 内容;
       if (扩展名 === '.docx') {
