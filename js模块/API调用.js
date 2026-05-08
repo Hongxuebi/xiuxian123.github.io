@@ -1345,6 +1345,9 @@ async function 执行百度搜索(查询词) {
       const 搜索摘要 = 数据.references.map((条目, i) => 
         `[${i + 1}] ${条目.title || ''}\n${条目.abstract || 条目.content || 条目.snippet || ''}\n来源: ${条目.url || 条目.link || ''}`
       ).join('\n\n');
+      // 联网搜索计数
+      const 联网计数 = parseInt(localStorage.getItem('_联网搜索计数') || '0');
+      localStorage.setItem('_联网搜索计数', 联网计数 + 1);
       console.log('百度搜索成功，获取到', 数据.references.length, '条结果');
       return `【联网搜索结果 — 真实数据 — 必须基于此回答】
 

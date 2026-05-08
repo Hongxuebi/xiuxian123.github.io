@@ -174,6 +174,10 @@ function 切换主题(主题名称) {
   root.style.setProperty('--助理消息背景', 配置.助理消息背景);
   root.style.setProperty('--助理消息文字', 配置.助理消息文字);
   
+  // 主题切换计数
+  const 主题计数 = parseInt(localStorage.getItem('_主题切换计数') || '0');
+  localStorage.setItem('_主题切换计数', 主题计数 + 1);
+  
   保存设置();
 }
 

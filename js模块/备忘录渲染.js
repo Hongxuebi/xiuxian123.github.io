@@ -989,6 +989,10 @@ function 打开编辑页面(id) {
     console.error('[打开编辑页面] 找不到备忘录:', id);
     return;
   }
+  // 备忘录打开计数
+  const 备忘录计数 = parseInt(localStorage.getItem('_备忘录打开计数') || '0');
+  localStorage.setItem('_备忘录打开计数', 备忘录计数 + 1);
+  
   document.getElementById('编辑标题').value = 备忘录.标题;
   document.getElementById('编辑内容').innerHTML = 备忘录.内容 || '';
 
