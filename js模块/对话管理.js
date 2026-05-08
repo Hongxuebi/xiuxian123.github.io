@@ -108,15 +108,22 @@ function 显示压缩对话框() {
       <div class="压缩对话框描述">当前上下文已使用 ${百分比}%（${已用} / ${总量} tokens）</div>
       <div class="压缩对话框说明">AI 将总结之前的对话内容，生成一条摘要替换原始历史。压缩后从此处重新计数，但摘要会保存下来。</div>
       <div class="压缩对话框按钮组">
-        <button class="压缩对话框按钮 取消" onclick="document.getElementById('压缩确认对话框').remove()">取消</button>
+        <button class="压缩对话框按钮 取消" id="压缩取消按钮">取消</button>
         <button class="压缩对话框按钮 确认" id="确认压缩按钮">压缩</button>
       </div>
     </div>
   `;
   document.body.appendChild(遮罩);
+  if (window._锁定滚动) window._锁定滚动();
+
+  document.getElementById('压缩取消按钮').addEventListener('click', () => {
+    遮罩.remove();
+    if (window._解锁滚动) window._解锁滚动();
+  });
 
   document.getElementById('确认压缩按钮').addEventListener('click', async () => {
     遮罩.remove();
+    if (window._解锁滚动) window._解锁滚动();
     await 执行上下文压缩();
   });
 }
@@ -899,7 +906,26 @@ async function 获取系统提示词(用户输入 = '') {
     }
   } catch (e) { /* 忽略 */ }
 
-  // 2.2 系统运行状态注入：让 AI 感知界面配置、用户操作记录
+  // 2.15 最高意志设定注入：从 agent.json.plugin 读取核心设定，优先级高于 system.md
+  try {
+    const 智能体配置 = window.获取当前智能体配置?.();
+    const 插件 = 智能体配置?.plugin;
+    if (插件) {
+      const 设定部分 = [];
+      if (插件.core_identity) 设定部分.push(`## 核心身份\n${插件.core_identity}`);
+      if (插件.tone_requirement) 设定部分.push(`## 语气要求\n${插件.tone_requirement}`);
+      if (插件.output_rules?.length) 设定部分.push(`## 输出规则\n- ${插件.output_rules.join('\n- ')}`);
+      if (插件.taboo_rules?.length) 设定部分.push(`## 禁忌规则\n- ${插件.taboo_rules.join('\n- ')}`);
+      if (设定部分.length > 0) {
+        const 标记 = (typeof window._设定刚更新 !== 'undefined' && window._设定刚更新 === true)
+          ? '（⚠️ 用户刚刚修改了你的设定，以下是最新的最高意志，覆盖一切旧信息）\n\n'
+          : '';
+        部分.push(`## 用户为你设定的核心规则（最高意志，优先级高于一切）\n${标记}${设定部分.join('\n\n')}`);
+      }
+    }
+  } catch (e) { /* 无配置则跳过 */ }
+
+  // 2.2 系统运行状态注入：让 AI 感知界面配置和使用统计
   try {
     const 状态 = [];
     
@@ -909,25 +935,33 @@ async function 获取系统提示词(用户输入 = '') {
     const 百度Key = (window.全局设置 && window.全局设置.百度搜索密钥) || 
                     localStorage.getItem('百度搜索密钥') || '';
     if (联网已开 && 百度Key) {
-      状态.push('✅ 联网搜索已开启，百度 API Key 已配置（可用）');
+      状态.push('联网搜索：已开启，百度 API Key 已配置（可用）');
     } else if (联网已开 && !百度Key) {
-      状态.push('⚠️ 联网搜索开关已打开，但未配置百度 API Key（不可用）');
+      状态.push('联网搜索：开关已打开，但百度 API Key 未配置（不可用）');
     } else if (!联网已开 && 百度Key) {
-      状态.push('⚠️ 已配置百度 API Key，但联网搜索开关未打开（不可用）');
+      状态.push('联网搜索：已配置百度 API Key，但开关未打开（不可用）');
     } else {
-      状态.push('❌ 联网搜索未开启（需在设置中打开开关并配置百度 API Key）');
+      状态.push('联网搜索：未开启');
     }
     
-    // 当前主题
+    // 使用统计（从 localStorage 读取计数）
+    const 联网搜索次数 = parseInt(localStorage.getItem('_联网搜索计数') || '0');
+    const 备忘录打开次数 = parseInt(localStorage.getItem('_备忘录打开计数') || '0');
+    const 主题切换次数 = parseInt(localStorage.getItem('_主题切换计数') || '0');
+    const 对话次数 = window.AI记忆管理器?.用户画像?.交互历史?.对话次数 || 0;
+    if (对话次数 > 0) 状态.push(`对话总次数：${对话次数} 次`);
+    if (联网搜索次数 > 0) 状态.push(`联网搜索已使用：${联网搜索次数} 次`);
+    if (备忘录打开次数 > 0) 状态.push(`备忘录浏览次数：${备忘录打开次数} 次`);
+    if (主题切换次数 > 0) 状态.push(`主题切换次数：${主题切换次数} 次`);
+    
+    // 当前界面状态
     const 当前主题 = (window.全局设置 && window.全局设置.当前主题) || '默认主题';
-    状态.push(`🎨 当前主题：${当前主题}`);
-    
-    // 当前对话信息
+    状态.push(`当前主题：${当前主题}`);
     const 当前会话名称 = (window.当前会话 && window.当前会话.名称) || '未命名会话';
-    状态.push(`💬 当前会话：${当前会话名称}`);
+    状态.push(`当前会话：${当前会话名称}`);
     
-    部分.push(`## 系统运行状态（当前配置）
-以下是当前应用的状态信息，你的感知基于此：
+    部分.push(`## 当前状态
+（仅供感知，无需提及）
 ${状态.join('\n')}`);
   } catch (e) {
     console.log('[系统提示词] 系统状态注入跳过:', e.message);
@@ -1783,8 +1817,11 @@ window.显示删除会话确认 = function(会话ID) {
     </div>
   `;
   document.body.appendChild(遮罩);
+  if (window._锁定滚动) window._锁定滚动();
   
-  遮罩.querySelector('.确认卡片-取消').addEventListener('click', () => 遮罩.remove());
+  function 移除遮罩() { 遮罩.remove(); if (window._解锁滚动) window._解锁滚动(); }
+  
+  遮罩.querySelector('.确认卡片-取消').addEventListener('click', 移除遮罩);
   遮罩.querySelector('.确认卡片-确认').addEventListener('click', () => {
     const 智能体ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
     const 会话列表 = 所有会话列表[智能体ID] || [];
@@ -1812,11 +1849,11 @@ window.显示删除会话确认 = function(会话ID) {
       渲染会话列表();
     }
     
-    遮罩.remove();
+    移除遮罩();
   });
   
   遮罩.addEventListener('click', (e) => {
-    if (e.target === 遮罩) 遮罩.remove();
+    if (e.target === 遮罩) 移除遮罩();
   });
 };
 
@@ -1899,6 +1936,51 @@ if (存储的会话列表 && 存储的会话列表.length > 0) {
 渲染会话列表();
 
 window.切换会话 = 切换会话;
+
+// ========== AI 工具用的会话管理函数 ==========
+
+window.重命名会话 = async function(会话ID, 新名称) {
+  const 智能体ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+  const 列表 = 所有会话列表[智能体ID] || [];
+  const 会话 = 列表.find(s => s.id === 会话ID);
+  if (!会话) return false;
+  if (!新名称 || !新名称.trim()) return false;
+  会话.名称 = 新名称.trim().slice(0, 30);
+  会话.最后活跃时间 = Date.now();
+  保存会话列表ToStorage(智能体ID, 列表);
+  渲染会话列表();
+  const 名称元素 = document.getElementById('当前会话名称');
+  if (名称元素 && 会话ID === 当前会话ID) {
+    名称元素.innerText = 会话.名称;
+  }
+  return true;
+};
+
+window.删除会话 = async function(会话ID) {
+  const 智能体ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+  const 列表 = 所有会话列表[智能体ID] || [];
+  const 索引 = 列表.findIndex(s => s.id === 会话ID);
+  if (索引 === -1) return false;
+  列表.splice(索引, 1);
+  保存会话列表ToStorage(智能体ID, 列表);
+  // 清理 IndexedDB 中的对话历史文件
+  try {
+    const 存储 = window.获取存储();
+    存储.删除文件(`agents/${智能体ID}/对话历史/${会话ID}.json`).catch(() => {});
+    存储.删除文件(`agents/${智能体ID}/对话历史/${会话ID}_summaries.json`).catch(() => {});
+  } catch(e) { /* 忽略 */ }
+  // 如果删除的是当前会话，切到第一个可用或新建
+  if (会话ID === 当前会话ID) {
+    if (列表.length > 0) {
+      setTimeout(() => 切换会话(列表[0].id), 0);
+    } else {
+      window.新建会话?.();
+    }
+  } else {
+    渲染会话列表();
+  }
+  return true;
+};
 
 window.加载智能体会话列表 = (智能体ID) => {
   const 存储的 = 加载会话列表FromStorage(智能体ID);

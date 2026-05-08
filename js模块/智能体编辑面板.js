@@ -721,6 +721,10 @@ async function 保存配置(智能体ID, 新配置) {
 
   if (window.加载智能体) await window.加载智能体(智能体ID);
 
+  // ★ 标记设定已更新，下一次获取系统提示词时会注入最高意志提醒
+  window._设定刚更新 = true;
+  setTimeout(() => { window._设定刚更新 = false; }, 10000);
+
   // 更新智能体选择器按钮显示
   if (新配置.name) {
     const 按钮 = document.getElementById('智能体选择按钮');
