@@ -1,7 +1,10 @@
 // 智能体选择器.js - 智能体选择UI + 添加新智能体
 window.创建智能体选择器UI = async function() {
-  const 左侧区 = document.querySelector('.左侧区');
-  if (!左侧区) return;
+  const 对话面板 = document.querySelector('#对话面板 .对话布局');
+  if (!对话面板) {
+    console.warn('对话面板未找到，智能体选择器挂载失败');
+    return;
+  }
 
   if (!window.获取智能体列表) {
     console.warn('获取智能体列表函数未定义，稍后重试');
@@ -40,7 +43,9 @@ window.创建智能体选择器UI = async function() {
 
   选择器容器.appendChild(选择按钮);
   选择器容器.appendChild(下拉菜单);
-  左侧区.appendChild(选择器容器);
+  对话面板.insertBefore(选择器容器, 对话面板.firstChild);
+  // 给选择器容器添加合适的外边距
+  选择器容器.style.cssText = 'padding: 8px 12px 4px;';
 
   function 渲染下拉菜单(列表, 当前选ID) {
     下拉菜单.innerHTML = '';
