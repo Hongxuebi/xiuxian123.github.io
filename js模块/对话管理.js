@@ -899,6 +899,40 @@ async function 获取系统提示词(用户输入 = '') {
     }
   } catch (e) { /* 忽略 */ }
 
+  // 2.2 系统运行状态注入：让 AI 感知界面配置、用户操作记录
+  try {
+    const 状态 = [];
+    
+    // 联网搜索状态
+    const 联网开关 = document.getElementById('联网搜索开关');
+    const 联网已开 = 联网开关 && 联网开关.checked;
+    const 百度Key = (window.全局设置 && window.全局设置.百度搜索密钥) || 
+                    localStorage.getItem('百度搜索密钥') || '';
+    if (联网已开 && 百度Key) {
+      状态.push('✅ 联网搜索已开启，百度 API Key 已配置（可用）');
+    } else if (联网已开 && !百度Key) {
+      状态.push('⚠️ 联网搜索开关已打开，但未配置百度 API Key（不可用）');
+    } else if (!联网已开 && 百度Key) {
+      状态.push('⚠️ 已配置百度 API Key，但联网搜索开关未打开（不可用）');
+    } else {
+      状态.push('❌ 联网搜索未开启（需在设置中打开开关并配置百度 API Key）');
+    }
+    
+    // 当前主题
+    const 当前主题 = (window.全局设置 && window.全局设置.当前主题) || '默认主题';
+    状态.push(`🎨 当前主题：${当前主题}`);
+    
+    // 当前对话信息
+    const 当前会话名称 = (window.当前会话 && window.当前会话.名称) || '未命名会话';
+    状态.push(`💬 当前会话：${当前会话名称}`);
+    
+    部分.push(`## 系统运行状态（当前配置）
+以下是当前应用的状态信息，你的感知基于此：
+${状态.join('\n')}`);
+  } catch (e) {
+    console.log('[系统提示词] 系统状态注入跳过:', e.message);
+  }
+
   // 2.15 智能体专属文件夹声明
   try {
     const 当前名字 = window.当前智能体名 ? window.当前智能体名() : '';
