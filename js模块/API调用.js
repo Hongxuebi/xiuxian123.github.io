@@ -47,6 +47,20 @@ const 工具映射 = {
   'remember': '记住',
   'recall_memory': '搜索记忆',
   'get_user_profile': '获取用户画像',
+  'list_agents': '列出智能体',
+  'create_agent': '创建智能体',
+  'switch_agent': '切换智能体',
+  'delete_agent': '删除智能体',
+  'list_conversations': '列出会话',
+  'create_conversation': '创建会话',
+  'switch_conversation': '切换会话',
+  'rename_conversation': '重命名会话',
+  'delete_conversation': '删除会话',
+  'list_conversations': '列出会话',
+  'create_conversation': '创建会话',
+  'switch_conversation': '切换会话',
+  'rename_conversation': '重命名会话',
+  'delete_conversation': '删除会话',
   'update_user_profile': '更新用户画像',
   'get_ai_identity': '获取AI身份',
   'insert_todo': '插入待办事项',
@@ -132,7 +146,9 @@ const _备忘录工具列表 = [
           "标题": { "type": "string", "description": "新的标题，不改则不传" },
           "内容": { "type": "string", "description": "新的内容，支持HTML格式（可用<span style='color:red'>、<b>、<i>、<u>、<s>、<h1>-<h3>、<blockquote>、<table>、<ul>/<ol>、<hr>等标签设置富文本样式），也可用纯文本。不改则不传" },
           "标签": { "type": "array", "items": { "type": "string" }, "description": "新标签数组，不改则不传" },
-          "文件夹": { "type": "string", "description": "新的文件夹名称。必须是现有文件夹（通过 get_folder_tree 获取）。如果用户指定的文件夹不存在，请先调用 create_folder 创建。" }
+          "文件夹": { "type": "string", "description": "新的文件夹名称。必须是现有文件夹（通过 get_folder_tree 获取）。如果用户指定的文件夹不存在，请先调用 create_folder 创建。" },
+          "收藏": { "type": "boolean", "description": "设为 true 收藏该备忘录，设为 false 取消收藏。不传则不修改" },
+          "已置顶": { "type": "boolean", "description": "设为 true 置顶该备忘录，设为 false 取消置顶。不传则不修改" }
         },
         "required": ["备忘录ID"]
       }
@@ -1183,10 +1199,138 @@ const _备忘录工具列表 = [
         "required": ["keyword"]
       }
     }
-  }
-];
-// 合并工具列表
-const 合并后工具列表 = [...预定义工具列表, ..._备忘录工具列表];
+  },
+{
+      "type": "function",
+      "function": {
+        "name": "list_agents",
+        "description": "获取所有可用的智能体列表。当用户问「有哪些智能体」「列出智能体」「我的角色们」时调用。返回智能体名称和ID。",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "create_agent",
+        "description": "创建新智能体。当用户说「创建一个新角色」「帮我创建一个叫XX的智能体」「新建一个助手」时调用。创建成功后建议询问用户是否立即切换。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "名称": { "type": "string", "description": "智能体名称，简短明确" },
+            "图标": { "type": "string", "description": "智能体图标，传入一个 emoji 字符，如「🤖」「📖」「🎨」。不传则默认「🤖」" },
+            "设定": { "type": "string", "description": "智能体的核心身份和行为设定。告诉这个智能体它是什么角色、有什么性格、做什么用的。例如「你是一个旅行规划师，擅长制定行程、推荐景点和美食」" }
+          },
+          "required": ["名称"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "switch_agent",
+        "description": "切换到指定智能体。当用户说「切换到XX」「换个角色」「用XX跟我聊」时调用。先通过 list_agents 获取列表匹配名称或ID。如果名称匹配不到，返回可用列表让用户确认。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "智能体名称": { "type": "string", "description": "要切换到的智能体名称" },
+            "智能体ID": { "type": "string", "description": "智能体ID，如果知道可以直接传。名称和ID至少传一个，都传时以ID为准。" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "delete_agent",
+        "description": "删除指定智能体。当用户说「删除这个角色」「把XX删了」「移除智能体」时调用。不能删除默认智能体。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "智能体ID": { "type": "string", "description": "要删除的智能体ID，先通过 list_agents 获取" }
+          },
+          "required": ["智能体ID"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "list_conversations",
+        "description": "列出当前智能体的所有会话。当用户问「有哪些对话」「有哪些会话」「显示对话列表」时调用。返回会话名称、ID、是否置顶、创建时间。",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "create_conversation",
+        "description": "创建新会话。当用户说「新建对话」「新开一个聊天」「重新开始聊」「创一个新会话」时调用。创建后会自动切换到新会话。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "名称": { "type": "string", "description": "会话名称，可选。不传则自动生成如「新对话」「新对话 2」" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "switch_conversation",
+        "description": "切换到指定会话。当用户说「切换到XX对话」「打开昨天的聊天」「回到刚才那个对话」时调用。先通过 list_conversations 获取列表匹配名称或ID。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "会话名称": { "type": "string", "description": "要切换的会话名称" },
+            "会话ID": { "type": "string", "description": "会话ID，如果知道可以直接传。名称和ID至少传一个，都传时以ID为准。" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "rename_conversation",
+        "description": "重命名会话。当用户说「重命名这个对话」「把这个对话改为XX」「给会话起个名字」时调用。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "会话ID": { "type": "string", "description": "要重命名的会话ID。先通过 list_conversations 获取。如果只传了名称没传ID则默认重命名当前会话。" },
+            "新名称": { "type": "string", "description": "新会话名称" }
+          },
+          "required": ["新名称"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "delete_conversation",
+        "description": "删除指定会话及其所有对话历史。当用户说「删除这个对话」「清除聊天记录」「把这个对话删了」时调用。删除当前会话时会自动切到下一个。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "会话ID": { "type": "string", "description": "要删除的会话ID。先通过 list_conversations 获取。如果只传了名称没传ID则默认删除当前会话。" }
+          },
+          "required": ["会话ID"]
+        }
+      }
+    }
+  ]
+  ;
+  // 合并工具列表
+  const 合并后工具列表 = [...预定义工具列表, ..._备忘录工具列表];
 
 
 
@@ -1760,7 +1904,7 @@ async function 处理工具调用(工具名称, 参数) {
       return `已记住：${内容}`;
     }
   }
-  else if (工具名称 === '搜索备忘录' || 工具名称 === '创建备忘录' || 工具名称 === '更新备忘录' || 工具名称 === '删除备忘录' || 工具名称 === '整理备忘录' || 工具名称 === '批量整理备忘录' || 工具名称 === '获取所有备忘录' || 工具名称 === '获取文件夹树' || 工具名称 === '创建文件夹' || 工具名称 === '重命名文件夹' || 工具名称 === '移动文件夹' || 工具名称 === '删除文件夹' || 工具名称 === '批量选择备忘录' || 工具名称 === '批量操作备忘录' || 工具名称 === '整理到知识库' || 工具名称 === '创建技能' || 工具名称 === '提取技能' || 工具名称 === '压缩记忆' || 工具名称 === '管理智能体' || 工具名称 === '删除待整理' || 工具名称 === '记录人物') {
+  else if (工具名称 === '搜索备忘录' || 工具名称 === '创建备忘录' || 工具名称 === '更新备忘录' || 工具名称 === '删除备忘录' || 工具名称 === '整理备忘录' || 工具名称 === '批量整理备忘录' || 工具名称 === '获取所有备忘录' || 工具名称 === '获取文件夹树' || 工具名称 === '创建文件夹' || 工具名称 === '重命名文件夹' || 工具名称 === '移动文件夹' || 工具名称 === '删除文件夹' || 工具名称 === '批量选择备忘录' || 工具名称 === '批量操作备忘录' || 工具名称 === '整理到知识库' || 工具名称 === '创建技能' || 工具名称 === '提取技能' || 工具名称 === '压缩记忆' || 工具名称 === '管理智能体' || 工具名称 === '删除待整理' || 工具名称 === '记录人物' || 工具名称 === '列出智能体' || 工具名称 === '创建智能体' || 工具名称 === '切换智能体' || 工具名称 === '删除智能体' || 工具名称 === '列出会话' || 工具名称 === '创建会话' || 工具名称 === '切换会话' || 工具名称 === '重命名会话' || 工具名称 === '删除会话' || 工具名称 === '列出会话' || 工具名称 === '创建会话' || 工具名称 === '切换会话' || 工具名称 === '重命名会话' || 工具名称 === '删除会话') {
     return await 处理备忘录工具(工具名称, 参数);
   }
   else if (工具名称 === '查询备忘录' || 工具名称 === '展示备忘录' || 工具名称 === '清除备忘录筛选' || 工具名称 === '读取备忘录正文') {
@@ -1895,8 +2039,190 @@ async function 处理备忘录工具(工具名, 参数) {
     return `已保存到备忘录「${新建.标题}」（#${新建.id}）\n文件夹：${新建.文件夹}\n标签：${新建.标签.join(', ') || '无'}`;
   }
 
+
+  if (工具名 === '列出智能体') {
+    try {
+      const 列表 = await window.获取智能体列表();
+      if (!列表 || 列表.length === 0) return '当前没有可用智能体。请先创建一个。';
+      const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+      const 文本 = 列表.map(a => `${a.icon || '🤖'} ${a.name}（ID: ${a.id}）${a.id === 当前ID ? ' ← 当前' : ''}`).join('\n');
+      return JSON.stringify({ success: true, data: 列表, message: `当前可用智能体（共${列表.length}个）：\n\n${文本}` });
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '获取智能体列表失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '创建智能体') {
+    const { 名称, 图标 = '🤖', 设定 } = 参数;
+    if (!名称 || !名称.trim()) return JSON.stringify({ success: false, error: '缺少智能体名称' });
+    // 检查重名（忽略大小写）
+    try {
+      const 现有列表 = await window.获取智能体列表();
+      if (现有列表.some(a => a.name.toLowerCase() === 名称.trim().toLowerCase())) {
+        return JSON.stringify({ success: false, error: `智能体「${名称}」已存在`, data: { 已有智能体: 现有列表.map(a => a.name) } });
+      }
+    } catch (e) { /* 忽略检查异常 */ }
+    try {
+      const 新智能体 = await window._原始创建新智能体(名称.trim(), 图标);
+      if (!新智能体 || !新智能体.id) return JSON.stringify({ success: false, error: '创建失败，请稍后重试' });
+      // 如果有设定，更新 system.md
+      if (设定 && 设定.trim()) {
+        await window.更新指定智能体(新智能体.id, { type: 'system_prompt', 内容: 设定 });
+      }
+      const 设定提示 = 设定 && 设定.trim() ? '设定已注入。' : '';
+      return JSON.stringify({ success: true, data: { id: 新智能体.id, name: 新智能体.name }, message: `✅ 智能体「${名称}」创建成功。${设定提示}\n\n是否要现在切换到「${名称}」？可以回复「切换到${名称}」来切换。` });
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '创建智能体失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '切换智能体') {
+    const { 智能体名称, 智能体ID } = 参数;
+    let 目标ID = 智能体ID;
+    if (!目标ID) {
+      if (!智能体名称) return JSON.stringify({ success: false, error: '缺少智能体名称或ID' });
+      try {
+        const 列表 = await window.获取智能体列表();
+        // 忽略大小写，精确匹配优先
+        let 匹配 = 列表.find(a => a.id === 智能体名称);
+        if (!匹配) 匹配 = 列表.find(a => a.name === 智能体名称);
+        if (!匹配) 匹配 = 列表.find(a => a.name.toLowerCase() === 智能体名称.toLowerCase());
+        if (!匹配) {
+          return JSON.stringify({ success: false, error: `未找到智能体「${智能体名称}」`, data: { 可用智能体: 列表.map(a => ({ name: a.name, id: a.id })) } });
+        }
+        目标ID = 匹配.id;
+      } catch (e) {
+        return JSON.stringify({ success: false, error: '获取智能体列表失败', detail: e.message || '' });
+      }
+    }
+    const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+    if (目标ID === 当前ID) return JSON.stringify({ success: true, message: '已经是当前智能体。', data: { id: 当前ID, name: (window.当前智能体名 ? window.当前智能体名() : 当前ID) } });
+    try {
+      const 结果 = await window.切换智能体(目标ID);
+      if (结果) {
+        const 名称 = window.当前智能体名 ? window.当前智能体名() : 目标ID;
+        return JSON.stringify({ success: true, message: `✅ 已切换到「${名称}」。现在和我聊天会以新角色的身份回复你。`, data: { id: 目标ID, name: 名称 } });
+      } else {
+        return JSON.stringify({ success: false, error: `切换失败，智能体 ID「${目标ID}」可能不存在` });
+      }
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '切换智能体失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '删除智能体') {
+    const { 智能体ID } = 参数;
+    if (!智能体ID) return JSON.stringify({ success: false, error: '缺少智能体ID。请先通过 list_agents 获取' });
+    if (智能体ID === 'default') return JSON.stringify({ success: false, error: '不能删除默认智能体' });
+    try {
+      const 结果 = await window.删除智能体(智能体ID);
+      if (结果 !== false) {
+        const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+        const 已切回默认 = 当前ID === 'default' ? '（已自动切回默认智能体）' : '';
+        return JSON.stringify({ success: true, message: `✅ 智能体已删除。${已切回默认}` });
+      } else {
+        return JSON.stringify({ success: false, error: '删除失败，智能体可能不存在' });
+      }
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '删除智能体失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '列出会话') {
+    try {
+      const 列表 = window.会话列表 ? window.会话列表() : [];
+      if (!列表 || 列表.length === 0) return JSON.stringify({ success: true, data: [], message: '当前没有会话。可以创建一个。' });
+      const 当前ID = window.当前会话ID ? (typeof window.当前会话ID === 'function' ? window.当前会话ID() : window.当前会话ID) : '';
+      const 文本 = 列表.map(s => `${s.置顶 ? '📌 ' : ''}${s.名称}（ID: ${s.id}）${s.id === 当前ID ? ' ← 当前' : ''}`).join('\n');
+      return JSON.stringify({ success: true, data: 列表, message: `当前会话列表（共${列表.length}个）：\n\n${文本}` });
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '获取会话列表失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '创建会话') {
+    try {
+      window.新建会话();
+      // 新建后把用户传入的名称改掉（可选）
+      const { 名称 } = 参数;
+      const 当前ID = window.当前会话ID ? (typeof window.当前会话ID === 'function' ? window.当前会话ID() : window.当前会话ID) : '';
+      if (名称 && 名称.trim()) {
+        await window.重命名会话(当前ID, 名称.trim());
+      }
+      const 会话名 = 名称 && 名称.trim() ? 名称.trim() : '新对话';
+      return JSON.stringify({ success: true, message: `✅ 已创建新会话「${会话名}」并切换到该会话。`, data: { id: 当前ID, name: 会话名 } });
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '创建会话失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '切换会话') {
+    const { 会话名称, 会话ID } = 参数;
+    let 目标ID = 会话ID;
+    if (!目标ID) {
+      if (!会话名称) return JSON.stringify({ success: false, error: '缺少会话名称或ID' });
+      try {
+        const 列表 = window.会话列表 ? window.会话列表() : [];
+        // 忽略大小写匹配，精确优先
+        let 匹配 = 列表.find(s => s.id === 会话名称);
+        if (!匹配) 匹配 = 列表.find(s => s.名称 === 会话名称);
+        if (!匹配) 匹配 = 列表.find(s => s.名称.toLowerCase() === 会话名称.toLowerCase());
+        if (!匹配) {
+          return JSON.stringify({ success: false, error: `未找到会话「${会话名称}」`, data: { 可用会话: 列表.map(s => ({ name: s.名称, id: s.id })) } });
+        }
+        目标ID = 匹配.id;
+      } catch (e) {
+        return JSON.stringify({ success: false, error: '获取会话列表失败', detail: e.message || '' });
+      }
+    }
+    const 当前ID = window.当前会话ID ? (typeof window.当前会话ID === 'function' ? window.当前会话ID() : window.当前会话ID) : '';
+    if (目标ID === 当前ID) return JSON.stringify({ success: true, message: '已经是当前会话。' });
+    try {
+      await window.切换会话(目标ID);
+      // 获取会话名称
+      const 列表 = window.会话列表 ? window.会话列表() : [];
+      const 会话 = 列表.find(s => s.id === 目标ID);
+      const 名称 = 会话?.名称 || 目标ID;
+      return JSON.stringify({ success: true, message: `✅ 已切换到会话「${名称}」。`, data: { id: 目标ID, name: 名称 } });
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '切换会话失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '重命名会话') {
+    const { 会话ID, 新名称 } = 参数;
+    if (!新名称 || !新名称.trim()) return JSON.stringify({ success: false, error: '缺少新名称' });
+    const 目标ID = 会话ID || 
+      (window.当前会话ID ? (typeof window.当前会话ID === 'function' ? window.当前会话ID() : window.当前会话ID) : '');
+    if (!目标ID) return JSON.stringify({ success: false, error: '缺少会话ID且无法获取当前会话' });
+    try {
+      const 结果 = await window.重命名会话(目标ID, 新名称.trim());
+      if (结果) {
+        return JSON.stringify({ success: true, message: `✅ 已重命名为「${新名称.trim()}」。`, data: { id: 目标ID, name: 新名称.trim() } });
+      } else {
+        return JSON.stringify({ success: false, error: '重命名失败，会话可能不存在' });
+      }
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '重命名会话失败', detail: e.message || '' });
+    }
+  }
+
+  if (工具名 === '删除会话') {
+    const { 会话ID } = 参数;
+    if (!会话ID) return JSON.stringify({ success: false, error: '缺少会话ID。请先通过 list_conversations 获取' });
+    try {
+      const 列表 = window.会话列表 ? window.会话列表() : [];
+      const 会话 = 列表.find(s => s.id === 会话ID);
+      const 名称 = 会话?.名称 || '未知会话';
+      await window.删除会话(会话ID);
+      return JSON.stringify({ success: true, message: `✅ 会话「${名称}」已删除。` });
+    } catch (e) {
+      return JSON.stringify({ success: false, error: '删除会话失败', detail: e.message || '' });
+    }
+  }
+
   if (工具名 === '更新备忘录') {
-    const { 备忘录ID, 标题, 内容, 标签: 原始标签, 文件夹 } = 参数;
+    const { 备忘录ID, 标题, 内容, 标签: 原始标签, 文件夹, 收藏, 已置顶 } = 参数;
     // AI标签最多3个（不含agent标签）
     const agent标签 = window.获取当前智能体标签 ? window.获取当前智能体标签() : null;
     let 标签 = 原始标签;
@@ -1934,11 +2260,18 @@ async function 处理备忘录工具(工具名, 参数) {
       // 不用const变量，直接构建更新参数提前返回
       const 更新参数 = { 标题, 标签, 文件夹: 目标文件夹 };
       if (内容 !== undefined) 更新参数.内容 = 内容;
+      if (收藏 !== undefined) 更新参数.收藏 = 收藏;
+      if (已置顶 !== undefined) {
+        更新参数.已置顶 = 已置顶;
+        更新参数.置顶时间 = 已置顶 ? new Date().toISOString() : null;
+      }
       const 更新后 = await window.备忘录管理器.updateMemo(Number(备忘录ID), 更新参数);
       const 变化 = ['文件夹'];
       if (标题) 变化.push('标题');
       if (标签) 变化.push('标签');
       if (内容 !== undefined) 变化.push('内容');
+      if (收藏 !== undefined) 变化.push(收藏 ? '收藏' : '取消收藏');
+      if (已置顶 !== undefined) 变化.push(已置顶 ? '置顶' : '取消置顶');
       const 更新后摘要 = 提取结构化正文(更新后.内容 || '').slice(0, 200);
       return `备忘录 #${备忘录ID} 已更新（${变化.join(',')}）。
 「${更新后.标题}」→ 文件夹「${目标文件夹}」
@@ -1971,11 +2304,18 @@ async function 处理备忘录工具(工具名, 参数) {
     if (!文件夹) {
       const 更新参数2 = { 标题, 标签, 文件夹 };
       if (内容 !== undefined) 更新参数2.内容 = 内容;
+      if (收藏 !== undefined) 更新参数2.收藏 = 收藏;
+      if (已置顶 !== undefined) {
+        更新参数2.已置顶 = 已置顶;
+        更新参数2.置顶时间 = 已置顶 ? new Date().toISOString() : null;
+      }
       const 更新后2 = await window.备忘录管理器.updateMemo(Number(备忘录ID), 更新参数2);
       const 变化2 = [];
       if (标题) 变化2.push('标题');
       if (内容) 变化2.push('内容');
       if (标签) 变化2.push('标签');
+      if (收藏 !== undefined) 变化2.push(收藏 ? '收藏' : '取消收藏');
+      if (已置顶 !== undefined) 变化2.push(已置顶 ? '置顶' : '取消置顶');
       const 更新后摘要2 = 提取结构化正文(更新后2.内容 || '').slice(0, 200);
       return `备忘录 #${备忘录ID} 已更新${变化2.length ? '（' + 变化2.join(',') + '）' : ''}。
 「${更新后2.标题}」
