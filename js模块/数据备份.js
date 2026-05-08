@@ -1,4 +1,4 @@
-﻿// 数据备份.js - 完整备份系统
+// 数据备份.js - 完整备份系统
 // 职责：每日自动备份 + 备份管理（查看/恢复/删除/导出分享）
 // 备份内容：全量备忘录 + 智能体配置 + 记忆数据 + 设置
 
@@ -253,7 +253,7 @@ window.执行完整备份 = async function(仅内部存储 = false) {
 
     // 如果不是纯内部存储，也尝试触发下载（给用户一份实体文件）
     if (!仅内部存储) {
-      // 鸿蒙原生保存
+      // 鸿蒙原生：文本优先走 saveTextFile
       if (window.nativeBridge && window.nativeBridge.saveTextFile) {
         window.nativeBridge.saveTextFile(文件名, 内容).then(res => {
           try {
@@ -540,9 +540,9 @@ window.绑定备份按钮 = function() {
       btn.disabled = false;
       btn.textContent = '立即备份';
       if (结果.成功) {
-        alert('\u2705 备份完成\n文件名：' + 结果.文件名 + '\n大小：' + (结果.文件大小 / 1024).toFixed(1) + 'KB');
+        window._显示提示('✅ 备份完成: ' + 结果.文件名,'success');
       } else {
-        alert('\u274c 备份失败：' + 结果.错误);
+        window._显示提示('❌ 备份失败: ' + 结果.错误,'error');
       }
     } else if (操作 === '恢复' && 文件名) {
       if (!await window._自定义确认('确定从该备份恢复？\n' + 文件名 + '\n\n注意：恢复操作会添加新备忘录，不会覆盖现有数据。')) return;
@@ -552,11 +552,11 @@ window.绑定备份按钮 = function() {
       btn.disabled = false;
       btn.textContent = '恢复';
       if (结果.成功) {
-        alert('\u2705 恢复完成\n新增：' + 结果.恢复数 + ' 条\n跳过（已存在）：' + 结果.跳过数 + ' 条');
+        window._显示提示('✅ 恢复完成: 新增' + 结果.恢复数 + '条','success');
         if (window.切换标签) window.切换标签('备忘录面板');
         if (window.渲染备忘录列表) window.渲染备忘录列表();
       } else {
-        alert('\u274c 恢复失败：' + 结果.错误);
+        window._显示提示('❌ 恢复失败: ' + 结果.错误,'error');
       }
     } else if (操作 === '导出' && 文件名) {
       btn.disabled = true;
@@ -568,9 +568,9 @@ window.绑定备份按钮 = function() {
       if (!await window._自定义确认('确定永久删除备份文件？\n' + 文件名)) return;
       const 结果 = await window.备份_删除备份(文件名);
       if (结果.成功) {
-        alert('\u2705 备份已删除');
+        window._显示提示('✅ 备份已删除','success');
       } else {
-        alert('\u274c 删除失败：' + 结果.错误);
+        window._显示提示('❌ 删除失败: ' + 结果.错误,'error');
       }
     }
   };

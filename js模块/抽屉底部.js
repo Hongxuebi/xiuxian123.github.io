@@ -29,6 +29,7 @@ window.绑定抽屉底部按钮 = function() {
   if (设置按钮 && 设置浮层) {
     设置按钮.addEventListener('click', () => {
       设置浮层.style.display = 'flex';
+      if (window._锁定滚动) window._锁定滚动();
       if (window.关闭抽屉) window.关闭抽屉();
     });
   }
@@ -45,10 +46,10 @@ window.绑定抽屉底部按钮 = function() {
             if (window.渲染文件夹树) window.渲染文件夹树();
             // 不关闭抽屉，保持打开状态
           } else {
-            alert('文件夹已存在或创建失败');
+            window._显示提示('文件夹已存在或创建失败','error');
           }
         } else {
-          alert('文件夹管理功能未初始化');
+          window._显示提示('文件夹管理功能未初始化','error');
         }
       }
     });

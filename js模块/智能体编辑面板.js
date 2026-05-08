@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 智能体编辑面板.js
  * 取代 记忆库面板.js — 双面板布局：左列智能体列表 + 右编辑/记忆区
  * 保留所有现有功能 API 不变（智能体管理.js、AI记忆管理器.js 等）
@@ -185,7 +185,7 @@ function 显示智能体管理菜单(x, y, 智能体ID) {
               if (window.渲染记忆库面板) await window.渲染记忆库面板();
             }
           } catch (e) {
-            alert('重命名失败：' + e.message);
+            window._显示提示('重命名失败：' + e.message,'error');
           }
         }
       } else if (action === 'delete') {
@@ -614,7 +614,7 @@ async function 渲染智能体详情(智能体ID, 配置) {
           if (window.渲染记忆库面板) await window.渲染记忆库面板();
         }
       } catch (错误) {
-        alert('保存失败: ' + 错误.message);
+        window._显示提示('保存失败: ' + 错误.message,'error');
       }
     });
   });
@@ -773,9 +773,9 @@ async function 复制智能体JSON(智能体ID, 配置) {
   const 配置数据 = await 构建导出JSON(智能体ID, 配置);
   try {
     await navigator.clipboard.writeText(JSON.stringify(配置数据, null, 2));
-    alert('已复制到剪贴板');
+    window._显示提示('已复制到剪贴板','success');
   } catch (e) {
-    alert('复制失败，请手动复制');
+    window._显示提示('复制失败，请手动复制','error');
   }
 }
 

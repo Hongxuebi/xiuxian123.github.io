@@ -1,4 +1,4 @@
-﻿// 导出功能.js - 备忘录导出核心逻辑
+// 导出功能.js - 备忘录导出核心逻辑
 // 职责：收集数据 → 格式转换 → 触发下载
 // 四个入口共用此文件，不写任何 UI 逻辑
 
@@ -201,7 +201,7 @@ function _触发下载降级(内容, 文件名, MIME) {
  */
 async function _导出为ZIP(memos, 文件名) {
   if (typeof JSZip === 'undefined') {
-    alert('ZIP功能不可用，请检查网络连接');
+    window._显示提示('ZIP功能不可用，请检查网络连接','error');
     return;
   }
   
@@ -261,7 +261,7 @@ async function _导出为ZIP(memos, 文件名) {
     const reader = new FileReader();
     const base64 = await new Promise((resolve) => {
       reader.onload = () => {
-        const result = reader.result;
+        const result = reader.result; // data:...;base64,xxxx
         const parts = result.split(',');
         resolve(parts[1] || parts[0]);
       };
@@ -502,7 +502,7 @@ window.导出当前列表 = async function() {
   try {
     const memos = _获取当前筛选列表();
     if (!memos || memos.length === 0) {
-      alert('当前没有可导出的备忘录');
+      window._显示提示('当前没有可导出的备忘录','info');
       return;
     }
     
@@ -513,16 +513,16 @@ window.导出当前列表 = async function() {
     const 时间戳 = _文件时间戳();
     if (选择 === 'zip') {
       await _导出为ZIP(memos, `备忘录备份-${时间戳}`);
-      alert(`ZIP导出成功，共 ${memos.length} 条`);
+      window._显示提示(`ZIP导出成功，共 ${memos.length} 条`,'success');
     } else {
       const 名称 = `备忘录备份-${时间戳}.json`;
       const 包 = _构建导出包(memos);
       _触发下载(JSON.stringify(包, null, 2), 名称);
-      alert(`JSON导出成功，共 ${memos.length} 条`);
+      window._显示提示(`JSON导出成功，共 ${memos.length} 条`,'success');
     }
   } catch (e) {
     console.error('[导出] 失败:', e);
-    alert('导出失败：' + e.message);
+    window._显示提示('导出失败：' + e.message,'error');
   }
 };
 
@@ -534,7 +534,7 @@ window.导出选中 = async function() {
   try {
     const ids = window.多选状态?.获取选中列表() || [];
     if (ids.length === 0) {
-      alert('请先选择要导出的备忘录');
+      window._显示提示('请先选择要导出的备忘录','info');
       return;
     }
     const 数据 = window._备忘录数据源 || window._备忘录数据 || [];
@@ -547,16 +547,16 @@ window.导出选中 = async function() {
     const 时间戳 = _文件时间戳();
     if (选择 === 'zip') {
       await _导出为ZIP(memos, `选中-${时间戳}-${ids.length}条`);
-      alert(`ZIP导出成功，共 ${memos.length} 条`);
+      window._显示提示(`ZIP导出成功，共 ${memos.length} 条`,'success');
     } else {
       const 包 = _构建导出包(memos, { 标签: `已选${ids.length}条` });
       const 名称 = `选中-${时间戳}-${ids.length}条.json`;
       _触发下载(JSON.stringify(包, null, 2), 名称);
-      alert(`JSON导出成功，共 ${memos.length} 条`);
+      window._显示提示(`JSON导出成功，共 ${memos.length} 条`,'success');
     }
   } catch (e) {
     console.error('[导出] 多选导出失败:', e);
-    alert('导出失败：' + e.message);
+    window._显示提示('导出失败：' + e.message,'error');
   }
 };
 
@@ -568,13 +568,13 @@ window.导出当前篇 = async function() {
   try {
     const id = window.当前编辑备忘录ID;
     if (!id) {
-      alert('当前没有正在编辑的备忘录');
+      window._显示提示('当前没有正在编辑的备忘录','info');
       return;
     }
     const 数据 = window._备忘录数据源 || window._备忘录数据 || [];
     const memo = 数据.find(m => m.id === id);
     if (!memo) {
-      alert('找不到当前备忘录');
+      window._显示提示('找不到当前备忘录','info');
       return;
     }
     
@@ -589,19 +589,19 @@ window.导出当前篇 = async function() {
       // 导出为ZIP（含附件）
       const 附件列表 = _解析附件(memo.内容 || '');
       await _导出为ZIP([memo], `${安全标题}-${时间戳}`);
-      alert(附件列表.length > 0
+      window._显示提示(附件列表.length > 0
         ? `ZIP导出成功，含 ${附件列表.length} 个附件`
-        : 'ZIP导出成功');
+        : 'ZIP导出成功','success');
     } else {
       // 导出为JSON
       const 包 = _构建导出包([memo], { 标签: memo.文件夹 });
       const 名称 = `${安全标题}-${时间戳}.json`;
       _触发下载(JSON.stringify(包, null, 2), 名称);
-      alert('JSON导出成功');
+      window._显示提示('JSON导出成功','success');
     }
   } catch (e) {
     console.error('[导出] 单篇导出失败:', e);
-    alert('导出失败：' + e.message);
+    window._显示提示('导出失败：' + e.message,'error');
   }
 };
 
@@ -613,7 +613,7 @@ window.导出当前篇 = async function() {
 window.导出文件夹 = async function(文件夹名) {
   try {
     if (!文件夹名) {
-      alert('未指定文件夹名');
+      window._显示提示('未指定文件夹名','info');
       return;
     }
     const 数据 = window._备忘录数据源 || window._备忘录数据 || [];
@@ -627,7 +627,7 @@ window.导出文件夹 = async function(文件夹名) {
       !m.已删除 && 目标文件夹列表.includes(m.文件夹)
     );
     if (memos.length === 0) {
-      alert(`"${文件夹名}" 文件夹下没有备忘录`);
+      window._显示提示(`「${文件夹名}」文件夹下没有备忘录`,'info');
       return;
     }
     
@@ -639,16 +639,16 @@ window.导出文件夹 = async function(文件夹名) {
     const 安全文件名 = _过滤文件名(文件夹名);
     if (选择 === 'zip') {
       await _导出为ZIP(memos, `文件夹-${安全文件名}-${时间戳}`);
-      alert(`ZIP导出成功，共 ${memos.length} 条`);
+      window._显示提示(`ZIP导出成功，共 ${memos.length} 条`,'success');
     } else {
       const 包 = _构建导出包(memos, { 标签: 文件夹名 });
       const 名称 = `文件夹-${安全文件名}-${时间戳}.json`;
       _触发下载(JSON.stringify(包, null, 2), 名称);
-      alert(`JSON导出成功，共 ${memos.length} 条`);
+      window._显示提示(`JSON导出成功，共 ${memos.length} 条`,'success');
     }
   } catch (e) {
     console.error('[导出] 文件夹导出失败:', e);
-    alert('导出失败：' + e.message);
+    window._显示提示('导出失败：' + e.message,'error');
   }
 };
 
@@ -692,7 +692,7 @@ window.导入备份文件 = async function() {
         }
       } catch (e) {
         console.error('[导入] 异常:', e);
-        alert('导入失败：' + (e.message || '未知错误'));
+        window._显示提示('导入失败：' + (e.message || '未知错误'),'error');
         resolve(null);
       }
     });
@@ -711,18 +711,18 @@ async function _导入JSON(file, resolve) {
   try {
     数据 = JSON.parse(await file.text());
   } catch (e) {
-    alert('文件格式错误，不是有效的 JSON 文件');
+    window._显示提示('文件格式错误，不是有效的 JSON 文件','error');
     resolve(null); return;
   }
 
   if (!数据.memos || !Array.isArray(数据.memos)) {
-    alert('文件格式错误：缺少 memos 数组');
+    window._显示提示('文件格式错误：缺少 memos 数组','error');
     resolve(null); return;
   }
 
   const memos = 数据.memos;
   if (memos.length === 0) {
-    alert('备份文件为空');
+    window._显示提示('备份文件为空','info');
     resolve(null); return;
   }
 
@@ -746,7 +746,7 @@ async function _导入JSON(file, resolve) {
   );
   if (!确认) { resolve(null); return; }
   if (新增.length === 0) {
-    alert('全部备忘录已存在，无需导入');
+    window._显示提示('全部备忘录已存在，无需导入','info');
     resolve({ 成功: 0, 跳过: 重复.length }); return;
   }
 
@@ -762,7 +762,7 @@ async function _导入JSON(file, resolve) {
  */
 async function _导入ZIP(file, resolve) {
   if (typeof JSZip === 'undefined') {
-    alert('ZIP导入需要 JSZip 库，请检查网络连接');
+    window._显示提示('ZIP导入需要 JSZip 库，请检查网络连接','error');
     resolve(null); return;
   }
 
@@ -770,7 +770,7 @@ async function _导入ZIP(file, resolve) {
   try {
     zip = await JSZip.loadAsync(file);
   } catch (e) {
-    alert('无法读取 ZIP 文件：' + (e.message || ''));
+    window._显示提示('无法读取 ZIP 文件：' + (e.message || ''),'error');
     resolve(null); return;
   }
 
@@ -798,20 +798,20 @@ async function _导入结构化ZIP(zip, 清单文件, resolve) {
     console.log('[结构化ZIP导入] 解析到 memos:', 清单内容.memos?.length, '条');
   } catch (e) {
     console.error('[结构化ZIP导入] 清单解析失败:', e);
-    alert('清单.json 解析失败，尝试按纯文本 ZIP 导入');
+    window._显示提示('清单.json 解析失败，尝试按纯文本 ZIP 导入','info');
     await _导入纯文本ZIP(zip, resolve);
     return;
   }
 
   if (!清单内容.memos || !Array.isArray(清单内容.memos)) {
-    alert('清单.json 格式不正确，尝试按纯文本 ZIP 导入');
+    window._显示提示('清单.json 格式不正确，尝试按纯文本 ZIP 导入','info');
     await _导入纯文本ZIP(zip, resolve);
     return;
   }
 
   const memos = 清单内容.memos;
   if (memos.length === 0) {
-    alert('备份文件为空');
+    window._显示提示('备份文件为空','info');
     resolve(null); return;
   }
 
@@ -898,7 +898,7 @@ async function _导入结构化ZIP(zip, 清单文件, resolve) {
   );
   if (!确认) { resolve(null); return; }
   if (新增.length === 0) {
-    alert('全部备忘录已存在，无需导入');
+    window._显示提示('全部备忘录已存在，无需导入','info');
     resolve({ 成功: 0, 跳过: 重复.length }); return;
   }
 
@@ -955,7 +955,7 @@ async function _导入纯文本ZIP(zip, resolve) {
   });
 
   if (txt文件列表.length === 0) {
-    alert('ZIP包中没有找到 .txt 文件');
+    window._显示提示('ZIP包中没有找到 .txt 文件','info');
     resolve(null); return;
   }
 
@@ -973,7 +973,7 @@ async function _导入纯文本ZIP(zip, resolve) {
   }
 
   if (待导入.length === 0) {
-    alert('ZIP包中的 .txt 文件均无法读取');
+    window._显示提示('ZIP包中的 .txt 文件均无法读取','info');
     resolve(null); return;
   }
 
@@ -998,7 +998,7 @@ async function _导入纯文本ZIP(zip, resolve) {
   );
   if (!确认) { resolve(null); return; }
   if (新增.length === 0) {
-    alert('全部备忘录已存在，无需导入');
+    window._显示提示('全部备忘录已存在，无需导入','info');
     resolve({ 成功: 0, 跳过: 重复.length }); return;
   }
 
@@ -1055,9 +1055,9 @@ async function _批量导入(memos) {
 function _导入完成提示(结果) {
   const 跳过提示 = 结果.跳过 ? `，跳过重复 ${结果.跳过} 条` : '';
   if (结果.失败 > 0) {
-    alert(`导入完成：成功 ${结果.成功} 条，失败 ${结果.失败} 条${跳过提示}`);
+    window._显示提示(`导入完成：成功 ${结果.成功} 条`,'success');
   } else {
-    alert(`导入成功，共 ${结果.成功} 条${跳过提示}`);
+    window._显示提示(`导入成功，共 ${结果.成功} 条`,'success');
   }
 }
 
@@ -1091,7 +1091,7 @@ window.导出指定年份 = async function(年份) {
   });
   
   if (筛选结果.length === 0) {
-    alert(`${年份}年没有备忘录`);
+    window._显示提示(`${年份}年没有备忘录`,'info');
     return;
   }
   
@@ -1116,7 +1116,7 @@ window.导出指定年月 = async function(年份, 月份) {
   console.log('[导出指定年月] 筛选结果=', 筛选结果.length);
   
   if (筛选结果.length === 0) {
-    alert(`${年份}年${月份}月没有备忘录`);
+    window._显示提示(`${年份}年${月份}月没有备忘录`,'info');
     return;
   }
   
@@ -1138,11 +1138,11 @@ window._导出指定年份为ZIP = async function(年份) {
     return new Date(m.日期 || m.更新时间).getFullYear().toString() === String(年份);
   });
   if (memos.length === 0) {
-    alert(年份 + '年没有备忘录');
+    window._显示提示(年份 + '年没有备忘录','info');
     return;
   }
   await _导出为ZIP(memos, '备忘录_' + 年份 + '年_' + _文件时间戳());
-  alert('ZIP导出成功，共 ' + memos.length + ' 条');
+  window._显示提示('ZIP导出成功，共 ' + memos.length + ' 条','success');
 };
 
 /**
@@ -1157,12 +1157,12 @@ window._导出指定年月为ZIP = async function(年份, 月份) {
     return d.getFullYear().toString() === String(年份) && 月份Str === String(月份).padStart(2, '0');
   });
   if (memos.length === 0) {
-    alert(年份 + '年' + 月份 + '月没有备忘录');
+    window._显示提示(年份 + '年' + 月份 + '月没有备忘录','info');
     return;
   }
   const 月名称 = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'][parseInt(月份) - 1];
   await _导出为ZIP(memos, '备忘录_' + 年份 + '年' + 月名称 + '_' + _文件时间戳());
-  alert('ZIP导出成功，共 ' + memos.length + ' 条');
+  window._显示提示('ZIP导出成功，共 ' + memos.length + ' 条','success');
 };
 
 // 暴露关键函数给 AI 工具调用

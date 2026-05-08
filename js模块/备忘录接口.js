@@ -13,7 +13,7 @@ function 初始化备忘录管理() {
 // 保存备忘录（从编辑页面调用）
 function 保存备忘录(标题, 内容, 文件夹, 标签) {
   if (!标题) {
-    alert('请输入标题');
+    window._显示提示('请输入标题','error');
     return;
   }
   
@@ -142,27 +142,27 @@ window.删除备忘录 = (id) => { window._删除备忘录(id); };
 // 回收站操作接口
 window.恢复备忘录 = async function(id) {
   if (!window.备忘录管理器) {
-    alert('备忘录管理器未初始化');
+    window._显示提示('备忘录管理器未初始化','error');
     return;
   }
   try {
     await window.备忘录管理器.恢复备忘录(id);
-    alert('备忘录已恢复');
+    window._显示提示('备忘录已恢复','success');
   } catch (错误) {
-    alert('恢复失败: ' + 错误.message);
+    window._显示提示('恢复失败: ' + 错误.message,'error');
   }
 };
 
 window.永久删除备忘录 = async function(id) {
   if (!window.备忘录管理器) {
-    alert('备忘录管理器未初始化');
+    window._显示提示('备忘录管理器未初始化','error');
     return;
   }
   if (!await window._自定义确认('确定要永久删除这条备忘录吗？此操作不可撤销。')) return;
   try {
     await window.备忘录管理器.永久删除备忘录(id);
-    alert('备忘录已永久删除');
+    window._显示提示('备忘录已永久删除','success');
   } catch (错误) {
-    alert('删除失败: ' + 错误.message);
+    window._显示提示('删除失败: ' + 错误.message,'error');
   }
 };

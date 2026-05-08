@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.log('存储适配器初始化成功');
   } catch (错误) {
     console.error('存储适配器初始化失败', 错误);
-    alert('存储初始化失败，应用将无法保存数据');
+    window._显示提示('存储初始化失败，应用将无法保存数据','error');
     return;
   }
   
@@ -222,7 +222,7 @@ window._自定义输入 = function(提示文字, 默认值) {
     确认按钮.textContent = '确认';
     确认按钮.style.cssText = 'padding:0.5rem 1.2rem;border:none;border-radius:0.5rem;background:var(--强调色,#4F46E5);color:#fff;cursor:pointer;font-size:0.9rem;';
 
-    const 关闭 = (值) => { 遮罩.remove(); resolve(值); };
+    const 关闭 = (值) => { 遮罩.remove(); if (window._解锁滚动) window._解锁滚动(); resolve(值); };
     取消按钮.onclick = () => 关闭(null);
     确认按钮.onclick = () => 关闭(输入框.value);
     输入框.onkeydown = (e) => { if (e.key === 'Enter') 关闭(输入框.value); };
@@ -232,6 +232,7 @@ window._自定义输入 = function(提示文字, 默认值) {
     对话框.append(提示, 输入框, 按钮区);
     遮罩.append(对话框);
     document.body.append(遮罩);
+    if (window._锁定滚动) window._锁定滚动();
     setTimeout(() => 输入框.focus(), 100);
   });
 };
@@ -260,7 +261,7 @@ window._自定义确认 = function(提示文字, 确认按钮文字 = '确定', 
     确认按钮.textContent = 确认按钮文字;
     确认按钮.style.cssText = 'padding:0.5rem 1.2rem;border:none;border-radius:0.5rem;background:#dc2626;color:#fff;cursor:pointer;font-size:0.9rem;';
 
-    const 关闭 = (值) => { 遮罩.remove(); resolve(值); };
+    const 关闭 = (值) => { 遮罩.remove(); if (window._解锁滚动) window._解锁滚动(); resolve(值); };
     取消按钮.onclick = () => 关闭(false);
     确认按钮.onclick = () => 关闭(true);
     遮罩.onclick = (e) => { if (e.target === 遮罩) 关闭(false); };
@@ -269,6 +270,67 @@ window._自定义确认 = function(提示文字, 确认按钮文字 = '确定', 
     对话框.append(提示, 按钮区);
     遮罩.append(对话框);
     document.body.append(遮罩);
+    if (window._锁定滚动) window._锁定滚动();
     确认按钮.focus();
   });
+};
+
+// ========== 滚动穿透防护工具（带计数器，支持嵌套调用）==========
+// 在模态浮层打开时锁定主内容区滚动，关闭时解锁
+// 每打开一个模态 +1，关闭一个 -1，计数归零才真正解锁
+if (!window.__滚动锁计数) window.__滚动锁计数 = 0;
+
+window._锁定滚动 = function() {
+  const 主内容区 = document.getElementById('主内容区');
+  if (!主内容区) return;
+  window.__滚动锁计数++;
+  if (window.__滚动锁计数 === 1) {
+    主内容区.dataset._原Overflow = 主内容区.style.overflow || '';
+    主内容区.style.overflow = 'hidden';
+  }
+};
+
+window._解锁滚动 = function() {
+  const 主内容区 = document.getElementById('主内容区');
+  if (!主内容区) return;
+  window.__滚动锁计数 = Math.max(0, window.__滚动锁计数 - 1);
+  if (window.__滚动锁计数 === 0 && 主内容区.dataset._原Overflow !== undefined) {
+    主内容区.style.overflow = 主内容区.dataset._原Overflow;
+    delete 主内容区.dataset._原Overflow;
+  }
+};
+
+// === 全局浮动提示（替代 alert，兼容鸿蒙 WebView） ===
+window._显示提示 = function(消息, 类型 = 'info') {
+  const 旧容器 = document.getElementById('_全局提示容器');
+  if (旧容器) 旧容器.remove();
+
+  const 容器 = document.createElement('div');
+  容器.id = '_全局提示容器';
+  容器.style.cssText = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: ${类型 === 'error' ? '#ef4444' : (类型 === 'success' ? '#22c55e' : '#3b82f6')};
+    color: white;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 100000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    max-width: 85%;
+    text-align: center;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    pointer-events: none;
+    line-height: 1.5;
+  `;
+  容器.textContent = 消息;
+  document.body.appendChild(容器);
+
+  setTimeout(() => {
+    容器.style.opacity = '0';
+    setTimeout(() => 容器.remove(), 300);
+  }, 2800);
 };

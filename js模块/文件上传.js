@@ -18,7 +18,7 @@ window.绑定文件上传事件 = function() {
     
     const 扩展名 = '.' + 文件.name.split('.').pop().toLowerCase();
     if (!允许的扩展名.includes(扩展名)) {
-      alert('暂不支持此文件类型，仅支持：' + 允许的扩展名.join(', '));
+      window._显示提示('暂不支持此文件类型，仅支持：' + 允许的扩展名.join(', '),'error');
       文件选择器.value = '';
       return;
     }
@@ -26,7 +26,7 @@ window.绑定文件上传事件 = function() {
     // 文件大小硬限制：5MB
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
     if (文件.size > MAX_FILE_SIZE) {
-      alert(`文件过大（${(文件.size / 1024 / 1024).toFixed(1)}MB），上限5MB。大文件会消耗大量API费用且影响回复质量。`);
+      window._显示提示(`文件过大（${(文件.size / 1024 / 1024).toFixed(1)}MB），上限5MB`,'error');
       文件选择器.value = '';
       return;
     }
@@ -42,7 +42,7 @@ window.绑定文件上传事件 = function() {
       } else {
         内容 = await 读取文件文本(文件);
       }
-      if (内容.length > 100000) alert('文件过大（超过10万字），可能影响AI回复质量');
+      if (内容.length > 100000) window._显示提示('文件过大（超过10万字），可能影响AI回复质量','error');
       当前上传文件内容 = 内容;
       当前上传文件名 = 文件.name;
       if (文件状态) {
@@ -52,7 +52,7 @@ window.绑定文件上传事件 = function() {
       文件选择器.value = '';
     } catch (错误) {
       console.error('文件读取失败', 错误);
-      alert('文件读取失败：' + 错误.message);
+      window._显示提示('文件读取失败：' + 错误.message,'error');
     }
   });
   

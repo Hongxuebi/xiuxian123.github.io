@@ -26,7 +26,7 @@ window.绑定备忘录UI = function() {
     const 遮罩 = document.createElement('div');
     遮罩.id = '整理确认卡片';
     遮罩.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99998;display:flex;align-items:center;justify-content:center;';
-    遮罩.onclick = (e) => { if (e.target === 遮罩) 遮罩.remove(); };
+    遮罩.onclick = (e) => { if (e.target === 遮罩) { 遮罩.remove(); if (window._解锁滚动) window._解锁滚动(); } };
     const 卡片 = document.createElement('div');
     卡片.style.cssText = 'background:var(--背景色, white);border-radius:16px;padding:24px;max-width:320px;width:85%;box-shadow:0 8px 32px rgba(0,0,0,0.3);';
     卡片.onclick = (e) => e.stopPropagation();
@@ -45,9 +45,11 @@ window.绑定备忘录UI = function() {
     `;
     遮罩.appendChild(卡片);
     document.body.appendChild(遮罩);
-    document.getElementById('整理确认取消').onclick = () => 遮罩.remove();
+    if (window._锁定滚动) window._锁定滚动();
+    document.getElementById('整理确认取消').onclick = () => { 遮罩.remove(); if (window._解锁滚动) window._解锁滚动(); };
     document.getElementById('整理确认开始').onclick = async () => {
       遮罩.remove();
+      if (window._解锁滚动) window._解锁滚动();
       if (window.开始批量整理) window.开始批量整理();
     };
   };
@@ -55,13 +57,13 @@ window.绑定备忘录UI = function() {
   // ========== 批量整理入口（按钮和AI工具共用） ==========
   function 开始批量整理() {
     if (!window.备忘录管理器) {
-      alert('备忘录管理器未初始化');
+      window._显示提示('备忘录管理器未初始化','error');
       return;
     }
 
     const 所有备忘录 = window.备忘录管理器.getAllMemos();
     if (所有备忘录.length === 0) {
-      alert('没有可整理的备忘录');
+      window._显示提示('没有可整理的备忘录','info');
       return;
     }
 
@@ -270,7 +272,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
       const 当前文件夹 = document.getElementById('当前文件夹名称').textContent;
       
       if (!标题 && !内容) {
-        alert('没有内容可整理');
+        window._显示提示('没有内容可整理','info');
         return;
       }
       
@@ -278,7 +280,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
       let 当前备忘录ID = window.当前编辑备忘录ID;
       if (!当前备忘录ID) {
         if (!标题) {
-          alert('请先输入标题再使用AI整理');
+          window._显示提示('请先输入标题再使用AI整理','info');
           return;
         }
         // 先保存到默认文件夹
@@ -291,9 +293,9 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
           });
           当前备忘录ID = 新建.id;
           window.当前编辑备忘录ID = 当前备忘录ID;
-          alert('已保存到「未分类」文件夹，现在开始AI整理...');
+          window._显示提示('已保存到「未分类」文件夹，开始AI整理...','info');
         } else {
-          alert('备忘录管理器未初始化');
+          window._显示提示('备忘录管理器未初始化','error');
           return;
         }
       }
@@ -390,7 +392,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
       const 内容 = document.getElementById('编辑内容').innerHTML;
       const 文件夹 = document.getElementById('当前文件夹名称').textContent;
       if (!标题) {
-        alert('请输入标题');
+        window._显示提示('请输入标题','error');
         return;
       }
       
@@ -405,7 +407,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
         window.保存备忘录(标题, 内容, 文件夹, 标签);
       } else {
         console.log('保存备忘录:', { 标题, 内容, 文件夹, 标签 });
-        alert('备忘录保存成功');
+        window._显示提示('备忘录已保存','success');
         const 编辑页面 = document.getElementById('编辑页面');
         const 备忘录面板 = document.getElementById('备忘录面板');
         if (编辑页面 && 备忘录面板) {
@@ -562,7 +564,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
                 if (当前文件夹名称Span) 当前文件夹名称Span.textContent = 文件夹名称.trim();
                 if (window.渲染文件夹树) window.渲染文件夹树();
               } else {
-                alert('文件夹已存在或创建失败');
+                window._显示提示('文件夹已存在或创建失败','error');
               }
             }
           }
@@ -783,7 +785,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
       const 新 = 名称.trim().slice(0, 20);
       const 已存在 = window._获取所有已用标签() || [];
       if (已存在.includes(新)) {
-        alert('标签已存在');
+        window._显示提示('标签已存在','info');
         return;
       }
       切换标签选中(encodeURIComponent(新));
@@ -1619,7 +1621,7 @@ ${deadlineDisplay}`;
     if (sel.rangeCount > 0 && !sel.isCollapsed) {
       AI保存的选区 = sel.getRangeAt(0).cloneRange();
     } else {
-      alert('请先选中要AI辅助处理的文字');
+      window._显示提示('请先选中要处理的文字','info');
       return;
     }
 
@@ -1717,14 +1719,14 @@ ${deadlineDisplay}`;
   // ========== 执行AI辅助编辑 ==========
   async function 执行AI辅助编辑(操作类型, 编辑区) {
     if (!AI保存的选区) {
-      alert('请先选中要处理的文字');
+      window._显示提示('请先选中要处理的文字','info');
       return;
     }
 
     // 获取选中的文本
     const 选中文本 = AI保存的选区.toString().trim();
     if (!选中文本) {
-      alert('请先选中要处理的文字');
+      window._显示提示('请先选中要处理的文字','info');
       return;
     }
 
@@ -2072,13 +2074,13 @@ ${deadlineDisplay}`;
         case 'clear-trash': {
           const 回收站列表 = window.备忘录管理器?.获取回收站列表?.() || [];
           if (回收站列表.length === 0) {
-            alert('回收站已经是空的');
+            window._显示提示('回收站已经是空的','info');
           } else if (await window._自定义确认(`确定要永久删除 ${回收站列表.length} 条备忘录吗？此操作不可撤销。`)) {
             try {
               const 结果 = await window.备忘录管理器.清空回收站();
-              alert(`已清空回收站，永久删除了 ${结果.删除数量} 条备忘录`);
+              window._显示提示(`已清空回收站，永久删除了 ${结果.删除数量} 条备忘录`,'success');
             } catch (错误) {
-              alert('清空回收站失败: ' + 错误.message);
+              window._显示提示('清空回收站失败: ' + 错误.message,'error');
             }
           }
           全局浮动菜单.classList.remove('显示');
@@ -2088,7 +2090,7 @@ ${deadlineDisplay}`;
         case 'restore-all': {
           const 回收站列表 = window.备忘录管理器?.获取回收站列表?.() || [];
           if (回收站列表.length === 0) {
-            alert('回收站中没有可恢复的备忘录');
+            window._显示提示('回收站中没有可恢复的备忘录','info');
           } else if (await window._自定义确认(`确定要恢复 ${回收站列表.length} 条备忘录吗？`)) {
             try {
               let 恢复数量 = 0;
@@ -2096,9 +2098,9 @@ ${deadlineDisplay}`;
                 await window.备忘录管理器.恢复备忘录(备忘录.id);
                 恢复数量++;
               }
-              alert(`已恢复 ${恢复数量} 条备忘录`);
+              window._显示提示(`已恢复 ${恢复数量} 条备忘录`,'success');
             } catch (错误) {
-              alert('恢复失败: ' + 错误.message);
+              window._显示提示('恢复失败: ' + 错误.message,'error');
             }
           }
           全局浮动菜单.classList.remove('显示');
@@ -2620,7 +2622,7 @@ async function 批量收藏() {
       console.error('收藏失败:', id, e);
     }
   }
-  alert(`已处理 ${成功数量}/${选中列表.length} 条备忘录`);
+  window._显示提示(`已处理 ${成功数量}/${选中列表.length} 条`,'success');
   window.多选状态?.清空();
 }
 
@@ -2643,7 +2645,7 @@ async function 批量移动() {
   收集文件夹(文件夹树);
   
   if (所有文件夹.length === 0) {
-    alert('没有可用的文件夹');
+    window._显示提示('没有可用的文件夹','info');
     return;
   }
   
@@ -2727,7 +2729,7 @@ async function 批量移动() {
             console.error('移动失败:', id, e);
           }
         }
-        alert(`已移动 ${成功数量}/${选中列表.length} 条备忘录到 "${目标文件夹}"`);
+        window._显示提示(`已移动 ${成功数量} 条到「${目标文件夹}」`,'success');
         window.多选状态?.清空();
         if (window.渲染备忘录列表) window.渲染备忘录列表();
         if (window.渲染文件夹树) window.渲染文件夹树();
@@ -2752,10 +2754,10 @@ async function 批量移动() {
           if (window._创建文件夹) {
             const 成功 = window._创建文件夹(文件夹名称.trim(), null);
             if (成功) {
-              alert(`文件夹 "${文件夹名称.trim()}" 创建成功，请重新点击移动按钮选择`);
+              window._显示提示(`文件夹「${文件夹名称.trim()}」创建成功，请重新选择`,'success');
               if (window.渲染文件夹树) window.渲染文件夹树();
             } else {
-              alert('文件夹已存在或创建失败');
+              window._显示提示('文件夹已存在或创建失败','error');
             }
           }
         }
@@ -2820,7 +2822,7 @@ async function 批量删除() {
       console.error('删除失败:', id, e);
     }
   }
-  alert(`已将 ${成功数量}/${选中列表.length} 条备忘录移入回收站`);
+  window._显示提示(`已将 ${成功数量} 条移入回收站`,'success');
   window.多选状态?.清空();
 }
 
@@ -2838,7 +2840,7 @@ async function 批量恢复() {
       console.error('恢复失败:', id, e);
     }
   }
-  alert(`已恢复 ${成功数量}/${选中列表.length} 条备忘录`);
+  window._显示提示(`已恢复 ${成功数量} 条`,'success');
   window.多选状态?.清空();
 }
 
@@ -2858,7 +2860,7 @@ async function 批量永久删除() {
       console.error('永久删除失败:', id, e);
     }
   }
-  alert(`已永久删除 ${成功数量}/${选中列表.length} 条备忘录`);
+  window._显示提示(`已永久删除 ${成功数量} 条`,'success');
   window.多选状态?.清空();
 }
 

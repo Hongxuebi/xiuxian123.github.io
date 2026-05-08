@@ -1950,6 +1950,11 @@ body {
   background: var(--强调色暗);
 }
 
+.编辑页面主要按钮.闪光 {
+  background: #22c55e !important;
+  transition: background 0.05s;
+}
+
 .编辑页面内容 {
   flex: 1;
   padding: 1rem 1.5rem;

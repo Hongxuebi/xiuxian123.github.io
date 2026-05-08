@@ -285,7 +285,7 @@ async function 渲染智能体详情(智能体ID, 配置) {
         el.textContent = 字段 === 'system_prompt' ? escHtml(新值) : 新值;
         await 更新智能体信息卡(智能体ID, window.获取当前智能体配置?.() || 配置);
       } catch (错误) {
-        alert('保存失败: ' + 错误.message);
+        window._显示提示('保存失败: ' + 错误.message,'error');
       }
     });
   });
@@ -396,7 +396,7 @@ window.绑定记忆库面板 = function() {
       const 名称 = 配置?.name || 智能体ID;
       
       if (智能体ID === 'default') {
-        alert('默认智能体无法删除');
+        window._显示提示('默认智能体无法删除','info');
         return;
       }
       
@@ -422,10 +422,10 @@ window.绑定记忆库面板 = function() {
               await 存储.写文件(路径, JSON.stringify(配置, null, 2));
               if (window.刷新智能体UI) await window.刷新智能体UI();
               if (window.渲染记忆库面板) await window.渲染记忆库面板();
-              alert('重命名成功');
+              window._显示提示('重命名成功','success');
             }
           } catch (e) {
-            alert('重命名失败：' + e.message);
+            window._显示提示('重命名失败：' + e.message,'error');
           }
         }
       } else if (动作 === '2') {
@@ -435,7 +435,7 @@ window.绑定记忆库面板 = function() {
               const 成功 = await window.删除智能体(智能体ID);
               if (成功 && window.刷新智能体UI) await window.刷新智能体UI();
             } else {
-              alert('删除功能未就绪');
+              window._显示提示('删除功能未就绪','info');
             }
           }
         }

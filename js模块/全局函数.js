@@ -10,10 +10,10 @@ window.切换无痕模式 = function() {
     标记.style.display = window.无痕模式激活 ? 'inline-block' : 'none';
     if (window.无痕模式激活) {
       标记.textContent = '无痕模式 · 切换会话后不保留记录';
-      alert('已开启无痕模式\n\n⚠️ 切换会话后，当前对话内容不会被保留。\nAI 仍可能从备忘录中记住你的信息。');
+      window._显示提示('无痕模式已开启，对话不保存','info');
     } else {
       标记.textContent = '无痕模式';
-      alert('已关闭无痕模式，对话将正常保存');
+      window._显示提示('无痕模式已关闭，对话将正常保存','info');
     }
   }
 };
@@ -25,11 +25,11 @@ window.一键更新记忆 = window.智能提取记忆 || function() {
 
 window.调试检索 = function() {
   if (!window.AI记忆管理器) {
-    alert('记忆管理器未初始化');
+    window._显示提示('记忆管理器未初始化','error');
     return;
   }
   window.AI记忆管理器.queryMemories('').then(结果 => {
-    alert('当前记忆库共有 ' + 结果.length + ' 条记忆');
+    window._显示提示('记忆库共有 ' + 结果.length + ' 条记忆','info');
   }).catch(err => {
     console.warn('[调试检索]', err);
   });

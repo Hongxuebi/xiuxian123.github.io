@@ -289,7 +289,7 @@ async function 处理创建子文件夹(父文件夹名) {
       已展开文件夹.add(父文件夹名);
       渲染文件夹树();
     } else {
-      alert('文件夹已存在或创建失败');
+      window._显示提示('文件夹已存在或创建失败','error');
     }
   }
 }
@@ -320,7 +320,7 @@ async function 处理移动文件夹(源文件夹名) {
   所有文件夹.unshift('📁 顶层（无父文件夹）');
 
   if (所有文件夹.length === 0) {
-    alert('没有可用的目标文件夹');
+    window._显示提示('没有可用的目标文件夹','info');
     return;
   }
 
@@ -333,11 +333,11 @@ async function 处理移动文件夹(源文件夹名) {
   // 执行移动
   const 成功 = window._移动文件夹 ? window._移动文件夹(源文件夹名, 实际目标) : false;
   if (成功) {
-    alert(`已将 "${源文件夹名}" 移动到 "${实际目标 || '顶层'}"`);
+    window._显示提示(`已移动到「${源文件夹名}」→「${实际目标 || '顶层'}」`,'success');
     渲染文件夹树();
     if (window.渲染备忘录列表) window.渲染备忘录列表();
   } else {
-    alert('移动失败');
+    window._显示提示('移动失败','error');
   }
 }
 
@@ -348,11 +348,11 @@ async function 处理重命名文件夹(原文件夹名) {
 
   const 成功 = window._重命名文件夹 ? window._重命名文件夹(原文件夹名, 新文件夹名.trim()) : false;
   if (成功) {
-    alert(`已重命名为 "${新文件夹名.trim()}"`);
+    window._显示提示(`已重命名为「${新文件夹名.trim()}」`,'success');
     渲染文件夹树();
     if (window.渲染备忘录列表) window.渲染备忘录列表();
   } else {
-    alert('重命名失败，可能文件夹已存在');
+    window._显示提示('重命名失败，可能文件夹已存在','error');
   }
 }
 
@@ -373,11 +373,11 @@ async function 处理删除文件夹(文件夹名) {
 
   const 成功 = window._删除文件夹 ? window._删除文件夹(文件夹名) : false;
   if (成功) {
-    alert(`已删除文件夹 "${文件夹名}"，${受影响备忘录.length} 条备忘录已移入回收站`);
+    window._显示提示(`已删除文件夹「${文件夹名}」，${受影响备忘录.length} 条移入回收站`,'success');
     渲染文件夹树();
     if (window.渲染备忘录列表) window.渲染备忘录列表();
   } else {
-    alert('删除失败');
+    window._显示提示('删除失败','error');
   }
 }
 

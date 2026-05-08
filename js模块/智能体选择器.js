@@ -119,7 +119,7 @@ window.创建智能体选择器UI = async function() {
     if (选项.id === '添加智能体按钮') {
       下拉菜单.style.display = 'none';
       if (window.打开添加智能体浮层) window.打开添加智能体浮层();
-      else alert('添加智能体功能开发中');
+      else window._显示提示('添加智能体功能开发中','info');
       return;
     }
     if (选ID && window.切换智能体) {
@@ -207,11 +207,11 @@ window.绑定头像预览 = function() {
           配置.avatar = base64;
           if (window.更新抽屉头像) window.更新抽屉头像(配置);
         } else {
-          alert('保存头像失败');
+          window._显示提示('保存头像失败','error');
         }
       } catch (err) {
         console.error('处理头像失败', err);
-        alert('处理图片失败');
+        window._显示提示('处理图片失败','error');
       }
       文件选择.value = '';
     });

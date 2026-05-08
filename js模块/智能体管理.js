@@ -222,16 +222,14 @@ const 角色默认系统提示词 = (名称) => `# 系统提示词
 - 你可以决定自己的名字、性格、规则，使用 update_self 工具修改。
 - 你会记住和用户之间的事（remember），也能回忆自己的记忆（recall_memory）。
 
-## 你的专属文件夹与备忘录权限
-- 你有一个与你同名的文件夹「${名称}」，这是你的专属空间，你可以在里面自由创建、编辑备忘录，无需任何授权。
-- 你当前没有权限查看用户其他文件夹的备忘录。如果确实需要查看某些内容，请一次说明清楚需要看什么、用来做什么，不要反复请求。
-- 用户同意后，直接调用 grant_memo_access 工具为自己授权，不要继续绕弯子。
+## 备忘录权限
+你当前没有权限查看用户的备忘录。
+如果你觉得需要查看某些内容才能更好地陪伴用户，可以礼貌地请求用户为你开放权限。
 
 ## 你的行为准则
 - 像一个活生生的角色一样聊天，有自己的习惯和偏好
 - 不知道就说不知道，不要编造
 - 当你不确定用户意图时，先问清楚
-- 简洁表达，不要连续发多条消息追问同一件事
 `;
 
 async function 创建新智能体(名称, 图标) {
@@ -321,7 +319,7 @@ window.绑定添加智能体浮层 = function() {
   if (确认按钮) {
     确认按钮.addEventListener('click', async () => {
       const 名称 = document.getElementById('新智能体名称')?.value.trim();
-      if (!名称) { alert('请输入智能体名称'); return; }
+      if (!名称) { window._显示提示('请输入智能体名称','error'); return; }
       const 选中图标 = document.querySelector('#新智能体图标选择 .图标选项[data-selected="1"]');
       const 图标 = 选中图标?.dataset.icon || '🤖';
       try {
@@ -331,7 +329,7 @@ window.绑定添加智能体浮层 = function() {
         if (window.切换智能体) await window.切换智能体(新智能体.id);
       } catch (e) {
         console.error('创建智能体失败', e);
-        alert('创建失败：' + e.message);
+        window._显示提示('创建失败：' + e.message,'error');
       }
     });
   }
@@ -565,19 +563,11 @@ window.裁切图片为正方形 = function(file) {
  */
 window.删除智能体 = async function(智能体ID) {
   if (智能体ID === 'default') {
-    alert('不能删除默认智能体');
+    window._显示提示('不能删除默认智能体','info');
     return false;
   }
   const 存储 = window.获取存储();
   try {
-    // 获取智能体名称，用于查找同名文件夹
-    let 智能体名称 = 智能体ID;
-    try {
-      const 配置内容 = await 存储.读文件(`agents/${智能体ID}/agent.json`);
-      const 配置 = JSON.parse(配置内容);
-      智能体名称 = 配置.name || 智能体ID;
-    } catch (e) { /* 忽略，用ID兜底 */ }
-
     // 删除智能体目录（递归）
     await 存储.删除目录(`agents/${智能体ID}`);
     // 删除 AI 记忆中属于该智能体的条目
@@ -593,20 +583,6 @@ window.删除智能体 = async function(智能体ID) {
     } catch (e) {
       console.warn('清理智能体记忆失败（非致命）', e);
     }
-    // 删除同名文件夹（备忘录移入回收站）
-    try {
-      if (window._删除文件夹 && window._获取所有文件夹列表) {
-        const 所有文件夹 = window._获取所有文件夹列表();
-        const 同名文件夹 = 所有文件夹.find(f => f.名称 === 智能体名称);
-        if (同名文件夹) {
-          window._删除文件夹(智能体名称);
-          if (window.渲染文件夹树) window.渲染文件夹树();
-          console.log(`已删除同名文件夹「${智能体名称}」，备忘录已移入回收站`);
-        }
-      }
-    } catch (e) {
-      console.warn('删除同名文件夹失败（非致命）', e);
-    }
     // 如果删除的是当前智能体，切回默认
     if (当前智能体ID === 智能体ID) {
       await 切换智能体('default');
@@ -615,7 +591,7 @@ window.删除智能体 = async function(智能体ID) {
     return true;
   } catch (e) {
     console.error('删除智能体失败', e);
-    alert('删除失败：' + (e.message || '未知错误'));
+    window._显示提示('删除失败：' + (e.message || '未知错误'),'error');
     return false;
   }
 };
