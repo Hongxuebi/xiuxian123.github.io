@@ -36,8 +36,8 @@ window.绑定抽屉底部按钮 = function() {
   // 新建文件夹
   const 新建文件夹按钮 = document.getElementById('新建文件夹按钮抽屉');
   if (新建文件夹按钮) {
-    新建文件夹按钮.addEventListener('click', () => {
-      const 文件夹名称 = prompt('请输入新文件夹名称：');
+    新建文件夹按钮.addEventListener('click', async () => {
+      const 文件夹名称 = await window._自定义输入('请输入新文件夹名称：');
       if (文件夹名称 && 文件夹名称.trim()) {
         if (window._创建文件夹) {
           const 成功 = window._创建文件夹(文件夹名称.trim(), null);

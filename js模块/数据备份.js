@@ -1,4 +1,4 @@
-// 数据备份.js - 完整备份系统
+﻿// 数据备份.js - 完整备份系统
 // 职责：每日自动备份 + 备份管理（查看/恢复/删除/导出分享）
 // 备份内容：全量备忘录 + 智能体配置 + 记忆数据 + 设置
 
@@ -253,15 +253,33 @@ window.执行完整备份 = async function(仅内部存储 = false) {
 
     // 如果不是纯内部存储，也尝试触发下载（给用户一份实体文件）
     if (!仅内部存储) {
-      const blob = new Blob([内容], { type: 'application/json;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 文件名;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      // 鸿蒙原生保存
+      if (window.nativeBridge && window.nativeBridge.saveTextFile) {
+        window.nativeBridge.saveTextFile(文件名, 内容).then(res => {
+          try {
+            const 结果 = JSON.parse(res);
+            if (!结果.success) console.warn('[备份] 导出保存未完成:', 结果.error);
+          } catch {}
+        }).catch(e => console.warn('[备份] 导出原生保存异常:', e));
+      } else if (window.nativeBridge && window.nativeBridge.saveFile) {
+        const base64 = btoa(unescape(encodeURIComponent(内容)));
+        window.nativeBridge.saveFile(文件名, base64).then(res => {
+          try {
+            const 结果 = JSON.parse(res);
+            if (!结果.success) console.warn('[备份] 导出保存未完成:', 结果.error);
+          } catch {}
+        }).catch(e => console.warn('[备份] 导出原生保存异常:', e));
+      } else {
+        const blob = new Blob([内容], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 文件名;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      }
     }
 
     return { 成功: true, 文件名, 文件大小 };
@@ -380,6 +398,24 @@ window.备份_导出到文件 = async function(文件名) {
     if (!内容) throw new Error('备份不存在');
 
     const blob = new Blob([内容], { type: 'application/json;charset=utf-8' });
+
+    // 鸿蒙原生保存（优先于 navigator.share，因为鸿蒙 share 不可靠）
+    if (window.nativeBridge && window.nativeBridge.saveTextFile) {
+      const res = await window.nativeBridge.saveTextFile(文件名, 内容);
+      try {
+        const 结果 = JSON.parse(res);
+        if (结果.success) return { 成功: true };
+        console.warn('[备份] 保存未完成:', 结果.error);
+      } catch {}
+    } else if (window.nativeBridge && window.nativeBridge.saveFile) {
+      const base64 = btoa(unescape(encodeURIComponent(内容)));
+      const res = await window.nativeBridge.saveFile(文件名, base64);
+      try {
+        const 结果 = JSON.parse(res);
+        if (结果.success) return { 成功: true };
+        console.warn('[备份] 保存未完成:', 结果.error);
+      } catch {}
+    }
 
     // 尝试分享（移动端）
     if (navigator.share && navigator.canShare) {
@@ -509,7 +545,7 @@ window.绑定备份按钮 = function() {
         alert('\u274c 备份失败：' + 结果.错误);
       }
     } else if (操作 === '恢复' && 文件名) {
-      if (!confirm('确定从该备份恢复？\n' + 文件名 + '\n\n注意：恢复操作会添加新备忘录，不会覆盖现有数据。')) return;
+      if (!await window._自定义确认('确定从该备份恢复？\n' + 文件名 + '\n\n注意：恢复操作会添加新备忘录，不会覆盖现有数据。')) return;
       btn.disabled = true;
       btn.textContent = '恢复中…';
       const 结果 = await window.备份_执行恢复(文件名);
@@ -529,7 +565,7 @@ window.绑定备份按钮 = function() {
       btn.disabled = false;
       btn.textContent = '导出';
     } else if (操作 === '删除' && 文件名) {
-      if (!confirm('确定永久删除备份文件？\n' + 文件名)) return;
+      if (!await window._自定义确认('确定永久删除备份文件？\n' + 文件名)) return;
       const 结果 = await window.备份_删除备份(文件名);
       if (结果.成功) {
         alert('\u2705 备份已删除');

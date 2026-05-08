@@ -9,6 +9,9 @@ window.绑定更多菜单 = function() {
     });
     document.addEventListener('click', () => 下拉菜单.classList.remove('显示'));
   }
+
+  // 暴露给鸿蒙返回手势
+  window.关闭更多菜单 = function() { if (下拉菜单) 下拉菜单.classList.remove('显示'); };
   
   const 无痕按钮 = document.getElementById('无痕会话按钮');
   if (无痕按钮) {

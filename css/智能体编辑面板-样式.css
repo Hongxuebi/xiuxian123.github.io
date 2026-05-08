@@ -912,10 +912,11 @@
   border-radius: 12px;
   width: 90%;
   max-width: 560px;
-  max-height: 80vh;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  overflow: hidden;
 }
 
 .智能体编辑-编辑弹窗-头部 {
@@ -944,7 +945,7 @@
 
 .智能体编辑-编辑弹窗-文本域 {
   flex: 1;
-  min-height: 260px;
+  min-height: 100px;
   padding: 14px 18px;
   border: none;
   outline: none;
@@ -955,14 +956,19 @@
   background: var(--内容底色);
   color: var(--文字主色);
   tab-size: 2;
+  overflow-y: auto;
 }
 
 .智能体编辑-编辑弹窗-底部 {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 10px 18px;
-  border-top: 1px solid var(--暖灰色);
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-top: 2px solid var(--暖灰色);
+  flex-shrink: 0;
+  min-height: 52px;
+  background: var(--卡片底色, var(--内容底色));
 }
 
 .智能体编辑-编辑弹窗-取消 {
@@ -976,14 +982,18 @@
 }
 
 .智能体编辑-编辑弹窗-确认 {
-  background: var(--主题色);
+  background: #4A90D9 !important;
   border: none;
-  padding: 8px 20px;
+  padding: 8px 24px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #fff;
-  font-weight: 500;
+  color: #fff !important;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .智能体编辑-编辑弹窗-确认:hover {

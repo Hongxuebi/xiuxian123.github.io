@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 智能体编辑面板.js
  * 取代 记忆库面板.js — 双面板布局：左列智能体列表 + 右编辑/记忆区
  * 保留所有现有功能 API 不变（智能体管理.js、AI记忆管理器.js 等）
@@ -163,7 +163,7 @@ function 显示智能体管理菜单(x, y, 智能体ID) {
     项.addEventListener('click', async () => {
       const action = 项.dataset.action;
       if (action === 'rename') {
-        const 新名称 = prompt('输入新名称：', 名称);
+        const 新名称 = await window._自定义输入('输入新名称：', 名称);
         if (新名称 && 新名称.trim() && 新名称 !== 名称) {
           try {
             const 存储 = window.获取存储 && window.获取存储();
@@ -174,6 +174,13 @@ function 显示智能体管理菜单(x, y, 智能体ID) {
               配置Obj.name = 新名称.trim();
               配置Obj.updated_at = new Date().toISOString();
               await 存储.写文件(路径, JSON.stringify(配置Obj, null, 2));
+              // 同步重命名同名文件夹
+              if (window._重命名文件夹 && 新名称.trim() !== 名称) {
+                try {
+                  window._重命名文件夹(名称, 新名称.trim());
+                  if (window.渲染文件夹树) window.渲染文件夹树();
+                } catch(e) { console.warn('重命名同名文件夹失败', e); }
+              }
               if (window.刷新智能体UI) await window.刷新智能体UI();
               if (window.渲染记忆库面板) await window.渲染记忆库面板();
             }
@@ -182,8 +189,8 @@ function 显示智能体管理菜单(x, y, 智能体ID) {
           }
         }
       } else if (action === 'delete') {
-        if (confirm('确认删除「' + 名称 + '」？此操作不可恢复！')) {
-          if (confirm('再次确认：所有对话历史和记忆都将被清除。')) {
+        if (await window._自定义确认('确认删除「' + 名称 + '」？此操作不可恢复！')) {
+          if (await window._自定义确认('再次确认：所有对话历史和记忆都将被清除。')) {
             if (window.删除智能体) {
               await window.删除智能体(智能体ID);
               if (window.刷新智能体UI) await window.刷新智能体UI();
@@ -322,7 +329,7 @@ async function 渲染右列标题(智能体ID, 配置) {
   const 删除Btn = document.getElementById('智能体编辑删除按钮');
   if (删除Btn) {
     删除Btn.addEventListener('click', async () => {
-      if (confirm('确认删除「' + 名称 + '」？所有对话历史和记忆都将被清除。')) {
+      if (await window._自定义确认('确认删除「' + 名称 + '」？所有对话历史和记忆都将被清除。')) {
         if (window.删除智能体) {
           await window.删除智能体(智能体ID);
           if (window.刷新智能体UI) await window.刷新智能体UI();
@@ -352,7 +359,7 @@ async function 渲染右列标题(智能体ID, 配置) {
   const 添加标签Btn = document.getElementById('智能体编辑添加标签');
   if (添加标签Btn) {
     添加标签Btn.addEventListener('click', async () => {
-      const 新标签 = prompt('输入标签名称：');
+      const 新标签 = await window._自定义输入('输入标签名称：');
       if (新标签 && 新标签.trim()) {
         const 标签 = 新标签.trim();
         if (!(配置?.tags || []).includes(标签)) {
@@ -434,7 +441,7 @@ async function 渲染记忆列表() {
       btn.addEventListener('click', async (e) => {
         const id = parseInt(e.target.dataset.id);
         if (isNaN(id)) return;
-        if (confirm('确定要删除这条记忆吗？')) {
+        if (await window._自定义确认('确定要删除这条记忆吗？')) {
           await 管理器.删除(id);
           await 渲染记忆列表();
         }
@@ -644,9 +651,9 @@ function 弹出编辑框(字段, 旧值) {
           <button class="智能体编辑-编辑弹窗-关闭">✕</button>
         </div>
         <textarea class="智能体编辑-编辑弹窗-文本域" spellcheck="false">${escHtml(旧值)}</textarea>
-        <div class="智能体编辑-编辑弹窗-底部">
-          <button class="智能体编辑-编辑弹窗-取消">取消</button>
-          <button class="智能体编辑-编辑弹窗-确认">保存</button>
+        <div class="智能体编辑-编辑弹窗-底部" style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 18px;border-top:2px solid #eee;flex-shrink:0;min-height:52px;background:var(--内容底色,#fff)">
+          <button class="智能体编辑-编辑弹窗-取消" style="background:#eee;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:0.85rem;color:#333">取消</button>
+          <button class="智能体编辑-编辑弹窗-确认" style="background:#4A90D9;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:0.85rem;color:#fff;font-weight:600;white-space:nowrap">保存</button>
         </div>
       </div>
     `;
@@ -702,7 +709,28 @@ async function 保存配置(智能体ID, 新配置) {
     } catch(e) { console.warn('同步AI身份名称失败', e); }
   }
 
+  // 同步重命名同名文件夹
+  if (新配置.name && 现有.name && 新配置.name !== 现有.name) {
+    try {
+      if (window._重命名文件夹) {
+        window._重命名文件夹(现有.name, 新配置.name);
+        if (window.渲染文件夹树) window.渲染文件夹树();
+      }
+    } catch(e) { console.warn('重命名同名文件夹失败', e); }
+  }
+
   if (window.加载智能体) await window.加载智能体(智能体ID);
+
+  // 更新智能体选择器按钮显示
+  if (新配置.name) {
+    const 按钮 = document.getElementById('智能体选择按钮');
+    if (按钮) {
+      const icon = 新配置.icon || '🤖';
+      if (智能体ID === (window.当前智能体ID?.() || 'default')) {
+        按钮.innerHTML = `${icon} ${新配置.name} ▼`;
+      }
+    }
+  }
 }
 
 async function 切换收藏(智能体ID, 收藏) {
@@ -726,11 +754,17 @@ async function 切换收藏(智能体ID, 收藏) {
 // ================================================================
 async function 导出智能体JSON(智能体ID, 配置) {
   const 配置数据 = await 构建导出JSON(智能体ID, 配置);
+  const 文件名 = `${(配置?.name || 智能体ID).replace(/[^a-zA-Z0-9\u4e00-\u9fa5_-]/g, '_')}_智能体.json`;
+  // 走统一下载入口（鸿蒙原生优先）
+  if (window._触发下载) {
+    window._触发下载(JSON.stringify(配置数据, null, 2), 文件名);
+    return;
+  }
   const blob = new Blob([JSON.stringify(配置数据, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(配置?.name || 智能体ID).replace(/[^a-zA-Z0-9\u4e00-\u9fa5_-]/g, '_')}_智能体.json`;
+  a.download = 文件名;
   a.click();
   URL.revokeObjectURL(url);
 }

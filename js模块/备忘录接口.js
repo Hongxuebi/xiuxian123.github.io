@@ -158,7 +158,7 @@ window.永久删除备忘录 = async function(id) {
     alert('备忘录管理器未初始化');
     return;
   }
-  if (!confirm('确定要永久删除这条备忘录吗？此操作不可撤销。')) return;
+  if (!await window._自定义确认('确定要永久删除这条备忘录吗？此操作不可撤销。')) return;
   try {
     await window.备忘录管理器.永久删除备忘录(id);
     alert('备忘录已永久删除');

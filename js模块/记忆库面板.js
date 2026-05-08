@@ -113,7 +113,7 @@ async function 渲染记忆列表() {
       btn.addEventListener('click', async (e) => {
         const id = parseInt(e.target.dataset.id);
         if (isNaN(id)) return;
-        if (confirm('确定要删除这条记忆吗？')) {
+        if (await window._自定义确认('确定要删除这条记忆吗？')) {
           await 管理器.删除(id);
           await 渲染记忆列表();
         }
@@ -400,16 +400,16 @@ window.绑定记忆库面板 = function() {
         return;
       }
       
-      const 动作 = prompt(
+      const 动作 = await window._自定义输入(
         '「' + 名称 + '」管理\n\n' +
-        '输入 1 并回车 → 重命名智能体\n' +
-        '输入 2 并回车 → 删除该智能体（不可恢复）\n\n' +
+        '输入 1 → 重命名智能体\n' +
+        '输入 2 → 删除该智能体（不可恢复）\n\n' +
         '取消 = 不做任何操作',
         ''
       );
       
       if (动作 === '1') {
-        const 新名称 = prompt('输入新名称：', 名称);
+        const 新名称 = await window._自定义输入('输入新名称：', 名称);
         if (新名称 && 新名称.trim() && 新名称 !== 名称) {
           try {
             const 存储 = window.获取存储 && window.获取存储();
@@ -429,8 +429,8 @@ window.绑定记忆库面板 = function() {
           }
         }
       } else if (动作 === '2') {
-        if (confirm('确认删除「' + 名称 + '」？此操作不可恢复！')) {
-          if (confirm('再次确认：所有对话历史和记忆都将被清除。确定要删除「' + 名称 + '」吗？')) {
+        if (await window._自定义确认('确认删除「' + 名称 + '」？此操作不可恢复！')) {
+          if (await window._自定义确认('再次确认：所有对话历史和记忆都将被清除。确定要删除「' + 名称 + '」吗？')) {
             if (window.删除智能体) {
               const 成功 = await window.删除智能体(智能体ID);
               if (成功 && window.刷新智能体UI) await window.刷新智能体UI();

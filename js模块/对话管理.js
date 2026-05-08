@@ -899,6 +899,15 @@ async function 获取系统提示词(用户输入 = '') {
     }
   } catch (e) { /* 忽略 */ }
 
+  // 2.15 智能体专属文件夹声明
+  try {
+    const 当前名字 = window.当前智能体名 ? window.当前智能体名() : '';
+    const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
+    if (当前名字 && 当前ID !== 'default') {
+      部分.push(`## 你的专属文件夹\n你有一个与你同名的文件夹「${当前名字}」，这是你的专属空间。你可以在里面自由创建、编辑备忘录，无需任何额外授权。建议优先将自己的内容存放到「${当前名字}」文件夹中。`);
+    }
+  } catch (e) { /* 忽略 */ }
+
   // 2.5 用户画像摘要（从 AI记忆管理器 获取）
   try {
     const 管理器 = window.AI记忆管理器;
@@ -1671,7 +1680,7 @@ function 渲染右键菜单(rect) {
   document.body.appendChild(菜单);
   
   菜单.querySelectorAll('.会话右键菜单-项').forEach(项 => {
-    项.addEventListener('click', (e) => {
+    项.addEventListener('click', async (e) => {
       e.stopPropagation();
       const 操作 = 项.dataset.操作;
       关闭右键菜单();
@@ -1682,7 +1691,7 @@ function 渲染右键菜单(rect) {
       if (!会话对象) return;
       
       if (操作 === 'rename') {
-        const 新名称 = prompt('重命名会话', 会话对象.名称);
+        const 新名称 = await window._自定义输入('重命名会话', 会话对象.名称);
         if (!新名称 || 新名称.trim() === '' || 新名称.trim() === 会话对象.名称) return;
         会话对象.名称 = 新名称.trim().slice(0, 8);
         会话对象.最后活跃时间 = Date.now();

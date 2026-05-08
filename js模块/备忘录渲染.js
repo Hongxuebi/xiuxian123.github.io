@@ -282,7 +282,7 @@ function 显示文件夹右键菜单(x, y, 文件夹名) {
 
 // 处理创建子文件夹
 async function 处理创建子文件夹(父文件夹名) {
-  const 子文件夹名 = prompt(`在"${父文件夹名}"下创建子文件夹：`, '');
+  const 子文件夹名 = await window._自定义输入(`在"${父文件夹名}"下创建子文件夹：`, '');
   if (子文件夹名 && window._创建文件夹) {
     const 成功 = window._创建文件夹(子文件夹名, 父文件夹名);
     if (成功) {
@@ -343,7 +343,7 @@ async function 处理移动文件夹(源文件夹名) {
 
 // 处理重命名文件夹
 async function 处理重命名文件夹(原文件夹名) {
-  const 新文件夹名 = prompt(`将 "${原文件夹名}" 重命名为：`, 原文件夹名);
+  const 新文件夹名 = await window._自定义输入(`将 "${原文件夹名}" 重命名为：`, 原文件夹名);
   if (!新文件夹名 || 新文件夹名.trim() === '' || 新文件夹名.trim() === 原文件夹名) return;
 
   const 成功 = window._重命名文件夹 ? window._重命名文件夹(原文件夹名, 新文件夹名.trim()) : false;
@@ -369,7 +369,7 @@ async function 处理删除文件夹(文件夹名) {
     ? `确定要删除文件夹 "${文件夹名}" 吗？\n\n该文件夹包含 ${子文件夹列表.length} 个子文件夹和 ${受影响备忘录.length} 条备忘录，这些备忘录将被移入回收站。`
     : `确定要删除文件夹 "${文件夹名}" 吗？`;
 
-  if (!confirm(确认消息)) return;
+  if (!await window._自定义确认(确认消息)) return;
 
   const 成功 = window._删除文件夹 ? window._删除文件夹(文件夹名) : false;
   if (成功) {
@@ -382,7 +382,7 @@ async function 处理删除文件夹(文件夹名) {
 }
 
 // 显示文件夹选择对话框（返回Promise）
-function 显示文件夹选择对话框(文件夹列表, 标题) {
+window._显示文件夹选择对话框 = function 显示文件夹选择对话框(文件夹列表, 标题) {
   return new Promise((resolve) => {
     // 创建遮罩和对话框
     const 遮罩 = document.createElement('div');
@@ -862,6 +862,8 @@ function 渲染备忘录列表() {
         if (e.target.closest('.操作栏按钮')) return;
         const 容器 = 卡片.closest('.备忘录卡片滑动容器');
         if (!容器) return;
+        if (window._刚收起卡片 && window._刚收起卡片()) return;
+        if (window._当前展开的卡片 && window._当前展开的卡片()) { window._收起所有卡片(); return; }
         const id = parseInt(容器.dataset.id);
         if (当前筛选 === 'deleted') return;
         window.打开编辑页面(id);
@@ -881,11 +883,10 @@ function 渲染备忘录列表() {
         if (容器 && 容器.classList.contains('展开')) return;
         if (window._是否发生了滑动 && window._是否发生了滑动()) return;
         if (e.target.closest('.操作栏按钮')) return;
+        if (window._刚收起卡片 && window._刚收起卡片()) return;
         const id = parseInt(容器.dataset.id);
-        if (当前筛选 === 'deleted') {
-          // 回收站中的备忘录点击不进入编辑，而是显示恢复选项
-          return;
-        }
+        if (当前筛选 === 'deleted') { return; }
+        if (window._当前展开的卡片 && window._当前展开的卡片()) { window._收起所有卡片(); return; }
         window.打开编辑页面(id);
       });
     });

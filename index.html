@@ -4,6 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>私人AI助理 · 鸿蒙原生</title>
+  <!-- 鸿蒙 WebView rawfile 下 navigator.onLine 误判离线，强制返回 true -->
+  <script>
+    try { Object.defineProperty(navigator, 'onLine', { get: () => true }); } catch(e) {}
+
+    // 鸿蒙边缘返回/返回键处理
+    // 按优先级逐层关闭：动态遮罩 > 浮层 > 抽屉 > 菜单 > 工具条 > 面板 > 退出App
+    window._handleBack = function() {
+      // === 第1层：动态遮罩对话框（按ID查找） ===
+      var dynamicOverlays = ['整理确认卡片', '压缩确认对话框', '__导出选择对话框__'];
+      for (var i = 0; i < dynamicOverlays.length; i++) {
+        var el = document.getElementById(dynamicOverlays[i]);
+        if (el) { el.remove(); return; }
+      }
+      // 智能体编辑遮罩（className不是id，用querySelector）
+      var editMask = document.querySelector('.智能体编辑-编辑遮罩');
+      if (editMask) { editMask.remove(); return; }
+      // 智能体权限向导遮罩
+      var permMask = document.querySelector('.智能体编辑-权限浮层-遮罩');
+      if (permMask) { permMask.remove(); return; }
+      // 动态创建的文件夹选择对话框 — 点取消按钮触发resolve(null)而不是直接remove，避免Promise卡死
+      var folderDialog = document.querySelector('.智能体权限向导-遮罩');
+      if (folderDialog) {
+        var cancelBtn = folderDialog.querySelector('button[data-action="cancel"], button:last-child');
+        if (cancelBtn) { cancelBtn.click(); return; }
+        folderDialog.remove(); return;
+      }
+
+      // === 第2层：静态浮层（设置、添加智能体、冲突、头像预览） ===
+      var overlays = document.querySelectorAll('.浮层');
+      for (var i = 0; i < overlays.length; i++) {
+        if (overlays[i].style.display !== 'none') {
+          overlays[i].style.display = 'none';
+          return;
+        }
+      }
+
+      // === 第3层：抽屉（会话抽屉 / 备忘录抽屉） ===
+      var drawer = document.querySelector('.抽屉.打开');
+      if (drawer) { if (window.关闭抽屉) window.关闭抽屉(); return; }
+
+      // === 第4层：编辑页面专属弹层 ===
+      var activePanel = document.querySelector('.内容面板.激活');
+      if (activePanel && activePanel.id === '编辑页面') {
+        // 字号抽屉（有遮罩）
+        if (window.隐藏字号抽屉) {
+          var drawer = document.getElementById('字号抽屉');
+          if (drawer && drawer.classList.contains('显示')) { window.隐藏字号抽屉(); return; }
+        }
+        // 格式菜单
+        var fmtMenu = document.querySelector('.浮动格式菜单');
+        if (fmtMenu && window.关闭格式菜单) { window.关闭格式菜单(); return; }
+        // AI菜单
+        var aiMenuCheck = document.querySelector('.ai辅助菜单');
+        if (aiMenuCheck) { if (window.关闭AI菜单) window.关闭AI菜单(); return; }
+        // 选区工具条
+        var toolbar = document.getElementById('选区工具条');
+        if (toolbar && toolbar.style.display !== 'none') { toolbar.style.display = 'none'; return; }
+        // 颜色面板
+        var cp = document.getElementById('颜色面板');
+        if (cp && cp.style.display !== 'none') { cp.style.display = 'none'; return; }
+        // 文件夹下拉菜单（在编辑页面内）
+        var folderMenu = document.getElementById('文件夹下拉菜单');
+        if (folderMenu && folderMenu.classList.contains('显示')) { if (window.关闭文件夹下拉菜单) window.关闭文件夹下拉菜单(); return; }
+        // 标签选择页
+        var tagPage = document.getElementById('标签选择页');
+        if (tagPage && tagPage.style.display !== 'none') { if (window.关闭标签选择页) window.关闭标签选择页(); return; }
+      }
+
+      // === 第5层：备忘录面板专属弹层 ===
+      if (activePanel && activePanel.id === '备忘录面板') {
+        var folderMenu2 = document.getElementById('文件夹下拉菜单');
+        if (folderMenu2 && folderMenu2.classList.contains('显示')) { if (window.关闭文件夹下拉菜单) window.关闭文件夹下拉菜单(); return; }
+        var floatMenu = document.getElementById('全局浮动菜单');
+        if (floatMenu && floatMenu.classList.contains('显示')) { if (window.关闭全局浮动菜单) window.关闭全局浮动菜单(); return; }
+      }
+
+      // === 第6层：对话面板专属弹层 ===
+      if (activePanel && activePanel.id === '对话面板') {
+        var moreMenu = document.querySelector('.更多菜单 .下拉内容.显示');
+        if (moreMenu) { if (window.关闭更多菜单) window.关闭更多菜单(); return; }
+      }
+
+      // === 第6.5层：标签选择页（任何面板都可能打开） ===
+      var tagPage = document.getElementById('标签选择页');
+      if (tagPage && tagPage.style.display !== 'none') { if (window.关闭标签选择页) window.关闭标签选择页(); return; }
+
+      // === 第7层：智能体编辑弹窗（记忆库面板） ===
+      var ae = document.querySelector('.智能体编辑-编辑弹窗');
+      if (ae) { ae.remove(); return; }
+
+      // === 第7.5层：展开的卡片（优先于面板切换，否则侧滑返回会跳面板而不收起卡片） ===
+      if (window._当前展开的卡片 && window._当前展开的卡片()) { if (window._收起所有卡片) window._收起所有卡片(); return; }
+
+      // === 第8层：子面板切换 ===
+      if (activePanel && activePanel.id !== '对话面板') {
+        if (window.切换标签) {
+          if (activePanel.id === '编辑页面') { window.切换标签('备忘录面板'); return; }
+          else { window.切换标签('对话面板'); return; }
+        }
+      }
+
+      // === 第9层：展开的卡片（已在第7.5层处理，此处为安全兜底） ===
+      if (window._当前展开的卡片 && window._当前展开的卡片()) { if (window._收起所有卡片) window._收起所有卡片(); return; }
+
+      // === 第10层：多选模式 ===
+      if (window.多选状态 && window.多选状态.isActive) { if (window.多选状态.退出多选) window.多选状态.退出多选(); return; }
+
+      // === 第11层：无任何面板可关 → 退出 App ===
+      if (window.nativeBridge) { window.nativeBridge.exitApp(); return; }
+    };
+  </script>
   <link rel="stylesheet" href="css/样式.css?v=20260430i">
   <link rel="stylesheet" href="css/智能体编辑面板-样式.css">
   <link rel="stylesheet" href="assets/css/font-awesome.min.css">
@@ -54,11 +165,32 @@
   <script src="js模块/设置浮层.js?v=20260430i"></script>
   <script src="js模块/备忘录UI.js?v=20260423b"></script>
   <script src="js模块/智能体编辑面板.js?v=20260502b"></script>
+  <script src="js模块/智能体权限向导.js"></script>
   
   <!-- 最后加载初始化 -->
   <script src="js模块/初始化.js?v=20260430e"></script>
 </head>
-<body>
+<body style="background:#0a0e1a">
+<!-- 诗意启动画面：纯 CSS，JS 加载完自动隐藏 -->
+<style>
+  #启动loading { position:fixed; inset:0; z-index:999999; background:linear-gradient(135deg,#0a0e1a 0%,#1a2847 40%,#2d1f4a 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.8s ease; overflow:hidden; }
+  #启动loading.隐藏 { opacity:0; pointer-events:none; }
+  #启动loading .cloud-icon { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#6e8efb,#a777e3); box-shadow:0 0 40px rgba(110,142,251,0.3); margin-bottom:28px; }
+  #启动loading .splash-title { font-size:32px; font-weight:300; color:rgba(255,255,255,0.95); letter-spacing:12px; margin-bottom:16px; }
+  #启动loading .splash-couplet { font-size:13px; color:rgba(255,255,255,0.45); letter-spacing:3px; line-height:2; text-align:center; }
+  #启动loading .star { position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; }
+  #启动loading .star1 { top:15%; left:20%; animation:twinkle 3s ease-in-out infinite; }
+  #启动loading .star2 { top:25%; left:75%; animation:twinkle 4s ease-in-out 1s infinite; }
+  #启动loading .star3 { top:60%; left:85%; animation:twinkle 3.5s ease-in-out 0.5s infinite; }
+  @keyframes twinkle { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.5)} }
+</style>
+<div id="启动loading">
+  <div class="star star1"></div><div class="star star2"></div><div class="star star3"></div>
+  <div class="cloud-icon"></div>
+  <div class="splash-title">流云记</div>
+  <div class="splash-couplet">流云过眼，万象皆成笔下记<br>片语关心，千山难隔耳边音</div>
+</div>
+
 <div id="应用容器">
   <!-- 顶部栏 -->
   <header class="顶部栏">

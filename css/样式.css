@@ -2020,12 +2020,22 @@ body {
   width: 200px;
   max-height: 200px;
   overflow-y: auto;
-  z-index: 9999; /* 提高z-index确保显示在最上层 */
+  z-index: 9999;
   display: none;
 }
 
 .文件夹下拉菜单.显示 {
   display: block;
+  position: fixed;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  width: 200px;
+  padding: 8px 0;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
 }
 
 .文件夹选项 {
@@ -2089,6 +2099,7 @@ body {
   font-size: 16px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y; /* 只允许纵向滚动，横向手势交给系统处理（鸿蒙返回） */
 }
 
 .标签选择页导航 {
@@ -2887,7 +2898,7 @@ body {
   border-radius: 1rem;
   height: auto;
   min-height: 120px;
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -2898,7 +2909,7 @@ body {
   border-radius: 1rem;
   padding: 0.9rem 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
   border: 1px solid var(--边框色);
   position: relative;
@@ -2912,7 +2923,12 @@ body {
 .备忘录卡片:active {
   transform: scale(0.985);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  transition: all 0.05s ease;
+  transition: box-shadow 0.05s ease;
+}
+
+/* 展开状态下 :active 不应改变 transform */
+.备忘录卡片滑动容器.展开 .备忘录卡片:active {
+  transform: translateX(-300px);
 }
 
 /* hover 效果只保留给非触屏设备 */
@@ -3199,7 +3215,7 @@ body {
   border-radius: 1rem;
   height: auto;
   min-height: 120px;
-  touch-action: pan-y pinch-zoom; /* 鸿蒙WebView兼容：允许垂直滚动，禁止水平滚动被父容器接管 */
+  touch-action: pan-y; /* 只允许纵向滚动，横向手势交给JS处理 */
   user-select: none;
   -webkit-user-select: none;
 }
@@ -3219,6 +3235,10 @@ body {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.2s ease;
+}
+
+.卡片操作栏.操作栏可见 {
+  opacity: 1;
 }
 
 /* 操作栏按钮 */
@@ -3307,10 +3327,18 @@ body {
 /* 展开状态 - 完全由CSS控制transform，避免JS内联样式冲突 */
 .备忘录卡片滑动容器.展开 .备忘录卡片 {
   transform: translateX(-300px);
+  z-index: 0; /* 展开时降低，让操作栏按钮可点击 */
 }
 
+.备忘录卡片滑动容器.展开 .备忘录卡片 {
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.备忘录卡片滑动容器.展开 .卡片操作栏.操作栏可见,
 .备忘录卡片滑动容器.展开 .卡片操作栏 {
   opacity: 1;
+  z-index: 10; /* 展开时提升，确保按钮在卡片之上可点击 */
+  pointer-events: auto;
 }
 
 /* 移动端适配 */

@@ -181,4 +181,94 @@ window.addEventListener('DOMContentLoaded', async () => {
   // （之前按百度Key有无设disabled，但Key可能存在而JS读取时机不对，导致开关永远灰色）
   const 开关 = document.getElementById('联网搜索开关');
   if (开关) 开关.disabled = false;
+
+  // === 隐藏启动 loading ===
+  const 启动loading = document.getElementById('启动loading');
+  if (启动loading) {
+    启动loading.classList.add('隐藏');
+    setTimeout(() => 启动loading.remove(), 400);
+  }
 });
+
+// === 自定义输入对话框（替代 prompt()，兼容鸿蒙 WebView） ===
+window._自定义输入 = function(提示文字, 默认值) {
+  return new Promise((resolve) => {
+    const 遮罩 = document.createElement('div');
+    遮罩.className = '自定义输入遮罩';
+    遮罩.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+
+    const 对话框 = document.createElement('div');
+    对话框.style.cssText = 'background:var(--内容底色,#fff);border-radius:1rem;padding:1.5rem;width:85%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+
+    const 提示 = document.createElement('div');
+    提示.textContent = 提示文字;
+    提示.style.cssText = 'margin-bottom:1rem;font-size:0.9rem;color:var(--文字主色,#333);white-space:pre-line;line-height:1.5;';
+
+    const 输入框 = document.createElement('input');
+    输入框.type = 'text';
+    输入框.value = 默认值 || '';
+    输入框.style.cssText = 'width:100%;padding:0.6rem;border:1px solid var(--边框色,#ddd);border-radius:0.5rem;font-size:1rem;box-sizing:border-box;outline:none;background:var(--背景色,#f9f9f9);color:var(--文字主色,#333);';
+    输入框.addEventListener('focus', () => { 输入框.style.borderColor = 'var(--强调色,#4F46E5)'; });
+    输入框.addEventListener('blur', () => { 输入框.style.borderColor = 'var(--边框色,#ddd)'; });
+
+    const 按钮区 = document.createElement('div');
+    按钮区.style.cssText = 'display:flex;gap:0.75rem;margin-top:1rem;justify-content:flex-end;';
+
+    const 取消按钮 = document.createElement('button');
+    取消按钮.textContent = '取消';
+    取消按钮.style.cssText = 'padding:0.5rem 1.2rem;border:1px solid var(--边框色,#ddd);border-radius:0.5rem;background:var(--内容底色,#fff);color:var(--文字主色,#333);cursor:pointer;font-size:0.9rem;';
+
+    const 确认按钮 = document.createElement('button');
+    确认按钮.textContent = '确认';
+    确认按钮.style.cssText = 'padding:0.5rem 1.2rem;border:none;border-radius:0.5rem;background:var(--强调色,#4F46E5);color:#fff;cursor:pointer;font-size:0.9rem;';
+
+    const 关闭 = (值) => { 遮罩.remove(); resolve(值); };
+    取消按钮.onclick = () => 关闭(null);
+    确认按钮.onclick = () => 关闭(输入框.value);
+    输入框.onkeydown = (e) => { if (e.key === 'Enter') 关闭(输入框.value); };
+    遮罩.onclick = (e) => { if (e.target === 遮罩) 关闭(null); };
+
+    按钮区.append(取消按钮, 确认按钮);
+    对话框.append(提示, 输入框, 按钮区);
+    遮罩.append(对话框);
+    document.body.append(遮罩);
+    setTimeout(() => 输入框.focus(), 100);
+  });
+};
+
+window._自定义确认 = function(提示文字, 确认按钮文字 = '确定', 取消按钮文字 = '取消') {
+  return new Promise((resolve) => {
+    const 遮罩 = document.createElement('div');
+    遮罩.className = '自定义确认遮罩';
+    遮罩.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+
+    const 对话框 = document.createElement('div');
+    对话框.style.cssText = 'background:var(--内容底色,#fff);border-radius:1rem;padding:1.5rem;width:85%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+
+    const 提示 = document.createElement('div');
+    提示.textContent = 提示文字;
+    提示.style.cssText = 'font-size:0.9rem;color:var(--文字主色,#333);white-space:pre-line;line-height:1.5;margin-bottom:1.2rem;';
+
+    const 按钮区 = document.createElement('div');
+    按钮区.style.cssText = 'display:flex;gap:0.75rem;justify-content:flex-end;';
+
+    const 取消按钮 = document.createElement('button');
+    取消按钮.textContent = 取消按钮文字;
+    取消按钮.style.cssText = 'padding:0.5rem 1.2rem;border:1px solid var(--边框色,#ddd);border-radius:0.5rem;background:var(--内容底色,#fff);color:var(--文字主色,#333);cursor:pointer;font-size:0.9rem;';
+
+    const 确认按钮 = document.createElement('button');
+    确认按钮.textContent = 确认按钮文字;
+    确认按钮.style.cssText = 'padding:0.5rem 1.2rem;border:none;border-radius:0.5rem;background:#dc2626;color:#fff;cursor:pointer;font-size:0.9rem;';
+
+    const 关闭 = (值) => { 遮罩.remove(); resolve(值); };
+    取消按钮.onclick = () => 关闭(false);
+    确认按钮.onclick = () => 关闭(true);
+    遮罩.onclick = (e) => { if (e.target === 遮罩) 关闭(false); };
+
+    按钮区.append(取消按钮, 确认按钮);
+    对话框.append(提示, 按钮区);
+    遮罩.append(对话框);
+    document.body.append(遮罩);
+    确认按钮.focus();
+  });
+};

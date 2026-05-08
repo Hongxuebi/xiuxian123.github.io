@@ -545,17 +545,21 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
       // 绑定"新建文件夹"事件
       const 新建文件夹选项 = 文件夹下拉菜单.querySelector('.新建文件夹选项');
       if (新建文件夹选项) {
-        新建文件夹选项.addEventListener('click', (optEvent) => {
+        新建文件夹选项.addEventListener('click', async (optEvent) => {
           optEvent.stopPropagation();
-          const 文件夹名称 = prompt('请输入新文件夹名称：');
+          // 用自定义对话框替代 prompt()（鸿蒙 WebView 屏蔽 prompt）
+          let 文件夹名称;
+          if (window._自定义输入) {
+            文件夹名称 = await window._自定义输入('请输入新文件夹名称：');
+          } else {
+            文件夹名称 = await window._自定义输入('请输入新文件夹名称：');
+          }
           if (文件夹名称 && 文件夹名称.trim()) {
             if (window._创建文件夹) {
               const 成功 = window._创建文件夹(文件夹名称.trim(), null);
               if (成功) {
-                // 选中新创建的文件夹
                 const 当前文件夹名称Span = document.getElementById('当前文件夹名称');
                 if (当前文件夹名称Span) 当前文件夹名称Span.textContent = 文件夹名称.trim();
-                // 刷新抽屉的文件夹树
                 if (window.渲染文件夹树) window.渲染文件夹树();
               } else {
                 alert('文件夹已存在或创建失败');
@@ -567,18 +571,9 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
         });
       }
       const 按钮位置 = 文件夹选择按钮.getBoundingClientRect();
-      文件夹下拉菜单.style.position = 'fixed';
+      // 只设置动态定位（top/left随按钮位置变化），样式全部由CSS class控制
       文件夹下拉菜单.style.top = (按钮位置.top + 按钮位置.height + 10) + 'px';
       文件夹下拉菜单.style.left = 按钮位置.left + 'px';
-      文件夹下拉菜单.style.zIndex = '9999';
-      文件夹下拉菜单.style.background = 'white';
-      文件夹下拉菜单.style.border = '1px solid #ccc';
-      文件夹下拉菜单.style.borderRadius = '8px';
-      文件夹下拉菜单.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      文件夹下拉菜单.style.width = '200px';
-      文件夹下拉菜单.style.padding = '8px 0';
-      文件夹下拉菜单.style.maxHeight = '200px';
-      文件夹下拉菜单.style.overflowY = 'auto';
       文件夹下拉菜单.classList.add('显示');
     });
     document.addEventListener('click', (e) => {
@@ -590,6 +585,17 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
     文件夹下拉菜单.addEventListener('click', (e) => e.stopPropagation());
   }
   
+  // 暴露给鸿蒙返回手势
+  window.关闭文件夹下拉菜单 = function() {
+    if (文件夹下拉菜单) {
+      文件夹下拉菜单.classList.remove('显示');
+      // 清除动态定位（top/left随按钮位置变化，关闭后需要重置）
+      文件夹下拉菜单.style.top = '';
+      文件夹下拉菜单.style.left = '';
+    }
+  };
+  window.关闭全局浮动菜单 = function() { var m = document.getElementById('全局浮动菜单'); if (m) m.classList.remove('显示'); };
+
   // ===== 标签管理（微信风格独立页面） =====
   const 标签按钮 = document.getElementById('标签按钮');
   const 标签选择页 = document.getElementById('标签选择页');
@@ -733,9 +739,9 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
   }
 
   // 删除标签（全局）
-  function 全局删除标签(标签原始) {
+  async function 全局删除标签(标签原始) {
     const 标签 = decodeURIComponent(标签原始);
-    if (!confirm(`确定删除标签「${标签}」？\n该操作将从所有备忘录中移除该标签。`)) return;
+    if (!await window._自定义确认(`确定删除标签「${标签}」？\n该操作将从所有备忘录中移除该标签。`)) return;
     const 数据源 = window._备忘录数据源 || window.备忘录管理器?.memos || [];
     数据源.forEach(m => {
       if (m.标签 && Array.isArray(m.标签) && m.标签.includes(标签)) {
@@ -771,8 +777,8 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
     });
   }
   if (新建标签按钮) {
-    新建标签按钮.addEventListener('click', () => {
-      const 名称 = prompt('新建标签：', '');
+    新建标签按钮.addEventListener('click', async () => {
+      const 名称 = await window._自定义输入('新建标签：', '');
       if (!名称 || !名称.trim()) return;
       const 新 = 名称.trim().slice(0, 20);
       const 已存在 = window._获取所有已用标签() || [];
@@ -799,6 +805,7 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
       // 点击空白区域关闭（只有点击页面背景才关闭，不是点击内部元素）
       if (e.target === 标签选择页) 关闭标签选择页();
     });
+    // 返回手势由CSS touch-action:pan-y + 鸿蒙onBackPress处理
   }
 
   // ===== 事件委托 =====
@@ -857,14 +864,14 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
         document.removeEventListener('click', 关闭菜单);
       }
     };
-    菜单.addEventListener('click', (ev) => {
+    菜单.addEventListener('click', async (ev) => {
       const 操作项 = ev.target.closest('.标签操作项');
       if (!操作项) return;
       const action = 操作项.dataset.action;
       菜单.remove();
       document.removeEventListener('click', 关闭菜单);
       if (action === 'delete') {
-        if (confirm('删除标签「' + 标签名 + '」？')) {
+        if (await window._自定义确认('删除标签「' + 标签名 + '」？')) {
           if (window.全局删除标签) window.全局删除标签(encodeURIComponent(标签名));
         }
       } else if (action === 'view') {
@@ -956,6 +963,9 @@ ${本批.map(m => `${m.id} | ${m.标题} | ${m.文件夹 || '默认'} | ${(m.标
     };
     setTimeout(() => document.addEventListener('click', 关闭), 0);
   }
+
+  // 暴露给鸿蒙返回手势
+  window.关闭格式菜单 = function() { if (格式菜单) { 格式菜单.remove(); 格式菜单 = null; } };
 
   // ========== 待办事项 ==========
   function 插入待办项(编辑区, 初始文本 = null, 截止时间 = null) {
@@ -1454,6 +1464,20 @@ ${deadlineDisplay}`;
 
   // ========== 下载图片函数 ==========
   function 下载图片(base64数据, 文件名) {
+    // 走统一下载入口（鸿蒙原生优先）
+    if (window.nativeBridge && window.nativeBridge.saveFile) {
+      const parts = base64数据.split(',');
+      const base64 = parts[1] || parts[0];
+      window.nativeBridge.saveFile(文件名, base64).then(res => {
+        const 结果 = JSON.parse(res);
+        if (!结果.success) {
+          console.warn('[下载图片] 保存未完成:', 结果.error);
+        }
+      }).catch(e => {
+        console.warn('[下载图片] 原生保存异常:', e);
+      });
+      return;
+    }
     const link = document.createElement('a');
     link.href = base64数据;
     link.download = 文件名;
@@ -1557,6 +1581,20 @@ ${deadlineDisplay}`;
     const 文件名 = 附件元素.dataset.fileName;
     const 文件数据 = 附件元素.dataset.fileData;
 
+    // 走统一下载入口（鸿蒙原生优先）
+    if (window.nativeBridge && window.nativeBridge.saveFile) {
+      const parts = 文件数据.split(',');
+      const base64 = parts[1] || 文件数据;
+      window.nativeBridge.saveFile(文件名, base64).then(res => {
+        const 结果 = JSON.parse(res);
+        if (!结果.success) {
+          console.warn('[下载附件] 保存未完成:', 结果.error);
+        }
+      }).catch(e => {
+        console.warn('[下载附件] 原生保存异常:', e);
+      });
+      return;
+    }
     const link = document.createElement('a');
     link.href = 文件数据;
     link.download = 文件名;
@@ -1672,6 +1710,9 @@ ${deadlineDisplay}`;
     };
     setTimeout(() => document.addEventListener('click', 关闭), 0);
   }
+
+  // 暴露给鸿蒙返回手势
+  window.关闭AI菜单 = function() { if (AI菜单) { AI菜单.remove(); AI菜单 = null; } };
 
   // ========== 执行AI辅助编辑 ==========
   async function 执行AI辅助编辑(操作类型, 编辑区) {
@@ -1807,6 +1848,9 @@ ${deadlineDisplay}`;
       }
     });
 
+    // 暴露给鸿蒙返回手势
+    window.隐藏选区工具条 = function() { 选区工具条.style.display = 'none'; };
+
     // 工具条按钮事件委托
     选区工具条.addEventListener('click', (e) => {
       const 按钮 = e.target.closest('[data-action]');
@@ -1891,6 +1935,9 @@ ${deadlineDisplay}`;
     抽屉保存的选区 = null;
     缓存的字号元素 = null;
   }
+
+  // 暴露给鸿蒙返回手势
+  window.隐藏字号抽屉 = 隐藏字号抽屉;
 
   if (关闭按钮) {
     关闭按钮.addEventListener('click', () => {
@@ -2026,7 +2073,7 @@ ${deadlineDisplay}`;
           const 回收站列表 = window.备忘录管理器?.获取回收站列表?.() || [];
           if (回收站列表.length === 0) {
             alert('回收站已经是空的');
-          } else if (confirm(`确定要永久删除 ${回收站列表.length} 条备忘录吗？此操作不可撤销。`)) {
+          } else if (await window._自定义确认(`确定要永久删除 ${回收站列表.length} 条备忘录吗？此操作不可撤销。`)) {
             try {
               const 结果 = await window.备忘录管理器.清空回收站();
               alert(`已清空回收站，永久删除了 ${结果.删除数量} 条备忘录`);
@@ -2042,7 +2089,7 @@ ${deadlineDisplay}`;
           const 回收站列表 = window.备忘录管理器?.获取回收站列表?.() || [];
           if (回收站列表.length === 0) {
             alert('回收站中没有可恢复的备忘录');
-          } else if (confirm(`确定要恢复 ${回收站列表.length} 条备忘录吗？`)) {
+          } else if (await window._自定义确认(`确定要恢复 ${回收站列表.length} 条备忘录吗？`)) {
             try {
               let 恢复数量 = 0;
               for (const 备忘录 of 回收站列表) {
@@ -2692,9 +2739,15 @@ async function 批量移动() {
     // 绑定"新建文件夹"事件
     const 新建文件夹选项 = 下拉菜单.querySelector('.新建文件夹选项');
     if (新建文件夹选项) {
-      新建文件夹选项.addEventListener('click', (optEvent) => {
+      新建文件夹选项.addEventListener('click', async (optEvent) => {
         optEvent.stopPropagation();
-        const 文件夹名称 = prompt('请输入新文件夹名称：');
+        // 用自定义对话框替代 prompt()（鸿蒙 WebView 屏蔽 prompt）
+        let 文件夹名称;
+        if (window._自定义输入) {
+          文件夹名称 = await window._自定义输入('请输入新文件夹名称：');
+        } else {
+          文件夹名称 = await window._自定义输入('请输入新文件夹名称：');
+        }
         if (文件夹名称 && 文件夹名称.trim()) {
           if (window._创建文件夹) {
             const 成功 = window._创建文件夹(文件夹名称.trim(), null);
@@ -2756,7 +2809,7 @@ async function 批量删除() {
   const 选中列表 = window.多选状态?.获取选中列表() || [];
   if (选中列表.length === 0) return;
   
-  if (!confirm(`确定要将 ${选中列表.length} 条备忘录移入回收站吗？`)) return;
+  if (!await window._自定义确认(`确定要将 ${选中列表.length} 条备忘录移入回收站吗？`)) return;
   
   let 成功数量 = 0;
   for (const id of 选中列表) {
@@ -2794,7 +2847,7 @@ async function 批量永久删除() {
   const 选中列表 = window.多选状态?.获取选中列表() || [];
   if (选中列表.length === 0) return;
   
-  if (!confirm(`确定要永久删除 ${选中列表.length} 条备忘录吗？此操作不可撤销！`)) return;
+  if (!await window._自定义确认(`确定要永久删除 ${选中列表.length} 条备忘录吗？此操作不可撤销！`)) return;
   
   let 成功数量 = 0;
   for (const id of 选中列表) {

@@ -86,8 +86,8 @@ function 切换收藏(id) {
 }
 
 // 删除备忘录
-function 删除备忘录(id) {
-  if (confirm('确定要删除这条备忘录吗？')) {
+async function 删除备忘录(id) {
+  if (await window._自定义确认('确定要删除这条备忘录吗？')) {
     // 优先使用 MemoManager
     if (window.备忘录管理器) {
       window.备忘录管理器.deleteMemo(id).then(() => {
@@ -452,8 +452,8 @@ function 恢复备忘录(id) {
 }
 
 // 永久删除备忘录
-function 永久删除备忘录(id) {
-  if (!confirm('确定要永久删除这条备忘录吗？此操作不可撤销！')) return;
+async function 永久删除备忘录(id) {
+  if (!await window._自定义确认('确定要永久删除这条备忘录吗？此操作不可撤销！')) return;
   if (window.备忘录管理器) {
     window.备忘录管理器.永久删除备忘录(id).then(() => {
       console.log('[永久删除] 已永久删除');
@@ -471,8 +471,8 @@ function 永久删除备忘录(id) {
 }
 
 // 永久删除备忘录
-function 永久删除备忘录(id) {
-  if (!confirm('确定要永久删除这条备忘录吗？此操作不可撤销！')) return;
+async function 永久删除备忘录(id) {
+  if (!await window._自定义确认('确定要永久删除这条备忘录吗？此操作不可撤销！')) return;
   if (window.备忘录管理器) {
     window.备忘录管理器.永久删除备忘录(id).then(() => {
       console.log('[永久删除] 已永久删除');
