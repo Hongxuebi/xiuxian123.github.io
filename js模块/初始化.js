@@ -342,3 +342,82 @@ window._显示提示 = function(消息, 类型 = 'info') {
     setTimeout(() => 容器.remove(), 300);
   }, 2800);
 };
+
+// ========== 键盘适配（鸿蒙真机虚拟键盘）==========
+// 监听 visualViewport 变化，键盘弹出时自动上推输入区
+if (window.visualViewport) {
+  window._键盘原始视口高度 = window.visualViewport.height;
+  window.visualViewport.addEventListener('resize', () => {
+    const 当前高度 = window.visualViewport.height;
+    const 差值 = window._键盘原始视口高度 - 当前高度;
+    const 输入容器 = document.getElementById('输入容器') || document.querySelector('.对话输入区') || document.querySelector('.输入框容器');
+    if (差值 > 100) {
+      // 键盘弹出 — 把输入容器推上去
+      document.body.style.paddingBottom = 差值 + 'px';
+      document.body.scrollTop = document.body.scrollHeight;
+      if (输入容器) {
+        输入容器.style.transform = `translateY(-${差值}px)`;
+        输入容器.style.transition = 'transform 0.15s ease';
+      }
+      // 滚动到输入框
+      setTimeout(() => {
+        const 输入框 = document.querySelector('textarea, input[type="text"], [contenteditable]');
+        if (输入框) 输入框.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    } else if (差值 < -50) {
+      // 键盘收起
+      document.body.style.paddingBottom = '';
+      if (输入容器) {
+        输入容器.style.transform = '';
+        输入容器.style.transition = 'transform 0.2s ease';
+      }
+    }
+    window._键盘原始视口高度 = 当前高度;
+  });
+}
+
+// ========== 全局 touch 事件修复（鸿蒙真机 300ms 延迟）==========
+// 所有非链接、非表单控件的 click 监听转为 touchend
+// 仅在鸿蒙环境中启用（通过 UA 判断）
+if (/HarmonyOS|Huawei|ohos/i.test(navigator.userAgent)) {
+  document.addEventListener('touchstart', function(e) {
+    // 记录触控起始位置用于判断是否为滚动操作
+    window._触控起始Y = e.touches[0].clientY;
+    window._触控起始X = e.touches[0].clientX;
+    window._触控时间戳 = Date.now();
+  }, { passive: true });
+  
+  document.addEventListener('touchend', function(e) {
+    // 如果是滚动操作(位移>15px)则跳过
+    if (window._触控起始Y !== undefined) {
+      const dy = Math.abs(e.changedTouches[0].clientY - window._触控起始Y);
+      const dx = Math.abs(e.changedTouches[0].clientX - window._触控起始X);
+      if (dy > 15 || dx > 15) return; // 是滚动/滑动，不是点击
+    }
+    
+    // 短触(<300ms)且不是表单元素，减少click延迟影响
+    const 触控时长 = Date.now() - (window._触控时间戳 || 0);
+    if (触控时长 > 500) return; // 长按不做特殊处理
+    
+    // 找到目标元素
+    const target = e.changedTouches[0].target;
+    const tag = target.tagName;
+    // 输入框/文本域/选择框不做处理（需要原生行为）
+    if (['INPUT', 'TEXTAREA', 'SELECT', 'OPTION'].includes(tag)) return;
+    
+    // 对于按钮类元素，触发一个模拟click来补偿鸿蒙click延迟
+    // 但用 requestAnimationFrame 确保不重复
+    if (!e._handled) {
+      e.preventDefault();
+      const 新事件 = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        clientX: e.changedTouches[0].clientX,
+        clientY: e.changedTouches[0].clientY
+      });
+      // 标记防止循环
+      新事件._fromTouch = true;
+      target.dispatchEvent(新事件);
+    }
+  }, { passive: false });
+}

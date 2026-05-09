@@ -1393,10 +1393,12 @@ window.显示压缩对话框 = async function() {
 
   遮罩.appendChild(卡片);
   document.body.appendChild(遮罩);
+  if (window._锁定滚动) window._锁定滚动();
 
-  卡片.querySelector('.取消压缩').addEventListener('click', () => 遮罩.remove());
+  卡片.querySelector('.取消压缩').addEventListener('click', () => { 遮罩.remove(); if (window._解锁滚动) window._解锁滚动(); });
   卡片.querySelector('.确认压缩').addEventListener('click', async () => {
     遮罩.remove();
+    if (window._解锁滚动) window._解锁滚动();
     await window.压缩当前对话();
   });
 };

@@ -27,7 +27,69 @@ window.绑定抽屉事件 = function() {
   }
   
   开关.addEventListener('click', 打开抽屉);
+  开关.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    打开抽屉();
+  });
   遮罩.addEventListener('click', 关闭抽屉);
+  
+  // ========== 抽屉拖拽关闭（移动端）==========
+  let 拖拽开始X = 0;
+  let 抽屉拖动中 = false;
+  
+  // 获取当前打开的抽屉元素
+  function 获取当前抽屉() {
+    if (会话抽屉.classList.contains('打开')) return 会话抽屉;
+    if (备忘录抽屉.classList.contains('打开')) return 备忘录抽屉;
+    return null;
+  }
+  
+  遮罩.addEventListener('touchstart', function(e) {
+    拖拽开始X = e.touches[0].clientX;
+    抽屉拖动中 = true;
+  }, { passive: true });
+  
+  遮罩.addEventListener('touchmove', function(e) {
+    if (!抽屉拖动中) return;
+    const 偏移 = e.touches[0].clientX - 拖拽开始X;
+    if (偏移 < 0) {
+      // 向左滑动（抽屉内容向左滑出屏幕）
+      const 抽屉 = 获取当前抽屉();
+      if (抽屉) {
+        抽屉.style.transform = `translateX(${Math.max(偏移, -250)}px)`;
+        抽屉.style.transition = 'none';
+        抽屉.style.opacity = Math.max(0, 1 + 偏移 / 250);
+      }
+    }
+  }, { passive: true });
+  
+  遮罩.addEventListener('touchend', function(e) {
+    if (!抽屉拖动中) return;
+    抽屉拖动中 = false;
+    const 偏移 = e.changedTouches[0].clientX - 拖拽开始X;
+    const 抽屉 = 获取当前抽屉();
+    if (!抽屉) return;
+    
+    if (偏移 < -80) {
+      // 滑动超过阈值，关闭抽屉
+      抽屉.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+      抽屉.style.transform = 'translateX(-100%)';
+      抽屉.style.opacity = '0';
+      setTimeout(() => {
+        关闭抽屉();
+        抽屉.style.transform = '';
+        抽屉.style.opacity = '';
+        抽屉.style.transition = '';
+      }, 200);
+    } else {
+      // 未超过阈值，弹回
+      抽屉.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+      抽屉.style.transform = '';
+      抽屉.style.opacity = '';
+      setTimeout(() => { 抽屉.style.transition = ''; }, 200);
+    }
+    拖拽开始X = 0;
+  }, { passive: true });
   
   window.关闭抽屉 = 关闭抽屉;
   window.打开抽屉 = 打开抽屉;
