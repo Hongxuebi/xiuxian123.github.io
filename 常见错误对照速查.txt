@@ -230,3 +230,12 @@ grep -rn "window\._\|window\.变量名" js模块/
 | DR-01 | 头像元素用 getElementById | 不用 CSS 选择器 `.抽屉 .智能体头像`（class 名容易错），固定 ID 优先用 `getElementById` |
 | DR-02 | 照片优先级高于 emoji | `更新抽屉头像` 中先判断 `avatar`（照片），再判断 `icon`（emoji） |
 | DR-03 | 绑定头像预览函数不能删 | v0.7.8 重构时删除过，但 `初始化.js` 仍在调用。删函数前必须 grep 所有调用点 |
+
+### NW-06 桌面浏览器联网搜索失败（CORS 拦截）
+
+| 字段 | 内容 |
+|------|------|
+| **问题现象** | AI 说"搜索失败"或"没有联网搜索接口"，实际代码逻辑完整 |
+| **根因** | 浏览器同源策略拦截 fetch('https://qianfan.baidubce.com') |
+| **临时解决** | 终端运行: `node baidu-proxy.js`（启动本地代理，端口 3778） |
+| **永久方案** | 在 index.html 同级目录放 baidu-proxy.js，启动时自动拉起 |

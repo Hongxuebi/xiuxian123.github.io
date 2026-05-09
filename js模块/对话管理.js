@@ -1103,6 +1103,49 @@ ${说明书.内容}`);
     }
   } catch (e) { /* 无说明书则跳过 */ }
 
+  // 2.61 用户重要提醒/待办注入（备忘录中高优先级含日期条目）
+  // 让 AI 每次对话都能看到用户的活跃提醒，不依赖主动搜索备忘录
+  try {
+    const manager = window.备忘录管理器;
+    if (manager && typeof manager.getAllMemos === 'function') {
+      const allMemos = await manager.getAllMemos();
+      const 重要提醒 = [];
+      for (const memo of allMemos) {
+        // 符合以下任一条件视为重要提醒：
+        // 1. 标题或标签含「提醒」「考试」「截止」「ddl」「倒计时」等关键词
+        // 2. 重要性标记 >= 8（高优先级）
+        // 3. 内容含明确日期格式（YYYY-MM-DD 或 YYYY年M月D日）
+        const 标题 = memo.标题 || '';
+        const 内容 = memo.内容 || '';
+        const 标签 = memo.标签 || [];
+        const 重要性 = parseInt(memo.重要性) || 0;
+        const 标签文本 = Array.isArray(标签) ? 标签.join(',') : String(标签);
+        const 提醒关键词 = ['提醒', '考试', '截止', 'ddl', '倒计时', 'deadline', '到期', '面试', '面试时间', '预约', '会议'];
+        const 是提醒 = 提醒关键词.some(k => 标题.includes(k) || 标签文本.includes(k) || 内容.slice(0, 50).includes(k));
+        const 是高优先级 = 重要性 >= 8;
+        // 检查内容中是否有日期格式
+        const 含日期 = /\d{4}[-年]\d{1,2}[-月]\d{1,2}[日]?/.test(内容);
+        if (是提醒 || 是高优先级 || 含日期) {
+          重要提醒.push({
+            标题: 标题 || '未命名',
+            摘要: 内容.slice(0, 120),
+            重要性: 重要性,
+            标签: 标签
+          });
+        }
+      }
+      if (重要提醒.length > 0) {
+        重要提醒.sort((a, b) => b.重要性 - a.重要性);
+        const 提醒文本 = 重要提醒.map(r => 
+          `- [重要${'★'.repeat(Math.min(r.重要性 || 1, 3))}] ${r.标题}：${r.摘要}`
+        ).join('\n');
+        部分.push(`## 用户重要提醒（自动加载 — 必须关注）
+以下是你已记录的与用户相关的待办事项、考试、截止日等重要提醒，每次对话自动加载。当用户提及其中任何条目时，应当优先利用已有信息给出回应，并在必要时主动提醒用户完成或告知剩余时间。
+${提醒文本}`);
+      }
+    }
+  } catch (e) { console.log('[系统提示词] 重要提醒注入跳过:', e.message); }
+
   // 3. 记忆管理规则（由 AI 自主判断何时查、何时记）
   // 注意：这里只写规则，不写任何具体事实。事实由 AI 自行通过工具获取。
   部分.push(await 获取记忆管理规则());
