@@ -203,7 +203,6 @@
       <button class="标签页按钮" data-面板="备忘录面板">备忘录</button>
     </div>
     <div class="右侧区">
-      <button id="上下文占用率按钮" class="上下文占用率 安全" title="点击压缩对话历史">0%</button>
       <button id="清空对话按钮" class="图标按钮 简洁按钮" title="新建会话">+</button>
       <div class="备忘录更多菜单">
         <button id="备忘录更多按钮" class="菜单图标">⋯</button>
@@ -223,11 +222,14 @@
             <div class="输入工具条">
               <!-- 深度思索已移至下拉菜单 -->
               
-              <button id="上传文件按钮" class="次要按钮 简洁按钮">上传文件</button>
+              <button id="上下文占用率按钮" class="上下文占用率 安全" title="点击压缩对话历史">0%</button>
+              <button id="上传文件按钮" class="次要按钮 简洁按钮">传文件</button>
               <input type="file" id="文件选择器" style="display: none;" accept=".html,.htm,.md,.js,.css,.txt,.json,.xml,.docx,.xlsx,.xls,.pptx">
               <span id="文件状态" class="文件状态" style="display: none;"></span>
               
+              <label class="无痕标记" id="无痕标记提示" style="display: none;">无痕模式</label>
               <div class="更多菜单">
+                <button id="电话预留按钮" class="次要按钮 简洁按钮" title="电话功能（即将上线）">语</button>
                 <button id="更多按钮" class="次要按钮 简洁按钮">⋯</button>
                 <div class="下拉内容">
                   <label class="下拉菜单项">
@@ -239,7 +241,6 @@
                   </label>
                 </div>
               </div>
-              <label class="无痕标记" id="无痕标记提示" style="display: none;">无痕模式</label>
               <button id="发送消息按钮" class="主要按钮 简洁按钮">发送</button>
             </div>
           </div>
@@ -477,53 +478,79 @@
         <button id="关闭设置按钮" class="关闭按钮">✖</button>
       </div>
       <div class="设置主体">
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="margin-bottom: 0.5rem;">API设置</h4>
-          <label style="display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: #6c757d;">DeepSeek API密钥</label>
-          <input type="password" id="API密钥输入" placeholder="请输入DeepSeek API密钥（sk-开头）" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; margin-bottom: 0.75rem;">
-          <label style="display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: #6c757d;">百度搜索 API密钥（<a href="https://console.bce.baidu.com/ai-search/qianfan/ais/console/apiKey" target="_blank" style="color: #4a90d9;">点击申请</a>）</label>
-          <input type="password" id="百度搜索密钥输入" placeholder="千帆智能搜索 API Key" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; margin-bottom: 0.5rem;">
-          <button id="保存API密钥按钮" class="主要按钮 简洁按钮" style="margin-top: 0.5rem;">保存</button>
+        <!-- API设置 卡片 -->
+        <div class="设置分组">
+          <h4>🔌 API 设置</h4>
+          <label>DeepSeek API 密钥</label>
+          <input type="password" id="API密钥输入" placeholder="sk-...">
+          <div class="提示文字">从 <a href="https://platform.deepseek.com/" target="_blank" style="color: var(--强调色);">DeepSeek 控制台</a> 获取</div>
+          <label>百度搜索 API 密钥</label>
+          <input type="password" id="百度搜索密钥输入" placeholder="千帆智能搜索 API Key">
+          <div class="提示文字">从 <a href="https://console.bce.baidu.com/ai-search/qianfan/ais/console/apiKey" target="_blank" style="color: var(--强调色);">百度千帆控制台</a> 申请</div>
+          <div class="按钮行">
+            <button id="保存API密钥按钮" class="主要按钮 简洁按钮">保存</button>
+          </div>
         </div>
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="margin-bottom: 0.5rem;">数据备份</h4>
-          <p style="font-size: 0.8rem; color: #6c757d; margin-bottom: 0.5rem;">每日自动备份到应用内，最多保留 7 份。可恢复、导出分享或删除。</p>
+
+        <!-- 数据备份 卡片 -->
+        <div class="设置分组">
+          <h4>💾 数据备份</h4>
+          <div class="提示文字">每日自动备份到应用内，最多保留 7 份。可恢复、导出分享或删除。</div>
           <div id="备份状态容器" style="margin-bottom: 0.5rem;"></div>
-          <div id="备份按钮容器" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button id="立即备份按钮" class="次要按钮 简洁按钮" data-操作="立即备份" style="border-color: #4CAF50; color: #4CAF50;">立即备份</button>
+          <div id="备份按钮容器" class="按钮行">
+            <button id="立即备份按钮" class="次要按钮 简洁按钮" data-操作="立即备份">立即备份</button>
             <button id="导出当前列表按钮" class="次要按钮 简洁按钮" onclick="window.导出当前列表?.()">导出全部</button>
             <button id="恢复备份按钮" class="次要按钮 简洁按钮" onclick="window.导入备份文件?.()">从备份恢复</button>
           </div>
         </div>
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="margin-bottom: 0.5rem;">主题设置</h4>
-          <select id="主题选择" style="width: 100%; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem;">
+
+        <!-- 外观设置 卡片 -->
+        <div class="设置分组">
+          <h4>🎨 外观</h4>
+          <select id="主题选择">
             <!-- 由 设置浮层.js 刷新主题选择器() 动态填充 -->
           </select>
+          <div class="提示文字">切换应用主题颜色</div>
         </div>
-        <div style="margin-bottom: 1rem;">
-          <h4 style="margin-bottom: 0.5rem;">人物关系映射 
-            <span style="font-size: 0.75rem; color: #999; font-weight: normal;">（可自定义关系词→类别）</span>
-          </h4>
-          <p style="font-size: 0.8rem; color: #6c757d; margin-bottom: 0.5rem;">
-            一行一个，格式：<code>关系词 → 类别</code>，如：<code>导师 → 🎓 师长</code>。
-            AI 检测到关系词会自动追加到对应类别备忘录。
-          </p>
-          <textarea id="关系映射编辑框"
-            style="width: 100%; height: 120px; padding: 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; font-size: 0.85rem; font-family: monospace; resize: vertical;"
-            placeholder="导师 → 🎓 师长&#10;学长 → 🤝 朋友&#10;教练 → 🎓 师长"></textarea>
-          <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
-            <button id="保存关系映射按钮" class="次要按钮 简洁按钮" style="border-color: #6366f1; color: #6366f1;">保存映射</button>
-            <span id="关系映射状态" style="font-size: 0.8rem; color: #6c757d;"></span>
+
+        <!-- 关系映射 卡片 -->
+        <div class="设置分组">
+          <h4>🔗 人物关系映射</h4>
+          <div class="提示文字">自定义关系词 → 类别映射，一行一个。格式：<code>关系词 → 类别</code>，如 <code>导师 → 🎓 师长</code>。</div>
+          <textarea id="关系映射编辑框" placeholder="导师 → 🎓 师长&#10;学长 → 🤝 朋友&#10;教练 → 🎓 师长"></textarea>
+          <div class="按钮行">
+            <button id="保存关系映射按钮" class="次要按钮 简洁按钮">保存映射</button>
+            <span id="关系映射状态" style="font-size: 0.8rem; color: var(--文字辅色, #9ca3af);"></span>
           </div>
         </div>
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="margin-bottom: 0.5rem;">输出模式</h4>
-          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem;">
-            <input type="checkbox" id="流式输出开关">
-            <span>流式输出</span>
-            <span style="font-size: 0.75rem; color: #999; margin-left: 0.25rem;">（实时显示回复，关闭后支持函数调用）</span>
-          </label>
+
+        <!-- 输出模式 卡片 -->
+        <div class="设置分组">
+          <h4>⚙️ 输出模式</h4>
+          <div class="设置开关行">
+            <label class="开关标签">
+              <input type="checkbox" id="流式输出开关">
+              <span>流式输出</span>
+            </label>
+            <span style="font-size: 0.75rem; color: var(--文字辅色, #9ca3af);">关闭后支持函数调用</span>
+          </div>
+        </div>
+
+        <!-- 字体大小 卡片 -->
+        <div class="设置分组">
+          <h4>🔤 字体大小</h4>
+          <div class="设置字体大小行">
+            <div class="比例标签">
+              <span>小</span>
+              <span id="字体大小比例显示" style="font-weight: 600; color: var(--强调色);">标准</span>
+              <span>大</span>
+            </div>
+            <input type="range" id="字体大小滑条" class="字体大小滑条" min="0.75" max="1.5" step="0.05" value="1">
+            <div class="字体大小预览区" id="字体大小预览区">
+              <div class="预览标题">预览</div>
+              <div class="预览正文" id="字体大小预览正文">你好！今天有什么想聊的？可以让我帮忙搜索信息、管理备忘录，或者随便聊聊天~</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

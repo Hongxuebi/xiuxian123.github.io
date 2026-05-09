@@ -115,4 +115,45 @@ window.绑定设置浮层 = function() {
       }
     });
   }
+
+  // ========== 新增：字体大小滑条 ==========
+  const 字体滑条 = document.getElementById('字体大小滑条');
+  const 比例显示 = document.getElementById('字体大小比例显示');
+  const 预览正文 = document.getElementById('字体大小预览正文');
+  if (字体滑条) {
+    // 初始化
+    const 初始值 = window.全局设置.字体缩放比例 || 1;
+    字体滑条.value = 初始值;
+    更新字体比例显示(初始值);
+
+    字体滑条.addEventListener('input', function() {
+      const 比例 = parseFloat(this.value);
+      更新字体比例显示(比例);
+    });
+
+    字体滑条.addEventListener('change', function() {
+      const 比例 = parseFloat(this.value);
+      window.全局设置.字体缩放比例 = 比例;
+      document.documentElement.style.fontSize = (16 * 比例) + 'px';
+      document.documentElement.style.setProperty('--文字缩放比例', 比例);
+      window.保存设置();
+      window._显示提示('字体大小已调整为 ' + 获取比例标签(比例), 'info');
+    });
+  }
+
+  function 获取比例标签(比例) {
+    if (比例 <= 0.8) return '小';
+    if (比例 >= 1.25) return '大';
+    if (比例 <= 0.9) return '偏小';
+    if (比例 >= 1.1) return '偏大';
+    return '标准';
+  }
+
+  function 更新字体比例显示(比例) {
+    const 标签 = 获取比例标签(比例);
+    if (比例显示) 比例显示.textContent = 标签;
+    if (预览正文) {
+      预览正文.style.fontSize = 'calc(0.875rem * ' + 比例 + ')';
+    }
+  }
 };

@@ -118,7 +118,8 @@ window.全局设置 = {
   最大工具调用轮次: 15,
   启用预检索: true,
   预检索最大条数: 5,
-  当前主题: localStorage.getItem('current_theme') || '清爽白'
+  当前主题: localStorage.getItem('current_theme') || '清爽白',
+  字体缩放比例: parseFloat(localStorage.getItem('font_scale')) || 1
 };
 
 function 保存设置() {
@@ -126,6 +127,11 @@ function 保存设置() {
     localStorage.setItem('deepseek_api_key', btoa(window.全局设置.API密钥 || ''));
     localStorage.setItem('baidu_search_key', btoa(window.全局设置.百度搜索密钥 || ''));
     localStorage.setItem('current_theme', window.全局设置.当前主题);
+    localStorage.setItem('font_scale', String(window.全局设置.字体缩放比例 || 1));
+    // 应用到 html 根元素 —— 修改根字号让所有 rem 等比缩放
+    const 比例 = window.全局设置.字体缩放比例 || 1;
+    document.documentElement.style.fontSize = (16 * 比例) + 'px';
+    document.documentElement.style.setProperty('--文字缩放比例', 比例);
     console.log('设置已保存');
   } catch (错误) { console.error('保存设置失败', 错误); }
 }
@@ -138,6 +144,12 @@ function 加载设置() {
     if (保存的百度密钥) try { window.全局设置.百度搜索密钥 = atob(保存的百度密钥); } catch { window.全局设置.百度搜索密钥 = 保存的百度密钥; }
     const 保存的主题 = localStorage.getItem('current_theme');
     if (保存的主题) window.全局设置.当前主题 = 保存的主题;
+    const 保存的缩放比例 = parseFloat(localStorage.getItem('font_scale'));
+    if (保存的缩放比例 && 保存的缩放比例 > 0) {
+      window.全局设置.字体缩放比例 = 保存的缩放比例;
+      document.documentElement.style.fontSize = (16 * 保存的缩放比例) + 'px';
+      document.documentElement.style.setProperty('--文字缩放比例', 保存的缩放比例);
+    }
     
     // 加载用户创建的主题
     加载用户主题();

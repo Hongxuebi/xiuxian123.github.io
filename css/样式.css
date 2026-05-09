@@ -787,8 +787,8 @@ body {
   justify-content: flex-start;
 }
 
-/* 发送按钮固定在右侧 */
-#发送消息按钮 {
+/* 更多菜单+发送按钮靠右 */
+.输入工具条 > .更多菜单 {
   margin-left: auto;
 }
 
@@ -1372,8 +1372,164 @@ body {
 }
 
 .设置主体 {
-  padding: 1rem;
+  padding: 1rem 1rem 1.5rem;
   overflow-y: auto;
+}
+
+/* 设置：分组卡片 */
+.设置分组 {
+  background: var(--卡片背景, #f8f9fa);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--边框色, #e5e7eb);
+}
+.设置分组:last-child {
+  margin-bottom: 0;
+}
+.设置分组 h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--文字辅色, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.设置分组 h4 .图标 {
+  font-size: 1rem;
+}
+.设置分组 label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--文字辅色, #6b7280);
+  margin-bottom: 0.25rem;
+}
+.设置分组 input[type="password"],
+.设置分组 input[type="text"],
+.设置分组 select,
+.设置分组 textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--边框色, #e5e7eb);
+  border-radius: 0.5rem;
+  background: var(--内容底色, #fff);
+  color: var(--文字主色, #1f2937);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.设置分组 input:focus,
+.设置分组 select:focus,
+.设置分组 textarea:focus {
+  border-color: var(--强调色, #3b82f6);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--强调色, #3b82f6) 20%, transparent);
+}
+.设置分组 textarea {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+.设置分组 .提示文字 {
+  font-size: 0.75rem;
+  color: var(--文字辅色, #9ca3af);
+  margin: 0.25rem 0 0.5rem;
+  line-height: 1.4;
+}
+.设置分组 .按钮行 {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.设置开关行 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+.设置开关行 .开关标签 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.设置开关行 .开关标签 span:last-child {
+  font-size: 0.75rem;
+  color: var(--文字辅色, #9ca3af);
+  margin-left: 0.25rem;
+}
+
+/* 设置：字体大小 */
+.设置字体大小行 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.设置字体大小行 .比例标签 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.设置字体大小行 .比例标签 span {
+  font-size: 0.75rem;
+  color: var(--文字辅色, #9ca3af);
+}
+.字体大小滑条 {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--边框色, #e5e7eb);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.字体大小滑条::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--强调色, #3b82f6);
+  border: 2px solid var(--内容底色, #fff);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.字体大小滑条::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.字体大小滑条::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--强调色, #3b82f6);
+  border: 2px solid var(--内容底色, #fff);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+.字体大小预览区 {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: var(--助理消息背景, #e9e9eb);
+  border-radius: 0.5rem;
+  font-size: calc(0.875rem * var(--文字缩放比例, 1));
+  color: var(--文字主色, #111827);
+  line-height: 1.6;
+  transition: font-size 0.1s;
+}
+.字体大小预览区 .预览标题 {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  opacity: 0.7;
+}
+.字体大小预览区 .预览正文 {
+  word-break: break-word;
 }
 
 /* ========== 备忘录面板样式 ========== */
@@ -2106,7 +2262,7 @@ body {
   z-index: 2000;
   background: #F7F7F7;
   color: #121212;
-  font-size: 16px;
+  font-size: 1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y; /* 只允许纵向滚动，横向手势交给系统处理（鸿蒙返回） */
@@ -2125,14 +2281,14 @@ body {
   z-index: 10;
 }
 .标签选择页返回, .标签选择页确认 {
-  font-size: 17px;
+  font-size: 1.062rem;
   color: var(--强调色);
   cursor: pointer;
   min-width: 60px;
 }
 .标签选择页确认 { text-align: right; }
 .标签选择页标题 {
-  font-size: 17px;
+  font-size: 1.062rem;
   font-weight: 500;
 }
 
@@ -2143,7 +2299,7 @@ body {
   border-bottom: 1px solid #E5E5E5;
 }
 .标签选择页已选标题 {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #888;
   margin-bottom: 12px;
 }
@@ -2159,7 +2315,7 @@ body {
   line-height: 28px;
   padding: 0 12px;
   border-radius: 14px;
-  font-size: 14px;
+  font-size: 0.875rem;
   background: #E6F4FF;
   color: var(--强调色);
   position: relative;
@@ -2188,7 +2344,7 @@ body {
   top: 50%; left: 0;
 }
 .已选标签计数 {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #999;
   line-height: 28px;
   margin-right: 4px;
@@ -2207,7 +2363,7 @@ body {
   border: none;
   background: #F7F7F7;
   padding: 0 16px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #121212;
   outline: none;
 }
@@ -2221,7 +2377,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #888;
   background: #fff;
   border-bottom: 1px solid #E5E5E5;
@@ -2244,7 +2400,7 @@ body {
   line-height: 32px;
   padding: 0 16px;
   border-radius: 16px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   background: #FFFFFF;
   border: 1px solid #DCDCDC;
   color: #121212;
@@ -2300,13 +2456,13 @@ body {
   align-items: center;
   padding: 0 16px;
   border-bottom: 1px solid #F0F0F0;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
 }
 .标签列表项:active { background: #F5F5F5; }
 .标签列表项 span { flex: 1; }
-.标签列表项 .计数 { color: #888; font-size: 14px; }
-.标签列表项::after { content: '>'; color: #BBB; font-size: 16px; }
+.标签列表项 .计数 { color: #888; font-size: 0.875rem; }
+.标签列表项::after { content: '>'; color: #BBB; font-size: 1rem; }
 
 /* 标签操作菜单 */
 .标签操作项:hover { background: #F5F5F5; }
@@ -2319,7 +2475,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--强调色);
   background: #fff;
   cursor: pointer;
