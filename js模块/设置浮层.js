@@ -22,10 +22,16 @@ window.绑定设置浮层 = function() {
   if (!浮层) return;
   
   if (关闭按钮) {
-    关闭按钮.addEventListener('click', () => { 浮层.style.display = 'none'; });
+    关闭按钮.addEventListener('click', () => {
+      浮层.style.display = 'none';
+      if (window._解锁滚动) window._解锁滚动();
+    });
   }
   浮层.addEventListener('click', (e) => {
-    if (e.target === 浮层) 浮层.style.display = 'none';
+    if (e.target === 浮层) {
+      浮层.style.display = 'none';
+      if (window._解锁滚动) window._解锁滚动();
+    }
   });
   
   // 主题选择器
@@ -103,9 +109,9 @@ window.绑定设置浮层 = function() {
       window.全局设置.启用流式输出 = this.checked;
       window.保存设置();
       if (this.checked) {
-        alert('✅ 已开启流式输出，后续对话将实时显示回复内容（函数调用将被暂时禁用）');
+        window._显示提示('已开启流式输出','info');
       } else {
-        alert('✅ 已关闭流式输出，将使用标准模式（支持函数调用）');
+        window._显示提示('已关闭流式输出','info');
       }
     });
   }

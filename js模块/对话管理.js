@@ -1419,6 +1419,8 @@ function 追加对话历史(用户输入, AI回复) {
 
 function 清空对话历史() {
   当前对话历史 = [];
+  window.上次Token用量 = null;
+  if (window.更新上下文占用率) window.更新上下文占用率();
 }
 
 async function 保存对话历史(会话ID, 用户输入, AI回复) {
@@ -1439,6 +1441,14 @@ async function 保存对话历史(会话ID, 用户输入, AI回复) {
         { id: crypto.randomUUID(), role: 'user', content: 用户输入, timestamp: _ts },
         { id: crypto.randomUUID(), role: 'assistant', content: AI回复, timestamp: _ts }
       );
+    }
+    // [Bug修复] 保存当前 token 用量到对话文件
+    if (window.上次Token用量) {
+      数据.usage = {
+        prompt_tokens: window.上次Token用量.prompt_tokens,
+        completion_tokens: window.上次Token用量.completion_tokens,
+        total_tokens: window.上次Token用量.total_tokens
+      };
     }
     await 存储.写文件(文件路径, JSON.stringify(数据, null, 2));
   } catch (错误) { console.error('保存对话历史失败', 错误); }
@@ -1476,8 +1486,19 @@ async function 加载对话历史(会话ID) {
           ...(m.timestamp ? { timestamp: m.timestamp } : {})
         }));
       当前对话历史 = 原始消息.slice(-最大历史条数);
+
+      // [Bug修复] 恢复该会话的 token 用量（从保存的数据中读取）
+      if (数据.usage) {
+        window.上次Token用量 = {
+          prompt_tokens: 数据.usage.prompt_tokens || 0,
+          completion_tokens: 数据.usage.completion_tokens || 0,
+          total_tokens: 数据.usage.total_tokens || 0
+        };
+      }
+
       console.log(`[对话历史] 已加载 ${当前对话历史.length} 条历史消息`);
     }
+    if (window.更新上下文占用率) window.更新上下文占用率();
   } catch (错误) {
     console.warn('加载对话历史失败', 错误);
     清空对话历史();

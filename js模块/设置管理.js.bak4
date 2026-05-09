@@ -118,7 +118,7 @@ window.全局设置 = {
   最大工具调用轮次: 15,
   启用预检索: true,
   预检索最大条数: 5,
-  当前主题: localStorage.getItem('current_theme') || '清爽白'
+  当前主题: localStorage.getItem('current_theme') || '默认主题'
 };
 
 function 保存设置() {
