@@ -1826,6 +1826,11 @@ body {
   min-width: 160px;
   z-index: 1000;
   overflow: hidden;
+  display: none; /* 默认隐藏 */
+}
+
+.智能体下拉菜单.显示 {
+  display: block;
 }
 
 .智能体选项 {

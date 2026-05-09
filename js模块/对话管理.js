@@ -2017,10 +2017,17 @@ window.新建会话 = () => {
   if (名称元素) 名称元素.innerText = 名称;
 };
 
-window.addEventListener('智能体切换', () => {
-  document.getElementById('消息列表').innerHTML = '';
-  清空对话历史();
-  当前会话ID = 'default';
-  渲染会话列表();
-  加载对话历史('default');
+window.addEventListener('智能体切换', (e) => {
+  // 切换智能体函数已处理会话加载，此处仅兜底：
+  // 如果当前会话ID不在新智能体的会话列表中，才重置
+  const 新智能体ID = e?.detail?.智能体ID || (window.当前智能体ID ? window.当前智能体ID() : 'default');
+  const 列表 = 所有会话列表[新智能体ID] || [];
+  const 当前在列表中 = 列表.some(s => s.id === 当前会话ID);
+  if (!当前在列表中) {
+    document.getElementById('消息列表').innerHTML = '';
+    清空对话历史();
+    当前会话ID = 'default';
+    渲染会话列表();
+    加载对话历史('default');
+  }
 });

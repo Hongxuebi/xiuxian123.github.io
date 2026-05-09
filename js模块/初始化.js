@@ -1,33 +1,7 @@
 ﻿// 初始化.js - 应用启动入口
 
 // 调试面板：在页面右上角显示调试信息（防弹窗兜底）
-(function() {
-  const 日志队列 = [];
-  window._调试面板 = function(消息) {
-    try {
-      日志队列.push('[' + new Date().toLocaleTimeString() + '] ' + 消息);
-      let panel = document.getElementById('_调试面板');
-      if (!panel) {
-        const body = document.body || document.documentElement;
-        if (!body) return;
-        panel = document.createElement('div');
-        panel.id = '_调试面板';
-        panel.style.cssText = 'position:fixed;top:60px;right:10px;background:rgba(0,0,0,0.85);color:#0f0;padding:10px;border-radius:6px;font-size:13px;z-index:999999;max-width:90%;max-height:80%;overflow:auto;font-family:monospace;white-space:pre-wrap;word-break:break-all;';
-        body.appendChild(panel);
-      }
-      const line = document.createElement('div');
-      line.textContent = 日志队列[日志队列.length - 1];
-      panel.appendChild(line);
-      panel.scrollTop = panel.scrollHeight;
-    } catch(e) {
-      // 完全静默
-    }
-  };
-  // 用 __defineGetter__ 方式不行，直接输出到一个固定位置
-  window._调试面板_备用 = function(消息) {
-    document.title = 'DBG: ' + 消息;
-  };
-})();
+// 调试面板已移除（v0.7.9）
 
 window.addEventListener('DOMContentLoaded', async () => {
   // 备忘录标题显隐已改为CSS类控制，无需MutationObserver监控
@@ -55,14 +29,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 创建智能体选择器（函数在智能体选择器.js中）
   try {
     await window.创建智能体选择器UI();
-    window._调试面板('选择器创建完成');
   } catch (e) {
-    window._调试面板('选择器异常: ' + String(e));
+    console.error('创建智能体选择器异常', e);
   }
-  // 强制显示选择器
-  const sel = document.querySelector('.智能体选择器');
-  window._调试面板('选择器DOM: ' + (!!sel));
-  if (sel) sel.style.display = 'block';
   
   // 绑定各模块事件
   if (window.绑定抽屉事件) window.绑定抽屉事件();

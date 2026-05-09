@@ -1,40 +1,30 @@
 // 智能体选择器.js - 智能体选择UI + 添加新智能体
 window.创建智能体选择器UI = async function() {
   try {
-    window._调试面板('选择器: 开始');
     // 挂载到左侧区
     const 左侧区 = document.querySelector('.左侧区');
-    window._调试面板('左侧区: ' + (!!左侧区));
-    if (!左侧区) { window._调试面板('左侧区不存在!'); return; }
+    if (!左侧区) return;
 
-    window._调试面板('step1: 检查获取智能体列表');
     if (!window.获取智能体列表) {
-      window._调试面板('获取智能体列表函数未定义，稍后重试');
       setTimeout(window.创建智能体选择器UI, 500);
       return;
     }
-    window._调试面板('step2: 开始获取列表');
 
     let 智能体列表 = [];
     try {
       智能体列表 = await window.获取智能体列表();
-      window._调试面板('智能体列表: ' + (智能体列表?.length || 0));
     } catch (e) {
-      window._调试面板('获取列表失败: ' + String(e));
+      console.error('[智能体选择器] 获取列表失败', e);
     }
     if (!智能体列表 || !Array.isArray(智能体列表)) 智能体列表 = [];
 
-    window._调试面板('step3: 列表长度=' + 智能体列表.length);
     const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
     const 当前智能体 = 智能体列表.find(a => a.id === 当前ID) || { id: 'default', name: '默认智能体', icon: '🤖' };
 
-    window._调试面板('step4: 当前智能体=' + 当前智能体.name);
     更新抽屉头像(当前智能体);
 
-    window._调试面板('step5: 检查是否已存在');
-    if (document.querySelector('.智能体选择器')) { window._调试面板('选择器已存在，跳过'); return; }
-
-    window._调试面板('step6: 开始创建DOM');
+    // 防重复：如果已存在则跳过
+    if (document.querySelector('.智能体选择器')) return;
 
     const 选择器容器 = document.createElement('div');
     选择器容器.className = '智能体选择器';
@@ -50,8 +40,6 @@ window.创建智能体选择器UI = async function() {
 
     选择器容器.appendChild(选择按钮);
     选择器容器.appendChild(下拉菜单);
-    // 插入到左侧区
-    // 挂到左侧区
     左侧区.appendChild(选择器容器);
 
     function 渲染下拉菜单(列表, 当前选ID) {
@@ -61,91 +49,192 @@ window.创建智能体选择器UI = async function() {
         项.className = '智能体选项' + (智能体.id === 当前选ID ? ' 选中' : '');
         项.dataset.id = 智能体.id;
         项.innerHTML = `${智能体.icon} ${智能体.name}`;
-        项.addEventListener('click', async function() {
+        项.addEventListener('click', async function(ev) {
+          ev.stopPropagation();
           const id = this.dataset.id;
-          if (id === 当前选ID) { 下拉菜单.classList.remove('显示'); return; }
+          下拉菜单.classList.remove('显示'); // 先关菜单，再切换
+          if (id === 当前选ID) return;
           if (window.切换智能体) {
-            await window.切换智能体(id);
-            关闭下拉菜单();
-            更新抽屉头像(智能体列表.find(a => a.id === id) || 智能体);
-            选择按钮.innerHTML = `${(智能体列表.find(a=>a.id===id)||{}).icon||'🤖'} ${(智能体列表.find(a=>a.id===id)||{}).name||'未知'} ▼`;
+            try {
+              await window.切换智能体(id);
+              const 新智能体 = 列表.find(a => a.id === id);
+              if (新智能体) {
+                选择按钮.innerHTML = `${新智能体.icon} ${新智能体.name} ▼`;
+                更新抽屉头像(新智能体);
+              }
+            } catch (err) {
+              console.error('[智能体选择器] 切换失败', err);
+              if (window._显示提示) window._显示提示('切换智能体失败', 'error');
+            }
           }
         });
+        下拉菜单.appendChild(项); // 🔧 修复：原来缺少 appendChild
       });
     }
-
-    // 删除智能体功能（长按选中项触发）
-    // ... （如需删除，可以通过智能体管理界面操作）
 
     function 关闭下拉菜单() {
       下拉菜单.classList.remove('显示');
     }
 
-    // 选择按钮交互（鸿蒙WebView兼容 touchend + click 降级）
+    // 选择按钮交互
     const _选择按钮点击 = async function(e) {
-      e.stopPropagation();
-      e.preventDefault();
+      if (e) e.stopPropagation();
+      console.log('[智能体选择器] 按钮点击');
+
       if (下拉菜单.classList.contains('显示')) {
         关闭下拉菜单();
         return;
       }
+
+      // 显示加载状态
+      下拉菜单.innerHTML = '<div style="padding:8px;text-align:center;color:var(--text-secondary,#888);">加载中...</div>';
+      下拉菜单.classList.add('显示');
+
       try {
-        const 列表 = await window.获取智能体列表();
-        const 当前ID = window.当前智能体ID();
+        // 5秒超时防挂起
+        const 超时 = new Promise((_, reject) => setTimeout(() => reject(new Error('获取列表超时')), 5000));
+        const 列表 = await Promise.race([window.获取智能体列表(), 超时]);
+        if (!列表 || !Array.isArray(列表)) throw new Error('列表数据无效');
+        const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
         渲染下拉菜单(列表, 当前ID);
-        下拉菜单.classList.add('显示');
       } catch (err) {
-        console.error('刷新智能体列表失败', err);
+        console.error('[智能体选择器] 加载失败', err);
+        下拉菜单.innerHTML = '<div style="padding:8px;color:red;">加载失败，点击重试</div>';
+        if (window._显示提示) window._显示提示('智能体列表加载失败', 'error');
       }
     };
-    // 同时监听 touchend 和 click，鸿蒙 WebView 优先走 touchend
-    选择按钮.addEventListener('touchend', _选择按钮点击, { passive: false });
-    选择按钮.addEventListener('click', _选择按钮点击);
+
+    // 鸿蒙 WebView：touchend + preventDefault 阻止click合成
+    选择按钮.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      _选择按钮点击(e);
+    }, { passive: false });
+    // 桌面浏览器：常规 click
+    选择按钮.addEventListener('click', function(e) {
+      _选择按钮点击(e);
+    });
 
     // 点击其他地方关闭下拉菜单
     document.addEventListener('click', function(e) {
-      if (!选择器容器.contains(e.target)) {
-        关闭下拉菜单();
-      }
+      if (!选择器容器.contains(e.target)) 关闭下拉菜单();
     });
-    // 鸿蒙 WebView 也走 touchend 关闭
     document.addEventListener('touchend', function(e) {
-      if (!选择器容器.contains(e.target)) {
-        关闭下拉菜单();
-      }
+      if (!选择器容器.contains(e.target)) 关闭下拉菜单();
     });
 
-    // 更新智能体选择按钮的接口
+    // 更新接口
     window.更新智能体选择器 = async function() {
       try {
         const 列表 = await window.获取智能体列表();
-        const 当前ID = window.当前智能体ID();
+        const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
         const 智能体 = 列表.find(a => a.id === 当前ID) || 列表[0];
         if (智能体) {
           选择按钮.innerHTML = `${智能体.icon} ${智能体.name} ▼`;
           更新抽屉头像(智能体);
         }
       } catch (e) {
-        console.error('更新智能体选择器失败', e);
+        console.error('[智能体选择器] 更新失败', e);
       }
     };
 
-    window._调试面板('step7: 选择器创建完成');
   } catch(e) {
-    window._调试面板('创建选择器异常: ' + String(e));
+    console.error('[智能体选择器] 创建异常', e);
   }
 };
 
 function 更新抽屉头像(智能体) {
   if (!智能体) return;
-  // 更新抽屉中的智能体头像
-  const 抽屉头像 = document.querySelector('.抽屉 .智能体头像');
-  if (抽屉头像) {
-    抽屉头像.textContent = 智能体.icon || '';
-  }
-  // 更新底部抽屉中的智能体头像
-  const 底部头像 = document.querySelector('.抽屉底部 .智能体头像');
-  if (底部头像) {
-    底部头像.textContent = 智能体.icon || '';
+  // 抽屉头部头像区：有照片优先显示照片，否则用emoji icon
+  const 头像区 = document.getElementById('抽屉头像区');
+  if (头像区) {
+    const 名元素 = document.getElementById('抽屉智能体名');
+    const img = document.getElementById('抽屉智能体头像');
+    const 占位 = document.getElementById('抽屉头像占位');
+    if (智能体.avatar) {
+      if (img) { img.src = 智能体.avatar; img.style.display = 'block'; }
+      if (占位) 占位.style.display = 'none';
+      if (名元素) 名元素.textContent = '';
+      头像区.classList.add('has-img');
+    } else if (智能体.icon) {
+      if (名元素) 名元素.textContent = 智能体.icon;
+      if (img) img.style.display = 'none';
+      if (占位) 占位.style.display = 'none';
+      头像区.classList.remove('has-img');
+    }
   }
 }
+
+// ========== 头像预览浮层绑定 ==========
+window.绑定头像预览 = function() {
+  const 头像区 = document.getElementById('抽屉头像区');
+  const 预览浮层 = document.getElementById('头像预览浮层');
+  const 预览图片 = document.getElementById('头像预览图片');
+  const 预览名字 = document.getElementById('头像预览名字');
+  const 更换按钮 = document.getElementById('更换头像按钮');
+  const 关闭按钮 = document.getElementById('关闭头像预览');
+  const 文件选择 = document.getElementById('头像文件选择');
+
+  if (!头像区 || !预览浮层) return;
+
+  // 点击头像区 → 打开预览
+  const 打开预览 = function(e) {
+    if (e) e.stopPropagation();
+    const 配置 = window.获取当前智能体配置 ? window.获取当前智能体配置() : null;
+    const 头像源 = 配置?.avatar || 配置?.icon || '🤖';
+    const 名称 = 配置?.name || '默认智能体';
+
+    if (头像源.startsWith('http') || 头像源.startsWith('/') || 头像源.startsWith('data:')) {
+      预览图片.src = 头像源;
+      预览图片.style.display = 'block';
+    } else {
+      预览图片.style.display = 'none';
+    }
+    预览名字.textContent = 名称;
+    预览浮层.style.display = 'flex';
+  };
+
+  头像区.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    打开预览(e);
+  }, { passive: false });
+  头像区.addEventListener('click', function(e) {
+    打开预览(e);
+  });
+
+  // 关闭预览
+  if (关闭按钮) {
+    关闭按钮.addEventListener('click', function() { 预览浮层.style.display = 'none'; });
+  }
+  预览浮层.addEventListener('click', function(e) {
+    if (e.target === 预览浮层) 预览浮层.style.display = 'none';
+  });
+
+  // 更换头像 → 触发文件选择
+  if (更换按钮 && 文件选择) {
+    更换按钮.addEventListener('click', function(e) {
+      e.stopPropagation();
+      文件选择.click();
+    });
+    文件选择.addEventListener('change', async function() {
+      const file = 文件选择.files[0];
+      if (!file) return;
+      try {
+        const base64 = await window.裁切图片为正方形(file);
+        const 成功 = await window.保存头像(base64);
+        if (成功) {
+          预览图片.src = base64;
+          预览图片.style.display = 'block';
+          const 配置 = window.获取当前智能体配置 ? window.获取当前智能体配置() : {};
+          配置.avatar = base64;
+          if (window.更新抽屉头像) window.更新抽屉头像(配置);
+          if (window.更新智能体选择器) window.更新智能体选择器();
+        } else {
+          if (window._显示提示) window._显示提示('保存头像失败','error');
+        }
+      } catch(err) {
+        console.error('[头像预览] 保存失败', err);
+        if (window._显示提示) window._显示提示('保存头像失败','error');
+      }
+    });
+  }
+};
