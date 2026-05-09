@@ -1091,7 +1091,7 @@ const _备忘录工具列表 = [
       "type": "function",
       "function": {
         "name": "manage_agents",
-        "description": "【管理员工具 — 默认智能体专用】管理其他智能体的配置、提示词、记忆等。可以：①列出所有智能体 ②查看指定智能体的配置/提示词/记忆 ③修改指定智能体的配置/提示词/记忆 ④删除指定智能体的记忆。只有默认智能体（用户本人）可以使用此工具。其他智能体调用会被拒绝。",
+        "description": "【管理员工具 — 默认智能体专用】管理其他智能体的配置、提示词、记忆等。可以：①列出所有智能体 ②查看指定智能体的配置/提示词/记忆（修改前先用 get_config 读取现有配置）③修改指定智能体的配置/提示词/记忆 ④删除指定智能体的记忆。对话开始时建议主动调用 get_config 了解其他智能体的详细设定（他们的核心身份、语气要求等已在系统提示词中注入摘要）。只有默认智能体（用户本人）可以使用此工具。其他智能体调用会被拒绝。",
         "parameters": {
           "type": "object",
           "properties": {
@@ -2045,7 +2045,18 @@ async function 处理备忘录工具(工具名, 参数) {
       const 列表 = await window.获取智能体列表();
       if (!列表 || 列表.length === 0) return '当前没有可用智能体。请先创建一个。';
       const 当前ID = window.当前智能体ID ? window.当前智能体ID() : 'default';
-      const 文本 = 列表.map(a => `${a.icon || '🤖'} ${a.name}（ID: ${a.id}）${a.id === 当前ID ? ' ← 当前' : ''}`).join('\n');
+      // 每个智能体附带 system_prompt 摘要，让 AI 首次对话就能看到其他智能体的设定
+      const 文本 = (await Promise.all(列表.map(async (a) => {
+        let 摘要 = '';
+        try {
+          const 配置 = await window.获取指定智能体配置(a.id);
+          if (配置 && 配置.system_prompt) {
+            摘要 = 配置.system_prompt.slice(0, 100) + (配置.system_prompt.length > 100 ? '...' : '');
+          }
+        } catch (e) { /* 读取配置失败，跳过摘要 */ }
+        const 当前标记 = a.id === 当前ID ? ' ← 当前' : '';
+        return `${a.icon || '🤖'} ${a.name}（ID: ${a.id}）${当前标记}${摘要 ? '\n  设定摘要：' + 摘要 : ''}`;
+      }))).join('\n');
       return JSON.stringify({ success: true, data: 列表, message: `当前可用智能体（共${列表.length}个）：\n\n${文本}` });
     } catch (e) {
       return JSON.stringify({ success: false, error: '获取智能体列表失败', detail: e.message || '' });

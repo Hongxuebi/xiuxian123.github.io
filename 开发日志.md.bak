@@ -20,7 +20,6 @@ v0.7.8 重构智能体选择器后引入多个 bug，集中修复。
 **Bug 2 — 下拉选择后菜单不关闭**
 - 根因（两层）：① `classList.remove('显示')` 在 await 之后，切换卡住则不执行 ② CSS 缺少 `.智能体下拉菜单 { display:none }`，切 class 无可见性影响
 - 修复：先关菜单再切 + CSS 补 `display:none/display:block`
-- 教训：下拉菜单必须 CSS + JS 配合，缺任何一边都不行
 
 **Bug 3 — 选择智能体后头像区异常**
 - 根因：`更新抽屉头像` 用 `.抽屉 .智能体头像` CSS 选择器，实际元素是 `#抽屉智能体头像`，永远匹配不上
@@ -33,45 +32,67 @@ v0.7.8 重构智能体选择器后引入多个 bug，集中修复。
 **Bug 5 — 抽屉头像区点击无反应**
 - 根因：`绑定头像预览` 函数在 v0.7.8 重构时整体删除，但 `初始化.js` 仍在调用
 - 修复：从 git 恢复 `window.绑定头像预览` 函数（含 touchend 鸿蒙适配）
+- 教训：重构删函数前必须 grep 调用点
 
 **Bug 6 — 抽屉头像区不显示照片**
-- 根因：`更新抽屉头像` 函数中 `icon`（emoji）优先级高于 `avatar`（照片），有照片也被跳过
+- 根因：`更新抽屉头像` 中 `icon`（emoji）优先于 `avatar`（照片），智能体同时有两者时照片被跳过
 - 修复：调换分支顺序——有照片优先显示照片，没照片才用 emoji
 
-**Bug 7 — 列出智能体不显示设定摘要**
-- 用户问「初一你能看到另一个智能体吗？」时，`list_agents` 只返回名字/ID，AI 看不到蔡晓丹的设定
-- 修复：`list_agents` 返回值里附带上每个智能体的 `system_prompt` 前 100 字摘要
-- 同时 `manage_agents` 工具描述加约束：修改前先用 `get_config` 读取现有配置
-
 ### 代码纪律（新增硬规则）
-- 写 JS 后必须 `node --check` 语法检查，防止括号/反引号问题炸掉整个脚本
+- 写 JS 后必须 `node --check` 语法检查
 - try-catch 先写闭合括号再填内容
 - DOM 创建必须紧随 appendChild
 - async 关键调用加超时 + try-catch 日志
 - 模板字符串内有 Markdown 反引号必须转义 \`\`\`
-- touchend/click 分开处理，不在 click 里调 preventDefault
-
-### 调试方法论收获
-- **克隆按钮诊断法**：cloneNode + replaceChild + 简单 handler，快速确认事件绑定是否生效
-- async 事件处理器必须加超时和日志，否则挂起时完全无迹可寻
-- createElement + 忘 appendChild 是 JS 常见低级错误
-- 下拉菜单显示/隐藏必须 CSS 切 display + JS 切 class，缺一不可
-- **修复前先查 git history 确认原始设计意图**（抽屉头像区本来点开的是头像预览浮层，不是智能体选择器）
-- 用户反馈「其他地方能看到照片」意味着数据完好，问题在渲染条件，不在数据源
+- touchend/click 分开处理，不在 click 里乱调 preventDefault
 
 ### 文件变更
 | 文件 | 变更 |
 |------|------|
-| `js模块/智能体选择器.js` | appendChild、超时、日志、头像预览恢复、照片优先级修复 |
+| `js模块/智能体选择器.js` | appendChild、超时、日志、CSS/JS 配合、头像预览恢复、照片优先级修复 |
 | `js模块/对话管理.js` | 会话ID覆盖修复 |
 | `js模块/初始化.js` | 调试面板清理 |
 | `css/样式.css` | 下拉菜单 display:none/block |
-| `js模块/API调用.js` | list_agents 加设定摘要、manage_agents 描述加约束 |
+| `js模块/API调用.js` | list_agents 加设定摘要、manage_agents 描述加
+| `js模块/API调用.js` | list_agents 加设定摘要、manage_agents 描述加修改前先读约束 |
 
-### 版本标签
-- love-helper: `v6.4`（commit 347c64a）
-- 流云记: `v0.7.9`（commit 93348b6）
-- 均已推送 GitHub
+### 调试方法论
+- **克隆按钮诊断法**：cloneNode+replaceChild+简单handler，快速区分事件绑定 vs 回调逻辑问题
+- 下拉菜单必须 CSS + JS 配合（JS 切 class，CSS 根据 class 控制 display）
+- 修复 bug 前查 git history 确认原始设计意图
+
+### 标签
+- love-helper: v6.4（push）
+- liuyunji: v0.7.9（sync + push）
+
+---
+
+## v0.7.7 — 智能体管理与对话管理 AI 工具（2026-05-08）修改前先读"约束 |
+
+---
+
+## v0.7.7 — 智能体管理与对话管理 AI 工具（2026-05-08）
+
+### 变更概要
+- **智能体管理工具**：新增 `list_agents`、`create_agent`、`switch_agent`、`delete_agent` 四个 AI 可调用工具
+- **对话管理工具**：新增 `list_conversations`、`create_conversation`、`switch_conversation`、`rename_conversation`、`delete_conversation` 五个 AI 可调用工具
+- **系统提示词**：`智能体管理.js` 中追加完整的新工具使用指南（参数为中文名、返回值 `{success, data/error}` 格式解析、二次确认要求、联合调用示例、列表展示格式、重名处理）
+- **底层函数暴露验证**：`对话管理.js` 中 5 个核心函数（`会话列表`、`新建会话`、`切换会话`、`重命名会话`、`删除会话`）全部已 `window.xxx =` 暴露
+
+### 文件变更
+| 文件 | 变更 |
+|------|------|
+| `js模块/API调用.js` | +351 行：新增 4+5 个工具定义、handler 逻辑、映射表、白名单 |
+| `js模块/对话管理.js` | +45 行 |  
+| `js模块/智能体管理.js` | +66 行：提示词章节完善 |
+
+### 完整验证清单（代码级，未真机测试）
+- ✅ 5 个对话管理底层函数全部暴露到 window
+- ✅ 9 个工具定义全部在 `_备忘录工具列表` 中
+- ✅ 9 个 handler 分支全部存在（try/catch，返回统一 JSON 格式）
+- ✅ 9 条映射表（`const 工具映射`）全部存在
+- ✅ 3 个敏感操作在工具白名单中（删除会话、删除智能体、重命名会话）
+- ✅ love-helper 三文件同步，diff 一致
 
 ---
 
@@ -104,6 +125,8 @@ v0.7.8 重构智能体选择器后引入多个 bug，集中修复。
 - love-helper 同步完成
 - 验证场景：设置中修改核心身份为「异世界狐妖，筑基期一层」→ 同对话发「你是谁？」
 
+---
+
 ### 审核意见修复（来自开发者的补充审核）
 - 工具参数名修正为中文（`名称`、`图标`、`设定`、`智能体名称`、`会话ID` 等）
 - 返回值格式新增 `{success, data/error}` 解析指引
@@ -115,35 +138,10 @@ v0.7.8 重构智能体选择器后引入多个 bug，集中修复。
 
 ---
 
-## v0.7.7 — 智能体管理与对话管理 AI 工具（2026-05-08）
-
-### 变更概要
-- **智能体管理工具**：新增 `list_agents`、`create_agent`、`switch_agent`、`delete_agent` 四个 AI 可调用工具
-- **对话管理工具**：新增 `list_conversations`、`create_conversation`、`switch_conversation`、`rename_conversation`、`delete_conversation` 五个 AI 可调用工具
-- **系统提示词**：`智能体管理.js` 中追加完整的新工具使用指南（参数为中文名、返回值 `{success, data/error}` 格式解析、二次确认要求、联合调用示例、列表展示格式、重名处理）
-- **底层函数暴露验证**：`对话管理.js` 中 5 个核心函数（`会话列表`、`新建会话`、`切换会话`、`重命名会话`、`删除会话`）全部已 `window.xxx =` 暴露
-
-### 文件变更
-| 文件 | 变更 |
-|------|------|
-| `js模块/API调用.js` | +351 行：新增 4+5 个工具定义、handler 逻辑、映射表、白名单 |
-| `js模块/对话管理.js` | +45 行 |  
-| `js模块/智能体管理.js` | +66 行：提示词章节完善 |
-
-### 完整验证清单（代码级，未真机测试）
-- ✅ 5 个对话管理底层函数全部暴露到 window
-- ✅ 9 个工具定义全部在 `_备忘录工具列表` 中
-- ✅ 9 个 handler 分支全部存在（try/catch，返回统一 JSON 格式）
-- ✅ 9 条映射表（`const 工具映射`）全部存在
-- ✅ 3 个敏感操作在工具白名单中（删除会话、删除智能体、重命名会话）
-- ✅ love-helper 三文件同步，diff 一致
-
----
-
 ## v0.7.6 — 导出 JSON 空文件修复（2026-05-08）
 
 ### 变更
-- `saveTextFile` 桥接修复：`TextEncoder.encodeInto` 单参数 → `encoder.encode`、`WRITE_ONLY` → `WRITE_ONLY|CREATE`、`writeSync` 传 `buffer.buffer as ArrayBuffer`
+- `saveTextFile` 桥接修复：`TextEncoder.encodeInto` 单参数 → `encoder.encode`、`WRITE_ONLY` → `WRITE_ONLY\|CREATE`、`writeSync` 传 `buffer.buffer as ArrayBuffer`
 - `onAlert` 回调修复：`event.getMessage()` → `event.message`
 - AI 工具定义中补全 `收藏` 和 `已置顶` 参数（`update_memo`）
 
@@ -234,5 +232,5 @@ v0.7.8 重构智能体选择器后引入多个 bug，集中修复。
 ## 爱助手原项目日志
 
 完整开发日志请见：
-- `/Users/caixiaodan/Desktop/dev/love-helper/开发日志.md`
+- `/Users/caixiaodan/Desktop/dev/love-helper/开发日志.md`（1328 行）
 - `/Users/caixiaodan/Desktop/dev/love-helper/常见错误对照速查.txt`

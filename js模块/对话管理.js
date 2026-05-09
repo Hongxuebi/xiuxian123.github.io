@@ -1136,6 +1136,43 @@ ${技能文本}`);
     console.log('[系统提示词] 技能注入跳过:', e.message);
   }
 
+  // 2.60 其他智能体设定注入：让 AI 知道还有哪些智能体存在
+  // 不依赖 AI 主动调工具，每次对话无条件注入其他智能体的核心设定摘要
+  try {
+    const 智能体列表 = await window.获取智能体列表?.();
+    const 当前ID = window.当前智能体ID?.();
+    if (智能体列表 && 当前ID) {
+      const 其他 = 智能体列表.filter(a => a.id !== 当前ID);
+      if (其他.length > 0) {
+        const 摘要 = [];
+        for (const 智能体 of 其他) {
+          try {
+            const 存储 = window.获取存储?.();
+            if (!存储) continue;
+            const 配置路径 = `agents/${智能体.id}/agent.json`;
+            if (!(await 存储.文件存在(配置路径))) continue;
+            const 配置 = JSON.parse(await 存储.读文件(配置路径));
+            const 插件 = 配置.plugin || {};
+            const 身份 = 插件.core_identity || '';
+            const 语气 = 插件.tone_requirement || '';
+            const 输出 = 插件.output_rules?.slice(0, 3) || [];
+            const 行 = [];
+            行.push(`- ${智能体.name}${智能体.icon || ''}`);
+            if (身份) 行.push(`  核心身份：${身份.substring(0, 200)}`);
+            if (语气) 行.push(`  语气要求：${语气}`);
+            if (输出.length) 行.push(`  输出规则：${输出.join('；')}`);
+            摘要.push(行.join('\n'));
+          } catch (e) {/* 跳过读取失败的智能体 */}
+        }
+        if (摘要.length > 0) {
+          部分.push(`## 其他智能体设定概览（你以外还有以下智能体）\n以下是系统中其他智能体的核心设定摘要，了解它们有助于你确认它们的核心身份和职责范围。\n\n${摘要.join('\n\n')}`);
+        }
+      }
+    }
+  } catch (e) {
+    console.log('[系统提示词] 其他智能体注入跳过:', e.message);
+  }
+
   return 部分.filter(Boolean).join('\n\n');
 }
 
