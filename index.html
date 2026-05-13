@@ -199,11 +199,12 @@
 
 
 <style>
-/* 流云记适配:语音通话浮层 = call-container */
-#语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:relative; overflow:hidden; }
-
-/* 语音通话浮层 = call-container 别名 */
+/* 语音通话浮层 = call-container */
 #语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:fixed; overflow:hidden; background:#0a0a0f; z-index:9999; inset:0; }
+/* 响应式：宽屏下居中卡片（与豆包打电话一致） */
+@media (min-width:560px) {
+  #语音通话浮层 { max-width:420px; margin:0 auto; border-radius:32px; height:100vh; max-height:800px; box-shadow:0 0 60px rgba(0,0,0,0.5); inset:auto; top:50%; left:50%; transform:translate(-50%,-50%); }
+}
 #语音通话浮层 .call-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a0f 70%); z-index:0; }
 #语音通话浮层 > *:not(.call-bg):not(.input-panel) { position:relative; z-index:1; }
 /* ===== 语音通话核心UI(豆包原版完整搬入) ===== */
