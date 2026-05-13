@@ -205,7 +205,7 @@
 /* 语音通话浮层 = call-container 别名 */
 #语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:fixed; overflow:hidden; background:#0a0a0f; z-index:9999; inset:0; }
 #语音通话浮层 .call-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a0f 70%); z-index:0; }
-#语音通话浮层 > *:not(.call-bg):not(.input-panel):not(.loading-overlay) { position:relative; z-index:1; }
+#语音通话浮层 > *:not(.call-bg):not(.input-panel):not(.loading-overlay):not(.caption-area):not(.chat-toggle-btn) { position:relative; z-index:1; }
 /* ===== 语音通话核心UI(豆包原版完整搬入) ===== */
 * { margin:0; padding:0; box-sizing:border-box; }
 html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif; background:#0a0a0f; color:#fff; -webkit-font-smoothing:antialiased; }
@@ -1888,6 +1888,7 @@ async function loadModel() {
     model.scale.set(s);
     model.x = w / 2;
     model.y = h - 10;
+    console.log('[MONITOR] loadModel init: model.x='+model.x.toFixed(1)+' model.y='+model.y.toFixed(1)+' scale='+model.scale.x.toFixed(4)+' container='+w+'x'+h);
     // 保存原始容器尺寸,resize() 恢复时以此为基准
     // 保存模型原始像素尺寸,resize()/applyFaceZoom() 以此为基准
     window._origW = model.width / model.scale.x;
@@ -2325,6 +2326,7 @@ function aiSpeak(text) {
   $('aiCaption').style.display = 'block';
   $('interimCaption').style.display = 'none';
   $('userCaption').style.display = 'none';
+  console.log('[MONITOR] TTS bubble show: text="'+(cleanText||'').substring(0,30)+'..." model.x='+(model?model.x.toFixed(1):'N/A')+' model.y='+(model?model.y.toFixed(1):'N/A')+' scale='+(model?model.scale.x.toFixed(4):'N/A')+' container='+container.clientWidth+'x'+container.clientHeight+' hero-area='+(document.querySelector('.hero-area')?.offsetHeight||'N/A')+' caption-area.offsetHeight='+(document.querySelector('.caption-area')?.offsetHeight||'N/A'));
   $('roleStatus').textContent = 'AI 说话中...';
   $('roleStatus').className = 'chat-toggle-status speaking';
   _lastSpeakText = cleanText; _lastSpeakTime = Date.now();
@@ -2490,6 +2492,8 @@ function resize() {
     const s = Math.min(w / ow, h / oh) * 0.85;
     model.scale.set(s); model.x = w / 2; model.y = h - 10;
   }
+  console.log('[MONITOR] resize() called: w='+w+' h='+h+' model.x='+model.x.toFixed(1)+' model.y='+model.y.toFixed(1)+' scale='+model.scale.x.toFixed(4)+' container='+container.clientWidth+'x'+container.clientHeight+' caller='+(new Error().stack.split('\n')[2]||'unknown').trim());
+  console.log('[MONITOR]  container.offsetHeight='+container.offsetHeight+' hero-area.offsetHeight='+(document.querySelector('.hero-area')?.offsetHeight||'N/A')+' caption-area.display='+($('aiCaption').style.display)+' roleStatus.text='+$('roleStatus').textContent);
 }
 
 // ================================================================
@@ -2512,6 +2516,7 @@ function applyFaceZoom(level) {
   var desiredFaceY = defaultFaceY + (targetFaceY - defaultFaceY) * t;
   model.y = desiredFaceY + window._origH * s * (1 - FACE_RATIO);
   model.x = container.clientWidth / 2;
+  console.log('[MONITOR] applyFaceZoom: level='+level+' model.x='+model.x.toFixed(1)+' model.y='+model.y.toFixed(1)+' scale='+model.scale.x.toFixed(4)+' h='+h);
 }
 function updateFaceZoomBtn() {
   if (faceZoomLevel > 0) $('faceZoomBtn').classList.add('active');
