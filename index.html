@@ -349,14 +349,17 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
 .tts-slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:#8b5cf6; cursor:pointer; }
 .tts-slider-row .tts-val { color:rgba(255,255,255,0.35); font-size:11px; width:32px; text-align:left; flex-shrink:0; }
 
-/* 通话模式文字输入面板 */
-.input-panel { display:none; position:fixed; bottom:0; left:0; right:0; padding:12px 16px; background:rgba(15,15,25,0.95); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,0.1); z-index:100; gap:8px; align-items:center; }
+/* 通话模式文字输入面板（豆包原版风格） */
+.input-panel { display:none; position:absolute; inset:0; z-index:40; background:rgba(10,10,15,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); flex-direction:column; align-items:center; justify-content:center; padding:24px; }
 .input-panel[style*="flex"] { display:flex !important; }
-.input-field { flex:1; height:40px; padding:0 12px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:14px; outline:none; }
-.input-field:focus { border-color:var(--accent-color,#3b82f6); }
-.input-btn { height:36px; padding:0 16px; border-radius:18px; border:none; font-size:13px; cursor:pointer; }
-.input-cancel { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); }
-.input-send { background:var(--accent-color,#3b82f6); color:#fff; }
+.input-panel-box { width:100%; max-width:360px; display:flex; flex-direction:column; gap:16px; }
+.input-panel-input { width:100%; box-sizing:border-box; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:14px 16px; color:#fff; font-size:16px; outline:none; -webkit-appearance:none; }
+.input-panel-input:focus { border-color:rgba(99,102,241,0.6); }
+.input-panel-input::placeholder { color:rgba(255,255,255,0.3); }
+.input-panel-actions { display:flex; gap:12px; justify-content:flex-end; }
+.input-panel-btn { padding:10px 24px; border-radius:10px; border:none; font-size:14px; cursor:pointer; outline:none; }
+.input-panel-btn.cancel { background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); }
+.input-panel-btn.send { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; font-weight:500; }
 </style>
 
 
@@ -920,9 +923,13 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
 <div id="charSelect" class="hidden" style="display:none;"></div>
 <div id="charGrid" style="display:none;"></div>
 <div class="input-panel" id="inputPanel">
-    <input class="input-field" id="keyboardInput" type="text" placeholder="输入消息..." autocomplete="off" />
-    <button class="input-btn input-cancel" id="inputCancelBtn">取消</button>
-    <button class="input-btn input-send" id="inputSendBtn">发送</button>
+    <div class="input-panel-box">
+      <input type="text" class="input-panel-input" id="keyboardInput" placeholder="输入你想说的话..." autocomplete="off">
+      <div class="input-panel-actions">
+        <button class="input-panel-btn cancel" id="inputCancelBtn">取消</button>
+        <button class="input-panel-btn send" id="inputSendBtn">发送</button>
+      </div>
+    </div>
   </div>
 <div id="renamePanel" style="display:none;"><span id="renamePanelTitle"></span><input id="renameInput" type="text"/><input id="renamePitch" type="range"/><span id="renamePitchVal"></span><input id="renameSpeed" type="range"/><span id="renameSpeedVal"></span></div>
 
