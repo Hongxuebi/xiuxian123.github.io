@@ -2549,18 +2549,13 @@ async function 处理多选操作(e) {
   const 当前筛选 = window._当前筛选 ? window._当前筛选() : 'all';
   const 是回收站视图 = 当前筛选 === 'deleted';
   
-  // 获取当前可见的备忘录ID列表
+  // 获取当前页面上实际显示的备忘录ID列表（经过所有筛选后的结果）
   const 获取可见ID列表 = () => {
-    const 数据源 = window._备忘录数据源 || window._备忘录数据 || [];
-    let 筛选后的备忘录 = 数据源;
-    
-    if (是回收站视图) {
-      筛选后的备忘录 = 筛选后的备忘录.filter(m => m.已删除 === true);
-    } else {
-      筛选后的备忘录 = 筛选后的备忘录.filter(m => !m.已删除);
-    }
-    
-    return 筛选后的备忘录.map(m => m.id);
+    const 列表容器 = document.getElementById('备忘录卡片列表');
+    if (!列表容器) return [];
+    // 直接从 DOM 取当前渲染的卡片 data-id，
+    // 这样无论经过什么筛选（文件夹/搜索/收藏/日期/标签/AI），取到的就是用户实际看到的
+    return Array.from(列表容器.querySelectorAll('[data-id]')).map(el => el.dataset.id);
   };
   
   switch (action) {
