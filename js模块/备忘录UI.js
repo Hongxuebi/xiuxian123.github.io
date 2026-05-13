@@ -2933,4 +2933,4 @@ window.更新多选UI = function() {
   if (window.渲染备忘录列表) window.渲染备忘录列表();
 }
 
-window.更新已选标签数 = 更新已选标签数;
+window.更新已选标签数 = typeof 更新已选标签数 === 'function' ? 更新已选标签数 : function(){};
