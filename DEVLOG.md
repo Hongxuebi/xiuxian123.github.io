@@ -192,3 +192,54 @@ v7.1.0-call-overlay-layout-fix — 完整修复（3 个元素全部处理）
 | **v7.2.0** | **2026-05-13** | **caption-area 权重覆盖修复** |
 | v7.2.1 | 2026-05-13 | 气泡 CSS 变量化 + 滚动修复 |
 | v7.2.2 | 2026-05-13 | 通话对话重复修复 |
+
+---
+
+## v7.2.4 ~ v7.2.5 — 通话对话记录面板覆盖 action-bar（2026-05-13）
+
+### 问题现象
+展开对话记录面板时，底部的 action-bar（通话按钮区域）被往上挤，而非被面板覆盖。
+
+### 排查过程
+1. **第一次尝试（v7.2.4）**：`.chat-history-panel` 去掉 `display:flex;flex-direction:column`，`.chat-history-list` 从 `flex:1` 改为 `max-height:calc(40vh-44px)` — ❌ 无效
+2. **根因定位**：CSS 特异性覆盖
+   - 第208行规则 `#语音通话浮层 > *:not(...一堆排除项) { position:relative; z-index:1; }`
+   - 特异性 **(1, 5, 0)**（1个ID + 5个伪类）
+   - `.chat-history-panel { position:absolute }` 特异性只有 **(0, 1, 0)**
+   - → `position:relative` 覆盖了 `position:absolute`，面板参与 flex 布局
+
+### 修复（v7.2.5）
+在排除列表追加 4 个 absolute 定位元素：`:not(.chat-history-panel):not(.action-overlay):not(.rename-btns):not(.rename-reset)`
+同时去掉 `.chat-history-panel` 的 `flex-direction:column`（不需要了），`.chat-history-list` 保持 `max-height + overflow-y:auto`。
+
+## v7.2.6 — 锁定模式桌面端触发挂断修复（2026-05-13 深夜）
+
+### 问题现象
+桌面端点击 🔒（锁定模式）按钮时，不发送语音而是直接挂断。鸿蒙端正常。
+
+### 根因：输入设备差异
+同一元素 `#hangupBtn` 上有两个独立 `addEventListener`：
+1. `_D.hb` 监听（滑动交互层，先注册）— 锁定模式下调 `_finishLk()` 解锁+发送语音
+2. `$('hangupBtn')` 监听（通用挂断层，后注册）— 始终执行完整挂断
+
+- **鸿蒙（触摸屏）**：touchstart → touchend → `_D.hb` touchend 触发 → `e.preventDefault()` **阻止浏览器合成 click** → `$('hangupBtn')` click 永远不触发 ✅
+- **桌面（鼠标）**：mousedown → mouseup → 浏览器合成 click → `_D.hb` 没绑鼠标事件 → `$('hangupBtn')` click 直接触发 → 挂断 ❌
+
+### 修复
+在 `_D.hb` 上加 `mousedown` 监听器，和 touchend 同样的逻辑（`e.preventDefault()` 阻止后续 click 合成 + `_finishLk()` 解锁发送）。保持与 doubaodadianhua 鸿蒙版代码结构完全一致。
+
+### 经验
+- 触摸屏独占的行为（touch events）在桌面端不触发，需要补全 mouse 事件等价处理
+- `stopPropagation` vs `stopImmediatePropagation`：前者只阻止冒泡，后者还阻止同元素后续监听器。但鸿蒙端正确方案是 touchend 的 `preventDefault()` 阻断 click 合成，比 `stopImmediatePropagation` 更干净
+
+## 总结（05-13 完整日）
+
+| 版本 | 改动要点 |
+|------|---------|
+| v7.1.9 | 顶部栏挂断后不可见修复（_returnToVerification 缺恢复顶部栏） |
+| v7.2.0 | caption-area position:absolute 被 CSS 权重覆盖修复 |
+| v7.2.1 | 气泡 CSS 变量化 + 通话记录 flex 滚动修复 |
+| v7.2.2 | 通话对话重复修复（finishTtsUI 跳过 addChat） |
+| v7.2.3 | 页面加载时提前播放招呼语修复 |
+| v7.2.4~7.2.5 | 对话记录面板覆盖 action-bar 修复 |
+| v7.2.6 | 锁定模式桌面端触发挂断修复（补 _D.hb mousedown） |
