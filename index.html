@@ -205,7 +205,7 @@
 /* 语音通话浮层 = call-container 别名 */
 #语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:fixed; overflow:hidden; background:#0a0a0f; z-index:9999; inset:0; }
 #语音通话浮层 .call-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a0f 70%); z-index:0; }
-#语音通话浮层 > *:not(.call-bg):not(.input-panel):not(.loading-overlay):not(.caption-area):not(.chat-toggle-btn) { position:relative; z-index:1; }
+#语音通话浮层 > *:not(.call-bg):not(.input-panel):not(.loading-overlay):not(.caption-area):not(.chat-toggle-btn):not(.chat-history-panel):not(.action-overlay):not(.rename-btns):not(.rename-reset) { position:relative; z-index:1; }
 /* ===== 语音通话核心UI(豆包原版完整搬入) ===== */
 * { margin:0; padding:0; box-sizing:border-box; }
 html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif; background:#0a0a0f; color:#fff; -webkit-font-smoothing:antialiased; }
