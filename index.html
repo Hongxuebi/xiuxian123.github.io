@@ -3633,6 +3633,9 @@ var _rattanMotions = [
 // ================================================================
 window.进入通话模式 = function(charId) {
   console.log('[语音通话] 进入通话模式, charId=' + charId);
+  // 隐藏顶部栏
+  var header = document.querySelector('header.顶部栏');
+  if (header) { header.style.display = 'none'; }
   var el = document.getElementById('语音通话浮层');
   if (!el) { console.error('[语音通话] ❌ 语音通话浮层 DOM 不存在'); return; }
   console.log('[语音通话] 显示语音通话浮层, display=' + el.style.display);
@@ -3672,6 +3675,9 @@ window.挂断通话 = function() {
     setMouth && setMouth(0);
   }
   document.getElementById('语音通话浮层').style.display = 'none';
+  // 恢复顶部栏
+  var header = document.querySelector('header.顶部栏');
+  if (header) { header.style.display = ''; }
 };
 
 // love-helper 无 通话验证浮层 DOM,此函数保持空操作
