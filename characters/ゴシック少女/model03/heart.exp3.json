@@ -1,0 +1,20 @@
+{
+	"Type": "Live2D Expression",
+	"Parameters": [
+		{
+			"Id": "ParamCheek",
+			"Value": 1,
+			"Blend": "Add"
+		},
+		{
+			"Id": "Paramhearteye",
+			"Value": 1,
+			"Blend": "Add"
+		},
+		{
+			"Id": "Paramhighlightoff",
+			"Value": 1,
+			"Blend": "Add"
+		}
+	]
+}

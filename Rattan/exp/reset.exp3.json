@@ -1,0 +1,26 @@
+{
+	"Type": "Live2D Expression",
+	"Parameters": [
+		{"Id": "Param84", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param86", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param87", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param88", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param89", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param90", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param95", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param97", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param98", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param99", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param101", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param107", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param108", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param109", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param110", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param111", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param116", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param119", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param120", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param122", "Value": 0, "Blend": "Overwrite"},
+		{"Id": "Param127", "Value": 0, "Blend": "Overwrite"}
+	]
+}

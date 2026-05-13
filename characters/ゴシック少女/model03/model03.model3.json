@@ -1,0 +1,63 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "model03.moc3",
+		"Textures": [
+			"model03.8192/texture_00.png",
+			"model03.8192/texture_01.png",
+			"model03.8192/texture_02.png",
+			"model03.8192/texture_03.png",
+			"model03.8192/texture_04.png"
+		],
+		"Physics": "model03.physics3.json",
+		"DisplayInfo": "model03.cdi3.json",
+		"Expressions": [
+			{ "Name": "cheek", "File": "cheek.exp3.json" },
+			{ "Name": "heart", "File": "heart.exp3.json" },
+			{ "Name": "shock", "File": "shock.exp3.json" },
+			{ "Name": "jitome", "File": "jitome.exp3.json" },
+			{ "Name": "guruguru", "File": "guruguru.exp3.json" },
+			{ "Name": "kirakira", "File": "kirakira .exp3.json" },
+			{ "Name": "highlightoff", "File": "highlightoff.exp3.json" },
+			{ "Name": "earringoff", "File": "earringoff.exp3.json" },
+			{ "Name": "hairpinoff", "File": "hairpinoff.exp3.json" },
+			{ "Name": "headdressB", "File": "headdressB.exp3.json" },
+			{ "Name": "headdressW", "File": "headdressW.exp3.json" },
+			{ "Name": "ribbonB", "File": "ribbonB.exp3.json" },
+			{ "Name": "fronthairB", "File": "fronthairB.exp3.json" },
+			{ "Name": "shorthair", "File": "shorthair.exp3.json" },
+			{ "Name": "twintail", "File": "twintail.exp3.json" }
+		],
+		"Motions": {
+			"Idle": [
+				{ "File": "cheek.motion3.json" },
+				{ "File": "heart.motion3.json" },
+				{ "File": "shock.motion3.json" },
+				{ "File": "jitome.motion3.json" },
+				{ "File": "guruguru.motion3.json" },
+				{ "File": "kirakira .motion3.json" },
+				{ "File": "highlightoff.motion3.json" },
+				{ "File": "earringoff.motion3.json" },
+				{ "File": "hairpinoff.motion3.json" },
+				{ "File": "headdressB.motion3.json" },
+				{ "File": "headdressW.motion3.json" },
+				{ "File": "ribbonB.motion3.json" },
+				{ "File": "fronthairB.motion3.json" },
+				{ "File": "shorthair.motion3.json" },
+				{ "File": "twintail.motion3.json" }
+			]
+		}
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": ["ParamMouthOpenY"]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": ["ParamEyeLOpen", "ParamEyeROpen"]
+		}
+	]
+}

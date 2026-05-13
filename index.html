@@ -879,11 +879,11 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
 
 
 
-    <div class="rename-btns">
+    <div class="rename-btns" style="display:none;position:absolute;z-index:30;left:0;right:0;bottom:calc(var(--action-bar-height, 92px) + env(safe-area-inset-bottom, 0) + 60px);padding:8px 24px;gap:10px;justify-content:center;background:rgba(10,10,15,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;border:1px solid rgba(255,255,255,0.06);">
       <button class="rename-cancel" id="renameCancel">取消</button>
       <button class="rename-save" id="renameSave">保存</button>
     </div>
-    <button class="rename-reset" id="renameReset">恢复默认名字</button>
+    <button class="rename-reset" id="renameReset" style="display:none;position:absolute;z-index:29;left:50%;transform:translateX(-50%);bottom:calc(var(--action-bar-height, 92px) + env(safe-area-inset-bottom, 0) + 16px);font-size:11px;color:rgba(255,255,255,0.3);cursor:pointer;padding:4px 16px;background:rgba(255,255,255,0.04);border-radius:20px;border:1px solid rgba(255,255,255,0.06);">恢复默认名字</button>
 
   <div class="chat-history-panel" id="chatPanel">
     <div class="chat-panel-header"><span class="chat-panel-title">对话记录</span><div><span class="chat-panel-clear" id="clearChatBtn">清空</span><span class="chat-panel-hide" id="hideChatBtn">隐藏</span></div></div>

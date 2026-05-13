@@ -1,0 +1,32 @@
+{
+  "Version": 3,
+  "Meta": {
+    "Duration": 1.2,
+    "FadeInTime": 0.1,
+    "FadeOutTime": 0.1,
+    "Fps": 30.0,
+    "Loop": false,
+    "AreBeziersRestricted": false,
+    "CurveCount": 1,
+    "TotalSegmentCount": 8,
+    "TotalPointCount": 3,
+    "UserDataCount": 0,
+    "TotalUserDataSize": 0
+  },
+  "Curves": [
+    {
+      "Target": "Parameter",
+      "Id": "ParamBodyAngleY",
+      "Segments": [
+        0,
+        0,
+        0,
+        0.5,
+        10,
+        0,
+        1.2,
+        0
+      ]
+    }
+  ]
+}
