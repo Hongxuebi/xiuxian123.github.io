@@ -2494,8 +2494,6 @@ function applyFaceZoom(level) {
   var t = Math.max(0, Math.min(100, level)) / 100;
   var zoomFactor = 1 + t * 1.5;
   var s = window._faceZoomBaseS * zoomFactor;
-  // 限制最大缩放倍数（最多放大到初始的 1.8 倍，原 max 是 2.5x，容易溢出）
-  s = Math.min(s, window._faceZoomBaseS * 1.8);
   model.scale.set(s);
   var h = container.clientHeight;
   var defaultFaceY = (h - 10) - window._origH * window._faceZoomBaseS * (1 - FACE_RATIO);
