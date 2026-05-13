@@ -1224,9 +1224,7 @@ function getPatchedSystemPrompt(char) {
   // === 追加表情/动作标记协议(动态注入当前角色可用标签) ===
   var tags = (typeof _getCharActionTags === 'function') ? _getCharActionTags() : '';
   if (tags) {
-    prompt += '\n\n[动作指令] 你可以在回复中用方括号指定表情和动作,格式 [emo:标签] 或 [mot:标签]。\n可用: ' + tags + '\n示例:"[emo:happy] 恭喜!" 或 "[mot:nod] 我同意~"\n标记放句首或句尾,无特别需要可不加。';
-  } else {
-    prompt += '\n\n[动作指令] 可用表情: [emo:happy] [emo:sad] [emo:surprise] [emo:shy] [emo:thinking]\n可用动作: [mot:wave] [mot:nod] [mot:shake] [mot:bow] [mot:sigh]\n标记放句首或句尾,无需必加。';
+    prompt += '\n\n## 动作指令（Live2D 表情与动作）\n你可以在回复中用方括号指定表情和动作，让角色做出对应反应。\n格式: [emo:标签] 表情  [mot:标签] 动作\n\n' + tags + '\n\n规则:\n- 标记放句首或句尾，无特别需要可不加\n- 标有(持续)的表情会持续到下一轮对话\n- 标有(~Ns)的动作需要约N秒播放，避免同时触发多个长动作\n- 每轮回复最多加1个表情+1个动作，不要滥用\n- 用户要求你做特定表情时，用对应的标签配合符合人设的回话';
   }
 
   return prompt;
@@ -2154,6 +2152,7 @@ var _tickerHook = null, _lastMouthLevel = 0, _ttsActive = false, _stopRequested 
 var _autoRecTimer = null;  // 自动对话:录音启动定时器,打断/关闭时必须 clearTimeout
 var _lastSpeakText = '', _lastSpeakTime = 0;
 var _lastActions = [];  // AI 动作记录,用于 onTtsComplete 复位
+var _persistentActions = [];  // 持久表情记录(持续到下一轮用户输入)
 
 // softCloseMouth: 柔和淡出闭嘴
 var _fadeTimer = null;
@@ -2317,7 +2316,10 @@ function aiSpeak(text) {
   // === 解析表情/动作标记 ===
   var actions = [];
   var cleanText = text.replace(/\[(emo|mot):(\w+)\]/gi, function(match, type, tag) {
-    actions.push({ type: type.toLowerCase(), tag: tag.toLowerCase() });
+    var t = type.toLowerCase();
+    var tg = tag.toLowerCase();
+    var desc = _findActionDesc(t, tg);
+    actions.push({ type: t, tag: tg, persist: !!(desc && desc.persist) });
     return '';
   }).replace(/\s+/g, ' ').trim();
 
@@ -2326,6 +2328,7 @@ function aiSpeak(text) {
     var a = actions[i];
     if (a.type === 'emo') executeEmotionTag(a.tag);
     if (a.type === 'mot')  executeMotionTag(a.tag);
+    if (a.persist) _persistentActions.push(a);
   }
   _lastActions = actions;
 
@@ -2378,6 +2381,11 @@ async function callDeepSeek(userMsg) {
   chatHistory.push({ role: 'user', content: userMsg });
   $('roleStatus').textContent = 'AI思考中...';
   $('roleStatus').className = 'chat-toggle-status speaking';
+
+  // 先清除上一轮的持久表情(持续到用户发下一条消息为止)
+  if (_persistentActions.length > 0) {
+    _clearPersistentActions();
+  }
 
   if (_lastActions && _lastActions.length > 0) {
     try { stopAllAiMotions(); } catch(e) {}
@@ -3382,8 +3390,8 @@ var _rattanMotions = [
         happy:    { action: 'bounce',    label: '开心弹跳' },
         sad:      { action: 'sad',       label: '八字眉难过' },
         surprise: { action: 'scareBack', label: '惊吓后退' },
-        shy:      { action: 'tiltQ',     label: '歪头害羞' },
-        thinking: { action: 'tiltQ',     label: '歪头思考' },
+        shy:      { action: 'tiltQ',     label: '歪头害羞', persist: true },
+        thinking: { action: 'tiltQ',     label: '歪头思考', persist: true },
       },
       mot: {
         wave:  { action: 'bounce',    label: '弹跳' },
@@ -3399,14 +3407,13 @@ var _rattanMotions = [
         sad:      { motion: 'haru_g_m20.motion3.json', label: '伤心低头' },
         surprise: { action: 'scareBack', label: '惊吓后退' },
         shy:      { motion: 'haru_g_m26.motion3.json', label: '含羞' },
-        thinking: { action: 'tiltQ', label: '歪头思考' },
+        thinking: { action: 'tiltQ', label: '歪头思考', persist: true },
       },
       mot: {
         nod:  { motion: 'haru_g_m06.motion3.json', label: '认真点头' },
         sigh: { motion: 'haru_g_m20.motion3.json', label: '伤心叹息' },
         bow:  { motion: 'haru_g_m09.motion3.json', label: '承蒙关照' },
       },
-      tags: 'happy sad surprise shy thinking | mot: nod sigh bow',
     },
     hiyori: {
       emo: {
@@ -3414,14 +3421,13 @@ var _rattanMotions = [
         sad:      { action: 'sad', label: '八字眉难过' },
         surprise: { action: 'scareBack', label: '惊吓后退' },
         shy:      { motion: 'Hiyori_m06.motion3.json', label: '害羞的喜欢' },
-        thinking: { action: 'tiltQ', label: '歪头思考' },
+        thinking: { action: 'tiltQ', label: '歪头思考', persist: true },
       },
       mot: {
         nod:  { motion: 'Hiyori_m01.motion3.json', label: '嗯~点头' },
         wave: { motion: 'Hiyori_m03.motion3.json', label: '高兴挥手' },
         sigh: { action: 'sad', label: '叹息' },
       },
-      tags: 'happy sad surprise shy thinking | mot: nod wave sigh',
     },
     mark: {
       emo: {
@@ -3429,52 +3435,58 @@ var _rattanMotions = [
         sad:      { motion: 'mark_m04.motion3.json', label: '无奈' },
         surprise: { action: 'scareBack', label: '惊吓后退' },
         shy:      { action: 'tiltQ', label: '歪头害羞' },
-        thinking: { motion: 'mark_m01.motion3.json', label: '晃头思考' },
+        thinking: { motion: 'mark_m01.motion3.json', label: '晃头思考', persist: true },
       },
       mot: {
         nod:  { motion: 'mark_m01.motion3.json', label: '晃头' },
         wave: { motion: 'mark_m06.motion3.json', label: '跳一下' },
         sigh: { motion: 'mark_m04.motion3.json', label: '无奈叹气' },
       },
-      tags: 'happy sad surprise shy thinking | mot: nod wave sigh',
     },
     natori: {
       emo: {
-        happy:    { motion: 'mtn_03.motion3.json', label: '拿出金色怀表' },
+        happy:    { motion: 'mtn_03.motion3.json', label: '拿出金色怀表', duration: 3 },
         sad:      { action: 'sad', label: '八字眉难过' },
         surprise: { motion: 'mtn_04.motion3.json', label: '扶镜框惊讶' },
         shy:      { action: 'tiltQ', label: '歪头害羞' },
-        thinking: { motion: 'mtn_04.motion3.json', label: '扶镜框思考' },
+        thinking: { motion: 'mtn_04.motion3.json', label: '扶镜框思考', persist: true },
       },
       mot: {
         nod:  { motion: 'mtn_05.motion3.json', label: '伸出左手确定' },
         sigh: { motion: 'mtn_07.motion3.json', label: '不对哦~' },
         bow:  { motion: 'mtn_06.motion3.json', label: '承蒙关照' },
       },
-      tags: 'happy sad surprise shy thinking | mot: nod sigh bow',
     },
     mao: {
       emo: {
-        happy:    { motion: 'special_01.motion3.json', label: '魔法棒比心' },
+        happy:    { motion: 'special_01.motion3.json', label: '魔法棒比心', duration: 3 },
         sad:      { motion: 'special_02.motion3.json', label: '比心失败尴尬' },
         surprise: { motion: 'mtn_03.motion3.json', label: '闭眼享受' },
         shy:      { motion: 'mtn_04.motion3.json', label: '嗯哼傲娇' },
-        thinking: { action: 'tiltQ', label: '歪头思考' },
+        thinking: { action: 'tiltQ', label: '歪头思考', persist: true },
       },
       mot: {
         nod:  { motion: 'mtn_02.motion3.json', label: '嗯嗯嗯' },
-        wave: { motion: 'special_03.motion3.json', label: '展示魔法帽小兔子' },
+        wave: { motion: 'special_03.motion3.json', label: '展示魔法帽小兔子', duration: 4 },
         sigh: { motion: 'special_02.motion3.json', label: '比心失败' },
       },
-      tags: 'happy sad surprise shy thinking | mot: nod wave sigh',
     },
     rattan: {
       emo: {
         happy:    { motion: 'wave.motion3.json', label: '挥手开心' },
-        sad:      { action: 'sad', label: '八字眉难过' },
+        sad:      { expr: '脸黑', label: '脸黑', persist: true },
         surprise: { motion: 'surprise.motion3.json', label: '惊吓后退' },
-        shy:      { motion: 'tilt.motion3.json', label: '歪头害羞' },
-        thinking: { motion: 'tilt.motion3.json', label: '歪头思考' },
+        shy:      { expr: '脸红', label: '害羞脸红', persist: true },
+        thinking: { expr: '问号', label: '歪头思考(问号)', persist: true },
+        // 白藤专属面部表情
+        darkface: { expr: '脸黑', label: '脸黑', persist: true },
+        stareye:  { expr: '星星眼', label: '星星眼', persist: true },
+        hearteye: { expr: '爱心眼', label: '爱心眼', persist: true },
+        cry:      { expr: '哭', label: '哭', persist: true },
+        sweat:    { expr: '汗', label: '汗', persist: true },
+        blush:    { expr: '脸红', label: '脸红', persist: true },
+        rolleyes: { expr: '白眼', label: '翻白眼' },
+        question: { expr: '问号', label: '头上问号', persist: true },
       },
       mot: {
         wave:  { motion: 'wave.motion3.json',  label: '挥手' },
@@ -3482,14 +3494,39 @@ var _rattanMotions = [
         shake: { motion: 'nonono.motion3.json', label: '摇头' },
         bow:   { motion: 'bow.motion3.json',    label: '鞠躬' },
         sigh:  { motion: 'sigh.motion3.json',   label: '叹气' },
+        // 白藤专属配件
+        mic:      { expr: '话筒', label: '手持话筒', persist: true },
+        claw:     { expr: '爪', label: '伸出爪子', persist: true },
+        earring:  { expr: '耳环', label: '戴耳环', persist: true },
+        ponytail: { expr: '马尾', label: '马尾', persist: true },
+        veil:     { expr: '头纱', label: '戴头纱', persist: true },
+        headband: { expr: '头环', label: '戴头环', persist: true },
+        cover:    { expr: '遮挡', label: '遮挡物', persist: true },
       },
-      tags: 'happy sad surprise shy thinking | mot: wave nod shake bow sigh',
     },
   };
 
+  // 动态生成带中文标签的可用动作描述
   function _getCharActionTags() {
     var c = _charActionMap[currentCharacterId] || _charActionMap._default;
-    return c.tags || '';
+    var lines = [];
+    if (c.emo) {
+      var emoParts = [];
+      for (var k in c.emo) {
+        var d = c.emo[k];
+        emoParts.push('[emo:' + k + '] ' + (d.label || k) + (d.persist ? '(持续)' : '') + (d.duration ? '(~' + d.duration + 's)' : ''));
+      }
+      lines.push('表情: ' + emoParts.join('  '));
+    }
+    if (c.mot) {
+      var motParts = [];
+      for (var k in c.mot) {
+        var d = c.mot[k];
+        motParts.push('[mot:' + k + '] ' + (d.label || k) + (d.persist ? '(持续)' : '') + (d.duration ? '(~' + d.duration + 's)' : ''));
+      }
+      lines.push('动作: ' + motParts.join('  '));
+    }
+    return lines.join('\n');
   }
 
   // 从 _allActions 中按 id 查找动作对象
@@ -3498,6 +3535,14 @@ var _rattanMotions = [
       if (_allActions[i].id === id) return _allActions[i];
     }
     return null;
+  }
+
+  // 查找标签对应的动作描述(含 persist/duration 等元信息)
+  function _findActionDesc(type, tag) {
+    var c = _charActionMap[currentCharacterId] || _charActionMap._default;
+    var d = _charActionMap._default;
+    var desc = (c && c[type] && c[type][tag]) || (d && d[type] && d[type][tag]);
+    return desc || null;
   }
 
   // 解析 action descriptor: {motion: 'xxx'} 或 {action: 'xxx'}
@@ -3519,6 +3564,12 @@ var _rattanMotions = [
           _playParamAnim(a);
           return true;
       }
+    }
+    // 白藤专属：参数化表情（通过 _rattanExprMap + beforeModelUpdate hook）
+    if (desc.expr && typeof _setExpressionWithReset === 'function') {
+      console.log('[' + type + '] expr:', tag, '->', desc.expr, '(' + desc.label + ')');
+      _setExpressionWithReset(desc.expr);
+      return true;
     }
     return false;
   }
@@ -3562,6 +3613,19 @@ var _rattanMotions = [
         try { core.setParameterValueById(resetParams[i], 0); } catch(e) {}
       }
     }
+  }
+
+  // 清除持久表情(下一轮用户输入时调用)
+  function _clearPersistentActions() {
+    console.log('[PERSIST-CLEAR] clearing persistent actions:', _persistentActions.length);
+    for (var i = 0; i < _persistentActions.length; i++) {
+      var a = _persistentActions[i];
+      // 白藤持久表情:清空 _rattanActiveExpr
+      if (currentCharacterId === 'rattan') {
+        _rattanActiveExpr = '';
+      }
+    }
+    _persistentActions = [];
   }
 
   function resetExpressionToNeutral() {
