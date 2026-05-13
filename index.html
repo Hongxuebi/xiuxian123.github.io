@@ -1825,7 +1825,7 @@ async function loadModel() {
     // 确保canvas可见并获取正确的容器尺寸
     const w = container.clientWidth || 400;
     const h = container.clientHeight || 500;
-    diag('loadModel: container size=' + w + 'x' + h);
+    console.log('[DIAG] loadModel: container size=' + w + 'x' + h + ' (client=' + container.clientWidth + 'x' + container.clientHeight + ')');
 
     // 只在第一次创建 PIXI Application,之后复用(避免WebGL上下文丢失)
     if (!app) {
