@@ -217,8 +217,9 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
 .char-select-subtitle { font-size:13px; color:rgba(255,255,255,0.3); text-align:center; margin-bottom:24px; }
 .call-bg { position:absolute; inset:0; z-index:0; background:radial-gradient(ellipse 120% 60% at 50% 20%, rgba(59,130,246,0.15) 0%, transparent 70%), radial-gradient(ellipse 80% 50% at 20% 70%, rgba(139,92,246,0.10) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 80% 65%, rgba(236,72,153,0.08) 0%, transparent 55%), linear-gradient(180deg,#0a0a0f 0%,#101018 40%,#0f0f1a 100%); }
 .status-bar { position:relative; z-index:10; height:54px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; padding-top:env(safe-area-inset-top,0); flex-shrink:0; }
-.status-left { display:flex; align-items:center; gap:8px; }
-.status-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px rgba(34,197,94,0.5); animation:pulse 2s infinite; display:var(--dot-display,block); }
+.status-left { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+.status-role-name { font-size:11px; color:rgba(255,255,255,0.35); letter-spacing:1px; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px rgba(34,197,94,0.5); animation:pulse 2s infinite; display:var(--dot-display,block); flex-shrink:0; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .status-text { font-size:13px; color:rgba(255,255,255,0.6); }
 .hero-area { position:relative; z-index:2; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:0; overflow:hidden; }
@@ -817,7 +818,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
   </div>
 
   <div class="status-bar">
-    <div class="status-left"><div class="status-dot"></div><span class="status-text" id="statusText">连接中...</span></div>
+    <div class="status-left"><div style="display:flex;align-items:center;gap:8px"><div class="status-dot"></div><span class="status-text" id="statusText">连接中...</span></div><span class="status-role-name" id="roleName">加载中...</span></div>
     <div class="status-right">
       <div class="action-toggle-btn" id="actionToggleBtn" title="表情与动作">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
@@ -832,7 +833,6 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
   <div class="hero-area">
     <div class="live2d-container" id="live2dContainer"><canvas id="live2dCanvas"></canvas></div>
     <div class="role-title" id="roleTitle"></div>
-    <div class="role-name" id="roleName">Loading...</div>
     <div class="call-timer" id="callTimer">--:--</div>
     <!-- 面部聚焦缩放 -->
     <div class="face-zoom-btn" id="faceZoomBtn" title="面部聚焦">
