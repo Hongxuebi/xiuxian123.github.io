@@ -2494,12 +2494,17 @@ function applyFaceZoom(level) {
   var t = Math.max(0, Math.min(100, level)) / 100;
   var zoomFactor = 1 + t * 1.5;
   var s = window._faceZoomBaseS * zoomFactor;
+  // 限制最大缩放，防止角色完全飞出画布
+  s = Math.min(s, Math.max(container.clientWidth, container.clientHeight) * 0.8 / 200);
   model.scale.set(s);
-  var h = container.clientHeight;
-  var defaultFaceY = (h - 10) - window._origH * window._faceZoomBaseS * (1 - FACE_RATIO);
-  var targetFaceY = h / 2;
-  var desiredFaceY = defaultFaceY + (targetFaceY - defaultFaceY) * t;
-  model.y = desiredFaceY + window._origH * s * (1 - FACE_RATIO);
+  // anchor=(0.5,1) 底部中心锚点
+  // 面部目标位置：由上往下约30%处
+  var faceTargetRatio = 0.3;
+  // 插值：缩放越大，面部位置越往下移，确保头部始终在画布内
+  var yTarget = container.clientHeight * (faceTargetRatio - t * 0.05);
+  // clamp 到画布内
+  yTarget = Math.max(s * 100, Math.min(container.clientHeight - 10 - s * 50, yTarget));
+  model.y = yTarget;
   model.x = container.clientWidth / 2;
 }
 function updateFaceZoomBtn() {
