@@ -70,6 +70,24 @@ window.创建智能体选择器UI = async function() {
         });
         下拉菜单.appendChild(项); // 🔧 修复：原来缺少 appendChild
       });
+
+      // 分隔线
+      const 分隔线 = document.createElement('div');
+      分隔线.className = '智能体分隔线';
+      下拉菜单.appendChild(分隔线);
+
+      // 添加按钮
+      const 添加项 = document.createElement('div');
+      添加项.className = '智能体选项 添加智能体选项';
+      添加项.id = '添加智能体按钮';
+      添加项.innerHTML = '<span>➕</span><span>添加新智能体</span>';
+      添加项.addEventListener('click', function(ev) {
+        ev.stopPropagation();
+        关闭下拉菜单();
+        if (window.打开添加智能体浮层) window.打开添加智能体浮层();
+        else if (window._显示提示) window._显示提示('添加智能体功能开发中','info');
+      });
+      下拉菜单.appendChild(添加项);
     }
 
     function 关闭下拉菜单() {
@@ -132,10 +150,15 @@ window.创建智能体选择器UI = async function() {
           选择按钮.innerHTML = `${智能体.icon} ${智能体.name} ▼`;
           更新抽屉头像(智能体);
         }
+        // 同时刷新下拉菜单列表
+        渲染下拉菜单(列表, 当前ID);
       } catch (e) {
         console.error('[智能体选择器] 更新失败', e);
       }
     };
+
+    // 兼容别名：其他模块调用 window.刷新智能体UI
+    window.刷新智能体UI = window.更新智能体选择器;
 
   } catch(e) {
     console.error('[智能体选择器] 创建异常', e);
