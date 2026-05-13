@@ -2788,13 +2788,13 @@ document.addEventListener('mouseup', _onPE);
 // action按钮点击事件(录音模式下)
 _D.kb.addEventListener('click', function(e){ if(_S.p){ e.stopPropagation(); _S.iC=true; _onPE({preventDefault:function(){}}); } });
 _D.sb2.addEventListener('click', function(e){ if(_S.p){ e.stopPropagation(); _S.iA=true; _onPE({preventDefault:function(){}}); } });
-_D.hb.addEventListener('click', function(e){ if(_S.p||_S.l){ e.stopPropagation(); if(_S.l) _finishLk(); else { _S.iL=true; _onPE({preventDefault:function(){}}); } } });
+_D.hb.addEventListener('click', function(e){ if(_S.p||_S.l){ e.stopImmediatePropagation(); if(_S.l) _finishLk(); else { _S.iL=true; _onPE({preventDefault:function(){}}); } } });
 _D.hb.addEventListener('touchend', function(e){ if(_S.p||_S.l){ e.preventDefault(); e.stopPropagation(); if(_S.l) _finishLk(); else { _S.iL=true; _onPE({preventDefault:function(){}}); } } });
 _D.sb2.addEventListener('click', function(e){ if(_S.a && !_S.p){ e.stopPropagation(); _toggleAM(); } });
 _D.sb2.addEventListener('touchend', function(e){ if(_S.a && !_S.p){ e.preventDefault(); e.stopPropagation(); _toggleAM(); } });
 
 $('hangupBtn').addEventListener('click', () => {
-  if (!connected || _S.l) return;
+  if (!connected) return;
   connected = false; stopTimer();
   clearTimeout(_autoRecTimer); _autoRecTimer = null;  // ★ 挂断时清除自动录音定时器
   if (isRecording) { stopNativeAsr(); stopRecordingUI(); }
