@@ -373,6 +373,8 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
 </div>
 <script>(function(){var el=document.getElementById('启动loading');if(!el)return;el.classList.add('隐藏');setTimeout(function(){if(el.parentNode)el.style.display='none';},1200);})();</script>
 
+header.顶部栏 { display:flex; }
+
 <div id="应用容器">
   <!-- 顶部栏 -->
   <header class="顶部栏">
@@ -3635,7 +3637,7 @@ window.进入通话模式 = function(charId) {
   console.log('[语音通话] 进入通话模式, charId=' + charId);
   // 隐藏顶部栏
   var header = document.querySelector('header.顶部栏');
-  if (header) { header.dataset.savedDisplay = header.style.display; header.style.display = 'none'; }
+  if (header) { header.style.display = 'none'; }
   var el = document.getElementById('语音通话浮层');
   if (!el) { console.error('[语音通话] ❌ 语音通话浮层 DOM 不存在'); return; }
   console.log('[语音通话] 显示语音通话浮层, display=' + el.style.display);
@@ -3677,7 +3679,7 @@ window.挂断通话 = function() {
   document.getElementById('语音通话浮层').style.display = 'none';
   // 恢复通话前 UI 状态
   var header = document.querySelector('header.顶部栏');
-  if (header) { header.style.display = header.dataset.savedDisplay || ''; delete header.dataset.savedDisplay; }
+  if (header) { header.style.display = 'flex'; }
 };
 
 // love-helper 无 通话验证浮层 DOM,此函数保持空操作
