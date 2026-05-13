@@ -2803,7 +2803,7 @@ $('charSwitchBtn').addEventListener('click', _returnToVerification);
 
 $('keyboardBtn').addEventListener('click', () => {
   if (_S.p) return;
-  if (!connected) return;
+  // 键盘输入不需要 connected 判断，可在任意状态下使用
   if (isRecording) { stopNativeAsr(); stopRecordingUI(); }
   showInputPanel();
 });
