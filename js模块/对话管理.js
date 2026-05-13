@@ -1236,6 +1236,29 @@ ${技能文本}`);
     console.log('[系统提示词] 其他智能体注入跳过:', e.message);
   }
 
+  // 2.9 Live2D 表情/动作标记协议注入（通话模式才需要）
+  try {
+    const 通话浮层 = document.getElementById('语音通话浮层');
+    const 通话中 = 通话浮层 && 通话浮层.style.display !== 'none' && 通话浮层.style.display !== '';
+    if (通话中 && typeof window._getCharActionTags === 'function') {
+      const tags = window._getCharActionTags();
+      if (tags) {
+        部分.push(`## 动作指令（Live2D 表情与动作）
+你可以在回复中用方括号指定表情和动作，格式 [emo:标签] 或 [mot:标签]。
+可用: ${tags}
+示例："[emo:happy] 恭喜！" 或 "[mot:nod] 我同意～"
+标记放句首或句尾，无特别需要可不加。`);
+      } else {
+        部分.push(`## 动作指令（Live2D 表情与动作）
+可用表情: [emo:happy] [emo:sad] [emo:surprise] [emo:shy] [emo:thinking]
+可用动作: [mot:wave] [mot:nod] [mot:shake] [mot:bow] [mot:sigh]
+标记放句首或句尾，无需必加。`);
+      }
+    }
+  } catch (e) {
+    console.log('[系统提示词] 动作指令注入跳过:', e.message);
+  }
+
   return 部分.filter(Boolean).join('\n\n');
 }
 
