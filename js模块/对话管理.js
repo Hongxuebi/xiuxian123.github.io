@@ -666,7 +666,7 @@ window.检测并记录人物关系显式 = 检测并记录人物关系显式;
 let _发送中 = false; // 防重复提交锁
 
 async function 发送消息(用户输入) {
-  if (!用户输入.trim()) return;
+  console.log('[MONITOR] 发送消息 called: input="' + (用户输入||'').substring(0,30) + '" stack=' + new Error().stack.split('\n').slice(3).join('|').substring(0,200));  if (!用户输入.trim()) return;
   // 防重复提交：检查并立即置位
   if (_发送中) { console.warn('[发送消息] 上一轮尚未完成，忽略重复请求'); return; }
   _发送中 = true;
@@ -795,13 +795,11 @@ async function 发送消息(用户输入) {
       }
     }
 
-    // ===== 语音通话模式：AI 回复播报 TTS =====
+    // ===== 非流式分支：AI 回复播报 TTS =====
     if (AI回复 && typeof AI回复 === 'string') {
-      // 检查是否处于通话模式
       if (window.播报通话TTS) {
         window.播报通话TTS(AI回复);
       }
-      // 同时添加到通话对话列表
       if (window.添加通话对话) {
         window.添加通话对话('AI', AI回复);
       }
