@@ -1932,7 +1932,11 @@ async function loadModel() {
       $('statusText').textContent = '请先设置 API Key';
       $('roleStatus').textContent = '点击键盘按钮输入 API Key';
     }
-    startConv();
+    // 仅当通话浮层显示时才播招呼语(防止页面加载时提前出声)
+    var 通话浮层 = document.getElementById('语音通话浮层');
+    if (通话浮层 && 通话浮层.style.display === 'flex') {
+      startConv();
+    }
 
     console.log('✅ Live2D 加载成功:', char.name, '| pos:', model.x, model.y, 'scale:', model.scale.x, '| orig:', window._origW + 'x' + window._origH, '| container:', w + 'x' + h);
 

@@ -132,6 +132,49 @@ v7.1.0-call-overlay-layout-fix — 完整修复（3 个元素全部处理）
 
 ---
 
+## v7.1.1 ~ v7.2.2 — 后续快速迭代（2026-05-13 深夜）
+
+### v7.1.1 — 启动 loading 遮罩优化
+- 启动 loading 改为 1.2s 自动隐藏 + `.hidden` + z-index 降为 9999
+- 防止遮罩遮挡通话浮层按钮
+
+### v7.1.3 — status-bar CSS 排除规则
+- 选择器 `.通话浮层:not(#通话验证浮层).status-bar > :not(.loading-overlay)`
+- 防止 loading-overlay 因强制改 relative 而占用 flex 空间
+
+### v7.1.5 ~ v7.1.8 — 顶部栏隐藏/恢复（4 轮迭代）
+- 通话模式隐藏顶部栏 → 挂断后恢复显示
+- 使用 `dataset.savedDisplay` + `<style>` 内联 CSS 方案
+- v7.1.8 结束时挂断后子元素不可见未解决
+
+### v7.1.9 — 顶部栏挂断后不可见根因修复
+- 根因：`_returnToVerification()` 隐藏通话浮层但未恢复顶部栏
+- 修复：在 `_returnToVerification()` 增加顶部栏恢复逻辑
+- 同时修复了 love-helper 和 liuyunji 两处
+
+### v7.2.0 — caption-area 气泡 position:absolute 权重覆盖修复
+- 根因：`#语音通话浮层 > *:not(.call-bg):not(.input-panel):not(.loading-overlay) { position:relative; z-index:1; }`
+  权重 0-1-0 覆盖了 `.caption-area { position:absolute }` 的 0-0-1
+- 导致气泡不占 flex 空间却因 position:relative 挤占 hero-area 空间，画布高度减少 ~38px
+- 修复：排除列表加 `:not(.caption-area):not(.chat-toggle-btn)`
+- 两端同步标签：love-helper v7.2.0, liuyunji v0.9.14
+
+### v7.2.1 — 通话对话气泡 CSS 变量化 + 通话记录滚动修复
+- 气泡背景色从 rgba 硬编码改为引用 CSS 变量（`--助理消息背景`、`--用户消息背景` 等）
+- 通话记录无法滚动修复：参考豆宝打通鸿蒙版 v1.4.13→v1.4.14 diff
+  - `.chat-history-panel` 加 `display:flex;flex-direction:column`
+  - `.chat-panel-header` 加 `flex-shrink:0`
+  - `.chat-history-list` 从 `max-height` 改为 `flex:1;overflow-y:auto`
+- 两端同步标签：love-helper v7.2.1, liuyunji v0.9.15
+
+### v7.2.2 — 通话对话重复修复
+- 问题：每条 AI 消息在 chatList 中重复 2 次
+- 根因：对话管理.js 的 `添加通话对话` 和 `finishTtsUI` 的 `addChat('ai', lastAiText)` 各写一遍
+- 修复：`finishTtsUI` 检测到通话浮层显示时跳过 `addChat`，由对话管理.js 统一负责
+- 两端同步标签：love-helper v7.2.2, liuyunji v0.9.16
+
+---
+
 ## 历史版本速查
 
 | 版本 | 日期 | 核心改动 |
@@ -142,3 +185,10 @@ v7.1.0-call-overlay-layout-fix — 完整修复（3 个元素全部处理）
 | v7.0.8 | 2026-05-13 | applyFaceZoom 公式修复 |
 | v7.0.9 | 2026-05-13 | loadModel 防重入锁 |
 | **v7.1.0** | **2026-05-13** | **通话浮层布局修复（本文）** |
+| v7.1.1 | 2026-05-13 | 启动 loading 遮罩优化 |
+| v7.1.3 | 2026-05-13 | status-bar CSS 排除规则 |
+| v7.1.5~7.1.8 | 2026-05-13 | 顶部栏隐藏/恢复（4 轮迭代） |
+| v7.1.9 | 2026-05-13 | 顶部栏挂断后修复 |
+| **v7.2.0** | **2026-05-13** | **caption-area 权重覆盖修复** |
+| v7.2.1 | 2026-05-13 | 气泡 CSS 变量化 + 滚动修复 |
+| v7.2.2 | 2026-05-13 | 通话对话重复修复 |
