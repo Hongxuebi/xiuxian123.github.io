@@ -2794,7 +2794,7 @@ _D.sb2.addEventListener('click', function(e){ if(_S.a && !_S.p){ e.stopPropagati
 _D.sb2.addEventListener('touchend', function(e){ if(_S.a && !_S.p){ e.preventDefault(); e.stopPropagation(); _toggleAM(); } });
 
 $('hangupBtn').addEventListener('click', () => {
-  if (!connected) return;
+  if (!connected || _S.l) return;
   connected = false; stopTimer();
   clearTimeout(_autoRecTimer); _autoRecTimer = null;  // ★ 挂断时清除自动录音定时器
   if (isRecording) { stopNativeAsr(); stopRecordingUI(); }
