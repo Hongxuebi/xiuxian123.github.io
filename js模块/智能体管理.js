@@ -6,6 +6,7 @@ const 默认智能体配置 = {
   id: 'default',
   name: '默认智能体',
   icon: '🤖',
+  live2dModelId: 'haru',
   memo_access: { mode: 'all', folders: [] },
   model_params: { temperature: 0.7, top_p: 0.9, max_tokens: 2048 },
   plugin: {

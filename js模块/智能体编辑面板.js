@@ -477,6 +477,7 @@ async function 渲染智能体详情(智能体ID, 配置) {
   let html = '<div class="智能体编辑-配置区">';
 
   // ---- 基础信息（默认展开） ----
+  const 当前角色ID = 配置.live2dModelId || '';
   html += 渲染折叠面板('basics', '基础信息', true, `
     <div class="智能体编辑-字段">
       <label>名称</label>
@@ -485,6 +486,22 @@ async function 渲染智能体详情(智能体ID, 配置) {
     <div class="智能体编辑-字段">
       <label>头像</label>
       <div class="智能体编辑-字段值 可编辑" data-field="icon">${escHtml(配置.icon || '🤖')}</div>
+    </div>
+    <div class="智能体编辑-字段">
+      <label>Live2D 角色</label>
+      <div class="智能体编辑-字段值 智能体编辑-角色选择器" data-live2d-selector>
+        <select class="智能体编辑-角色下拉" data-field="live2dModelId" style="background:transparent;border:none;color:inherit;font-size:inherit;width:100%;cursor:pointer;">
+          <option value="" ${!当前角色ID ? 'selected' : ''}>无角色</option>
+          <option value="haru" ${当前角色ID === 'haru' ? 'selected' : ''}>Haru (小春)</option>
+          <option value="hiyori" ${当前角色ID === 'hiyori' ? 'selected' : ''}>Hiyori (知性学姐)</option>
+          <option value="mark" ${当前角色ID === 'mark' ? 'selected' : ''}>Mark (马克)</option>
+          <option value="natori" ${当前角色ID === 'natori' ? 'selected' : ''}>Natori (神秘少女)</option>
+          <option value="mao" ${当前角色ID === 'mao' ? 'selected' : ''}>Mao (魔法使)</option>
+          <option value="gothic" ${当前角色ID === 'gothic' ? 'selected' : ''}>哥特少女 (优雅少女)</option>
+          <option value="rattan" ${当前角色ID === 'rattan' ? 'selected' : ''}>白藤 (神秘清冷)</option>
+        </select>
+      </div>
+      <div style="font-size:0.7rem;color:var(--文字辅色);margin-top:4px;">选择角色后，点击"语"按钮可进行语音通话</div>
     </div>
     <div class="智能体编辑-字段 字段-多行">
       <label>核心身份</label>
@@ -567,6 +584,21 @@ async function 渲染智能体详情(智能体ID, 配置) {
     权限选择器.addEventListener('click', (e) => {
       e.stopPropagation();
       打开权限选择器(权限选择器, 智能体ID, 配置, 权限);
+    });
+  }
+
+  // ===== 绑定 Live2D 角色选择器 =====
+  const 角色下拉 = 容器.querySelector('[data-field="live2dModelId"]');
+  if (角色下拉) {
+    角色下拉.addEventListener('change', async () => {
+      const 新角色ID = 角色下拉.value;
+      try {
+        const 新配置 = { ...配置, live2dModelId: 新角色ID };
+        await 保存配置(智能体ID, 新配置);
+        window._显示提示(新角色ID ? `已绑定角色: ${新角色ID === 'haru' ? 'Haru' : 'Mark'}` : '已取消角色绑定');
+      } catch (错误) {
+        window._显示提示('保存失败: ' + 错误.message, 'error');
+      }
     });
   }
 

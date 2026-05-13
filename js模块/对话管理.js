@@ -758,6 +758,16 @@ async function 发送消息(用户输入) {
       思考内容 = 本轮API返回结果.thinking || '';
       最终化回复气泡(回复元素, AI回复, 思考内容);
 
+      // ===== 语音通话模式：流式输出完成后播报 TTS =====
+      if (AI回复 && typeof AI回复 === 'string') {
+        if (window.播报通话TTS) {
+          window.播报通话TTS(AI回复);
+        }
+        if (window.添加通话对话) {
+          window.添加通话对话('AI', AI回复);
+        }
+      }
+
     } else {
       // ===== 非流式输出 =====
       if (typeof window.调用API !== 'function') {
@@ -782,6 +792,18 @@ async function 发送消息(用户输入) {
         添加消息到界面('助理', AI回复, 思考内容);
       } else {
         添加消息到界面('助理', AI回复);
+      }
+    }
+
+    // ===== 语音通话模式：AI 回复播报 TTS =====
+    if (AI回复 && typeof AI回复 === 'string') {
+      // 检查是否处于通话模式
+      if (window.播报通话TTS) {
+        window.播报通话TTS(AI回复);
+      }
+      // 同时添加到通话对话列表
+      if (window.添加通话对话) {
+        window.添加通话对话('AI', AI回复);
       }
     }
 

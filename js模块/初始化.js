@@ -153,6 +153,42 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.log('[初始化] 自动备份已注册');
   }
 
+  // === 数据备份提醒 ===
+  // 检测是否有重要数据，提醒用户定期导出备份
+  setTimeout(async () => {
+    try {
+      let 有数据 = false;
+      let 数据计数 = 0;
+      
+      // 检查备忘录
+      if (window.备忘录管理器 && window.备忘录管理器.memos) {
+        数据计数 += window.备忘录管理器.memos.length;
+      }
+      
+      // 检查智能体
+      if (window.获取智能体列表) {
+        const 列表 = await window.获取智能体列表();
+        数据计数 += 列表 ? 列表.length : 0;
+      }
+      
+      // 有数据且今天没备份过，显示提醒
+      if (数据计数 > 0) {
+        const 今天 = new Date().toISOString().split('T')[0];
+        const 上次提醒 = localStorage.getItem('备份提醒_日期');
+        if (上次提醒 !== 今天) {
+          localStorage.setItem('备份提醒_日期', 今天);
+          console.log('[初始化] 数据备份提醒：检测到', 数据计数, '条数据');
+          // 显示轻量提示
+          if (window._显示提示) {
+            window._显示提示(`📦 你有 ${数据计数} 条数据，建议定期导出备份（设置 → 数据备份）`, 'info', 5000);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[初始化] 备份提醒检查失败:', e);
+    }
+  }, 3000);
+
   // === P1-2: 断网提示条 ===
   // 创建顶部提示条（默认隐藏）
   const 网络提示条 = document.createElement('div');

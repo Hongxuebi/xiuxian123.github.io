@@ -17,6 +17,13 @@ http.createServer((req, res) => {
     '.jpg': 'image/jpeg',
     '.svg': 'image/svg+xml',
     '.ico': 'image/x-icon',
+    '.moc3': 'application/octet-stream',
+    '.physics3': 'application/json',
+    '.pose3': 'application/json',
+    '.cdi3': 'application/json',
+    '.userdata3': 'application/json',
+    '.exp3': 'application/json',
+    '.motion3': 'application/json',
   };
 
   fs.readFile(filePath, (err, data) => {

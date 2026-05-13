@@ -1,0 +1,72 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "Mark.moc3",
+    "Textures": [
+      "Mark.2048/texture_00.png"
+    ],
+    "Physics": "Mark.physics3.json",
+    "UserData": "Mark.userdata3.json",
+    "DisplayInfo": "Mark.cdi3.json",
+    "Motions": {
+      "Idle": [
+        {
+          "File": "motions/mark_m01.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/mark_m02.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/mark_m03.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/mark_m04.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/mark_m05.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/mark_m06.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ]
+    },
+    "Expressions": [
+      {
+        "Name": "F01",
+        "File": "expressions/F01.exp3.json"
+      },
+      {
+        "Name": "F02",
+        "File": "expressions/F02.exp3.json"
+      }
+    ]
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": []
+    },
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    }
+  ],
+  "HitAreas": []
+}
