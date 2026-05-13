@@ -1034,3 +1034,50 @@
   background: var(--边框色);
   border-radius: 3px;
 }
+
+/* ========== TTS 语音参数滑块 ========== */
+.智能体编辑-tts参数 {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.tts-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tts-slider-row label {
+  color: var(--文字辅色, rgba(0,0,0,0.5));
+  font-size: 0.78rem;
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.tts-slider-row input[type=range] {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--边框色, rgba(0,0,0,0.1));
+  border-radius: 3px;
+  outline: none;
+}
+.tts-slider-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  cursor: pointer;
+}
+.tts-slider-row .tts-val {
+  color: var(--文字辅色, rgba(0,0,0,0.35));
+  font-size: 0.72rem;
+  width: 32px;
+  text-align: left;
+  flex-shrink: 0;
+  font-family: var(--字体等宽, monospace);
+}

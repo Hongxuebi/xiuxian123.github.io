@@ -2339,8 +2339,17 @@ function aiSpeak(text) {
   _lastSpeakText = cleanText; _lastSpeakTime = Date.now();
   _stopRequested = false;
   _ttsActive = true;  // 立即标记,不等 onTtsStart 回调(鸿蒙端可能延迟)
-  // === 加载当前角色的 TTS 音调/语速 ===
-  var tts = loadTtsSettings(currentCharacterId);
+  // === 加载 TTS 音调/语速：优先从智能体配置读取，fallback 到 localStorage ===
+  var tts = { pitch: 1.0, speed: 1.0 };
+  try {
+    var agentCfg = window.获取当前智能体配置 && window.获取当前智能体配置();
+    if (agentCfg && (agentCfg.ttsPitch || agentCfg.ttsSpeed)) {
+      tts.pitch = agentCfg.ttsPitch || 1.0;
+      tts.speed = agentCfg.ttsSpeed || 1.0;
+    } else {
+      tts = loadTtsSettings(currentCharacterId);
+    }
+  } catch(e) { tts = loadTtsSettings(currentCharacterId); }
   nativeTtsSpeak(cleanText, tts.pitch, tts.speed);
 
   if (!hasNativeBridge()) {

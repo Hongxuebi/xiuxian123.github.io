@@ -503,6 +503,21 @@ async function 渲染智能体详情(智能体ID, 配置) {
       </div>
       <div style="font-size:0.7rem;color:var(--文字辅色);margin-top:4px;">选择角色后，点击"语"按钮可进行语音通话</div>
     </div>
+    <div class="智能体编辑-字段" id="ttsParamField">
+      <label>TTS 语音参数</label>
+      <div class="智能体编辑-tts参数">
+        <div class="tts-slider-row">
+          <label>音调</label>
+          <input type="range" id="agentTtsPitch" min="50" max="200" value="${Math.round((配置.ttsPitch || 1.0) * 100)}" step="5" />
+          <span class="tts-val" id="agentTtsPitchVal">${(配置.ttsPitch || 1.0).toFixed(1)}</span>
+        </div>
+        <div class="tts-slider-row">
+          <label>语速</label>
+          <input type="range" id="agentTtsSpeed" min="50" max="200" value="${Math.round((配置.ttsSpeed || 1.0) * 100)}" step="5" />
+          <span class="tts-val" id="agentTtsSpeedVal">${(配置.ttsSpeed || 1.0).toFixed(1)}</span>
+        </div>
+      </div>
+    </div>
     <div class="智能体编辑-字段 字段-多行">
       <label>核心身份</label>
       <div class="智能体编辑-字段值 可编辑" data-field="core_identity">${escHtml(插件.core_identity || '无')}</div>
@@ -600,6 +615,36 @@ async function 渲染智能体详情(智能体ID, 配置) {
         window._显示提示('保存失败: ' + 错误.message, 'error');
       }
     });
+  }
+
+  // ===== 绑定 TTS 音调/语速滑块 =====
+  const pitch滑块 = 容器.querySelector('#agentTtsPitch');
+  const speed滑块 = 容器.querySelector('#agentTtsSpeed');
+  const pitch显示 = 容器.querySelector('#agentTtsPitchVal');
+  const speed显示 = 容器.querySelector('#agentTtsSpeedVal');
+  if (pitch滑块 && speed滑块) {
+    // 更新显示值
+    const 更新标签 = () => {
+      if (pitch显示) pitch显示.textContent = (parseInt(pitch滑块.value) / 100).toFixed(1);
+      if (speed显示) speed显示.textContent = (parseInt(speed滑块.value) / 100).toFixed(1);
+    };
+    pitch滑块.addEventListener('input', 更新标签);
+    speed滑块.addEventListener('input', 更新标签);
+
+    // 滑动结束后自动保存
+    const 自动保存TTS = async () => {
+      const p = Math.round(parseInt(pitch滑块.value) / 100 * 100) / 100;
+      const s = Math.round(parseInt(speed滑块.value) / 100 * 100) / 100;
+      try {
+        const 新配置 = { ttsPitch: p, ttsSpeed: s };
+        await 保存配置(智能体ID, 新配置);
+        window._显示提示?.(`TTS 参数已保存: 音调${p.toFixed(1)} 语速${s.toFixed(1)}`);
+      } catch (e) {
+        window._显示提示?.('TTS 参数保存失败: ' + e.message, 'error');
+      }
+    };
+    pitch滑块.addEventListener('change', 自动保存TTS);
+    speed滑块.addEventListener('change', 自动保存TTS);
   }
 
   // ===== 绑定可编辑字段双击编辑 =====
