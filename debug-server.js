@@ -6,7 +6,8 @@ const PORT = 3777;
 const ROOT = __dirname;
 
 http.createServer((req, res) => {
-  const filePath = path.join(ROOT, req.url === '/' ? 'index.html' : req.url);
+  const cleanPath = req.url.split('?')[0];
+  const filePath = path.join(ROOT, cleanPath === '/' ? 'index.html' : decodeURIComponent(cleanPath));
   const ext = path.extname(filePath).toLowerCase();
   const mime = {
     '.html': 'text/html; charset=utf-8',
@@ -25,6 +26,29 @@ http.createServer((req, res) => {
     '.exp3': 'application/json',
     '.motion3': 'application/json',
   };
+
+  // CORS 头（所有响应都加）
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // 预检请求直接返回
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    return res.end();
+  }
+
+  // 调试日志端点
+  if (req.method === 'POST' && req.url === '/log') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try { console.log('[CLIENT]', JSON.parse(body)); } catch(e) {}
+      res.writeHead(200);
+      return res.end('ok');
+    });
+    return;
+  }
 
   fs.readFile(filePath, (err, data) => {
     if (err) {

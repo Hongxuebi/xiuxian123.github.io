@@ -4,26 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>私人AI助理 · 鸿蒙原生</title>
-  <!-- 鸿蒙 WebView rawfile 下 navigator.onLine 误判离线，强制返回 true -->
+  <!-- 鸿蒙 WebView rawfile 下 navigator.onLine 误判离线,强制返回 true -->
   <script>
     try { Object.defineProperty(navigator, 'onLine', { get: () => true }); } catch(e) {}
 
     // 鸿蒙边缘返回/返回键处理
-    // 按优先级逐层关闭：动态遮罩 > 浮层 > 抽屉 > 菜单 > 工具条 > 面板 > 退出App
+    // 按优先级逐层关闭:动态遮罩 > 浮层 > 抽屉 > 菜单 > 工具条 > 面板 > 退出App
     window._handleBack = function() {
-      // === 第1层：动态遮罩对话框（按ID查找） ===
+      // === 第1层:动态遮罩对话框(按ID查找) ===
       var dynamicOverlays = ['整理确认卡片', '压缩确认对话框', '__导出选择对话框__'];
       for (var i = 0; i < dynamicOverlays.length; i++) {
         var el = document.getElementById(dynamicOverlays[i]);
         if (el) { el.remove(); return; }
       }
-      // 智能体编辑遮罩（className不是id，用querySelector）
+      // 智能体编辑遮罩(className不是id,用querySelector)
       var editMask = document.querySelector('.智能体编辑-编辑遮罩');
       if (editMask) { editMask.remove(); return; }
       // 智能体权限向导遮罩
       var permMask = document.querySelector('.智能体编辑-权限浮层-遮罩');
       if (permMask) { permMask.remove(); return; }
-      // 动态创建的文件夹选择对话框 — 点取消按钮触发resolve(null)而不是直接remove，避免Promise卡死
+      // 动态创建的文件夹选择对话框 - 点取消按钮触发resolve(null)而不是直接remove,避免Promise卡死
       var folderDialog = document.querySelector('.智能体权限向导-遮罩');
       if (folderDialog) {
         var cancelBtn = folderDialog.querySelector('button[data-action="cancel"], button:last-child');
@@ -31,7 +31,7 @@
         folderDialog.remove(); return;
       }
 
-      // === 第2层：静态浮层（设置、添加智能体、冲突、头像预览） ===
+      // === 第2层:静态浮层(设置、添加智能体、冲突、头像预览) ===
       var overlays = document.querySelectorAll('.浮层');
       for (var i = 0; i < overlays.length; i++) {
         if (overlays[i].style.display !== 'none') {
@@ -40,14 +40,14 @@
         }
       }
 
-      // === 第3层：抽屉（会话抽屉 / 备忘录抽屉） ===
+      // === 第3层:抽屉(会话抽屉 / 备忘录抽屉) ===
       var drawer = document.querySelector('.抽屉.打开');
       if (drawer) { if (window.关闭抽屉) window.关闭抽屉(); return; }
 
-      // === 第4层：编辑页面专属弹层 ===
+      // === 第4层:编辑页面专属弹层 ===
       var activePanel = document.querySelector('.内容面板.激活');
       if (activePanel && activePanel.id === '编辑页面') {
-        // 字号抽屉（有遮罩）
+        // 字号抽屉(有遮罩)
         if (window.隐藏字号抽屉) {
           var drawer = document.getElementById('字号抽屉');
           if (drawer && drawer.classList.contains('显示')) { window.隐藏字号抽屉(); return; }
@@ -64,7 +64,7 @@
         // 颜色面板
         var cp = document.getElementById('颜色面板');
         if (cp && cp.style.display !== 'none') { cp.style.display = 'none'; return; }
-        // 文件夹下拉菜单（在编辑页面内）
+        // 文件夹下拉菜单(在编辑页面内)
         var folderMenu = document.getElementById('文件夹下拉菜单');
         if (folderMenu && folderMenu.classList.contains('显示')) { if (window.关闭文件夹下拉菜单) window.关闭文件夹下拉菜单(); return; }
         // 标签选择页
@@ -72,7 +72,7 @@
         if (tagPage && tagPage.style.display !== 'none') { if (window.关闭标签选择页) window.关闭标签选择页(); return; }
       }
 
-      // === 第5层：备忘录面板专属弹层 ===
+      // === 第5层:备忘录面板专属弹层 ===
       if (activePanel && activePanel.id === '备忘录面板') {
         var folderMenu2 = document.getElementById('文件夹下拉菜单');
         if (folderMenu2 && folderMenu2.classList.contains('显示')) { if (window.关闭文件夹下拉菜单) window.关闭文件夹下拉菜单(); return; }
@@ -80,24 +80,24 @@
         if (floatMenu && floatMenu.classList.contains('显示')) { if (window.关闭全局浮动菜单) window.关闭全局浮动菜单(); return; }
       }
 
-      // === 第6层：对话面板专属弹层 ===
+      // === 第6层:对话面板专属弹层 ===
       if (activePanel && activePanel.id === '对话面板') {
         var moreMenu = document.querySelector('.更多菜单 .下拉内容.显示');
         if (moreMenu) { if (window.关闭更多菜单) window.关闭更多菜单(); return; }
       }
 
-      // === 第6.5层：标签选择页（任何面板都可能打开） ===
+      // === 第6.5层:标签选择页(任何面板都可能打开) ===
       var tagPage = document.getElementById('标签选择页');
       if (tagPage && tagPage.style.display !== 'none') { if (window.关闭标签选择页) window.关闭标签选择页(); return; }
 
-      // === 第7层：智能体编辑弹窗（记忆库面板） ===
+      // === 第7层:智能体编辑弹窗(记忆库面板) ===
       var ae = document.querySelector('.智能体编辑-编辑弹窗');
       if (ae) { ae.remove(); return; }
 
-      // === 第7.5层：展开的卡片（优先于面板切换，否则侧滑返回会跳面板而不收起卡片） ===
+      // === 第7.5层:展开的卡片(优先于面板切换,否则侧滑返回会跳面板而不收起卡片) ===
       if (window._当前展开的卡片 && window._当前展开的卡片()) { if (window._收起所有卡片) window._收起所有卡片(); return; }
 
-      // === 第8层：子面板切换 ===
+      // === 第8层:子面板切换 ===
       if (activePanel && activePanel.id !== '对话面板') {
         if (window.切换标签) {
           if (activePanel.id === '编辑页面') { window.切换标签('备忘录面板'); return; }
@@ -105,32 +105,32 @@
         }
       }
 
-      // === 第9层：展开的卡片（已在第7.5层处理，此处为安全兜底） ===
+      // === 第9层:展开的卡片(已在第7.5层处理,此处为安全兜底) ===
       if (window._当前展开的卡片 && window._当前展开的卡片()) { if (window._收起所有卡片) window._收起所有卡片(); return; }
 
-      // === 第10层：多选模式 ===
+      // === 第10层:多选模式 ===
       if (window.多选状态 && window.多选状态.isActive) { if (window.多选状态.退出多选) window.多选状态.退出多选(); return; }
 
-      // === 第11层：无任何面板可关 → 退出 App ===
+      // === 第11层:无任何面板可关 → 退出 App ===
       if (window.nativeBridge) { window.nativeBridge.exitApp(); return; }
     };
   </script>
   <link rel="stylesheet" href="css/样式.css?v=20260430i">
   <link rel="stylesheet" href="css/智能体编辑面板-样式.css">
-  <link rel="stylesheet" href="assets/css/font-awesome.min.css">
-  
-  <!-- 核心模块：存储适配器必须最先加载 -->
-    <!-- Live2D 运行时（语音通话模式使用） -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/font-awesome.min.css">
+
+  <!-- 核心模块:存储适配器必须最先加载 -->
+    <!-- Live2D 运行时(语音通话模式使用) -->
   <script src="live2dcubismcore.min.js"></script>
   <script src="l2d.bundle.js"></script>
   <script src="js模块/存储适配器.js"></script>
-  
+
   <!-- 调试日志工具 -->
   <script src="js模块/调试日志.js"></script>
-  
+
   <!-- 智能体管理模块 -->
   <script src="js模块/智能体管理.js?v=20260502a"></script>
-  
+
   <!-- 记忆管理模块 -->
   <script src="js模块/AI记忆管理器.js?v=20260501e"></script>
   <script src="js模块/记忆压缩.js?v=20260501a"></script>
@@ -139,7 +139,7 @@
   <script src="js模块/数据备份.js?v=20260502a"></script>
   <script src="js模块/API调用.js?v=20260502a"></script>
   <script src="js模块/对话管理.js?v=20260502b"></script>
-    <!-- 备忘录管理模块（拆分） -->
+    <!-- 备忘录管理模块(拆分) -->
   <script src="js模块/多选状态管理器.js"></script>
   <script src="js模块/备忘录数据.js?v=20260501d"></script>
   <script src="js模块/备忘录管理器.js"></script>
@@ -151,12 +151,12 @@
       <script src="js模块/jszip.min.js"></script>
   <script src="js模块/导出功能.js?v=20260423b"></script>
   <script>
-    console.log('[DEBUG v4] 对话管理.js 加载了吗？', typeof window.添加消息到界面);
+    console.log('[DEBUG v4] 对话管理.js 加载了吗?', typeof window.添加消息到界面);
   </script>
 
   <script src="js模块/设置管理.js?v=20260430i"></script>
-  
-  <!-- 主入口拆分模块（UI事件绑定） -->
+
+  <!-- 主入口拆分模块(UI事件绑定) -->
   <script src="js模块/全局函数.js"></script>
   <script src="js模块/智能体选择器.js?v=20260423b"></script>
   <script src="js模块/抽屉.js?v=20260423b"></script>
@@ -169,8 +169,8 @@
   <script src="js模块/备忘录UI.js?v=20260423b"></script>
   <script src="js模块/智能体编辑面板.js?v=20260502b"></script>
   <script src="js模块/智能体权限向导.js"></script>
-  
-  <!-- 通话模块（新增） -->
+
+  <!-- 通话模块(新增) -->
   <script src="js模块/TTS-ASR桥接.js"></script>
   <script src="js模块/通话管理.js"></script>
   <script src="js模块/角色管理.js"></script>
@@ -178,7 +178,7 @@
   <script src="js模块/初始化.js?v=20260430e"></script>
 </head>
 <body style="background:#0a0e1a">
-<!-- 诗意启动画面：纯 CSS，JS 加载完自动隐藏 -->
+<!-- 诗意启动画面:纯 CSS,JS 加载完自动隐藏 -->
 <style>
   #启动loading { position:fixed; inset:0; z-index:999999; background:linear-gradient(135deg,#0a0e1a 0%,#1a2847 40%,#2d1f4a 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.8s ease; overflow:hidden; }
   #启动loading.隐藏 { opacity:0; pointer-events:none; }
@@ -199,14 +199,14 @@
 
 
 <style>
-/* 流云记适配：语音通话浮层 = call-container */
+/* 流云记适配:语音通话浮层 = call-container */
 #语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:relative; overflow:hidden; }
 
 /* 语音通话浮层 = call-container 别名 */
-#语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:relative; overflow:hidden; background:#0a0a0f; }
+#语音通话浮层 { width:100%; height:100vh; display:flex; flex-direction:column; position:fixed; overflow:hidden; background:#0a0a0f; z-index:9999; inset:0; }
 #语音通话浮层 .call-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a0f 70%); z-index:0; }
 #语音通话浮层 > *:not(.call-bg) { position:relative; z-index:1; }
-/* ===== 语音通话核心UI（豆包原版完整搬入） ===== */
+/* ===== 语音通话核心UI(豆包原版完整搬入) ===== */
 * { margin:0; padding:0; box-sizing:border-box; }
 html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif; background:#0a0a0f; color:#fff; -webkit-font-smoothing:antialiased; }
 
@@ -365,7 +365,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
   <div class="star star1"></div><div class="star star2"></div><div class="star star3"></div>
   <div class="cloud-icon"></div>
   <div class="splash-title">流云记</div>
-  <div class="splash-couplet">流云过眼，万象皆成笔下记<br>片语关心，千山难隔耳边音</div>
+  <div class="splash-couplet">流云过眼,万象皆成笔下记<br>片语关心,千山难隔耳边音</div>
 </div>
 
 <div id="应用容器">
@@ -395,15 +395,15 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
         <section class="对话区域">
           <div id="消息列表" class="消息列表"></div>
           <div class="输入区域">
-            <textarea id="用户输入框" rows="2" placeholder="输入你的问题… (支持换行)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('发送消息按钮').click()}"></textarea>
+            <textarea id="用户输入框" rows="2" placeholder="输入你的问题... (支持换行)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('发送消息按钮').click()}"></textarea>
             <div class="输入工具条">
               <!-- 深度思索已移至下拉菜单 -->
-              
+
               <button id="上下文占用率按钮" class="上下文占用率 安全" title="点击压缩对话历史">0%</button>
               <button id="上传文件按钮" class="次要按钮 简洁按钮">传文件</button>
               <input type="file" id="文件选择器" style="display: none;" accept=".html,.htm,.md,.js,.css,.txt,.json,.xml,.docx,.xlsx,.xls,.pptx">
               <span id="文件状态" class="文件状态" style="display: none;"></span>
-              
+
               <label class="无痕标记" id="无痕标记提示" style="display: none;">无痕模式</label>
               <div class="更多菜单">
                 <button id="电话预留按钮" class="次要按钮 简洁按钮" title="语音通话">语</button>
@@ -433,18 +433,18 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
           <div id="AI筛选模式条" class="AI筛选模式条">
             <span class="AI筛选标题"></span>
             <span class="AI筛选数量"></span>
-            <button id="清除AI筛选" class="清除AI筛选按钮" title="清除AI筛选，恢复正常视图">×</button>
+            <button id="清除AI筛选" class="清除AI筛选按钮" title="清除AI筛选,恢复正常视图">×</button>
           </div>
           <div class="备忘录头部按钮组"></div>
         </div>
-        
+
         <div class="备忘录搜索框">
           <i class="fa fa-search"></i>
           <input type="text" id="备忘录搜索框" placeholder="搜索标题或内容...">
         </div>
-        
+
         <div id="备忘录卡片列表" class="备忘录卡片列表"></div>
-        
+
         <div class="备忘录列表空状态" id="备忘录空状态">
           <div class="空状态图标">📝</div>
           <p class="空状态文本">还没有备忘录</p>
@@ -512,8 +512,8 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
             </div>
           </div>
           <div id="编辑内容" class="编辑内容区" contenteditable="true" placeholder="开始书写你的灵感..."></div>
-          
-          <!-- 选区工具条（选文字后弹出） -->
+
+          <!-- 选区工具条(选文字后弹出) -->
           <div id="选区工具条" class="选区工具条" style="display: none;">
             <button data-action="bold" class="工具条按钮" title="加粗">B</button>
             <button data-action="color" class="工具条按钮" title="颜色">🎨</button>
@@ -527,7 +527,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
               <button data-color="theme" class="颜色按钮 主题色按钮" title="主题色">T</button>
             </div>
           </div>
-          <!-- 字号抽屉（从底部滑上来） -->
+          <!-- 字号抽屉(从底部滑上来) -->
           <div id="字号抽屉" class="字号抽屉" style="display: none;">
             <div class="抽屉头部">
               <span>调整字号</span>
@@ -554,7 +554,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
       </div>
     </div>
 
-    <!-- 智能体编辑面板（双面板） -->
+    <!-- 智能体编辑面板(双面板) -->
     <div id="记忆库面板" class="内容面板">
       <div class="智能体编辑面板">
         <div class="智能体编辑-左列" id="智能体编辑-左列"></div>
@@ -589,7 +589,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
       </div>
     </div>
   </div>
-  
+
   <!-- 备忘录抽屉 -->
   <div id="备忘录抽屉" class="抽屉">
     <div class="抽屉内容">
@@ -608,7 +608,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
       </div>
     </div>
   </div>
-  
+
   <div id="抽屉遮罩" class="抽屉遮罩"></div>
 
   <!-- 添加智能体浮层 -->
@@ -672,7 +672,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
         <!-- 数据备份 卡片 -->
         <div class="设置分组">
           <h4>💾 数据备份</h4>
-          <div class="提示文字">每日自动备份到应用内，最多保留 7 份。可恢复、导出分享或删除。</div>
+          <div class="提示文字">每日自动备份到应用内,最多保留 7 份。可恢复、导出分享或删除。</div>
           <div id="备份状态容器" style="margin-bottom: 0.5rem;"></div>
           <div id="备份按钮容器" class="按钮行">
             <button id="立即备份按钮" class="次要按钮 简洁按钮" data-操作="立即备份">立即备份</button>
@@ -693,7 +693,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
         <!-- 关系映射 卡片 -->
         <div class="设置分组">
           <h4>🔗 人物关系映射</h4>
-          <div class="提示文字">自定义关系词 → 类别映射，一行一个。格式：<code>关系词 → 类别</code>，如 <code>导师 → 🎓 师长</code>。</div>
+          <div class="提示文字">自定义关系词 → 类别映射,一行一个。格式:<code>关系词 → 类别</code>,如 <code>导师 → 🎓 师长</code>。</div>
           <textarea id="关系映射编辑框" placeholder="导师 → 🎓 师长&#10;学长 → 🤝 朋友&#10;教练 → 🎓 师长"></textarea>
           <div class="按钮行">
             <button id="保存关系映射按钮" class="次要按钮 简洁按钮">保存映射</button>
@@ -725,7 +725,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
             <input type="range" id="字体大小滑条" class="字体大小滑条" min="0.75" max="1.5" step="0.05" value="1">
             <div class="字体大小预览区" id="字体大小预览区">
               <div class="预览标题">预览</div>
-              <div class="预览正文" id="字体大小预览正文">你好！今天有什么想聊的？可以让我帮忙搜索信息、管理备忘录，或者随便聊聊天~</div>
+              <div class="预览正文" id="字体大小预览正文">你好!今天有什么想聊的?可以让我帮忙搜索信息、管理备忘录,或者随便聊聊天~</div>
             </div>
           </div>
         </div>
@@ -733,7 +733,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
     </div>
   </div>
 
-  <!-- 冲突解决浮层（用于记忆更新时的用户确认） -->
+  <!-- 冲突解决浮层(用于记忆更新时的用户确认) -->
   <div id="冲突解决浮层" class="浮层" style="display: none;">
     <div class="浮层内容" style="max-width: 600px;">
       <div class="浮层头部">
@@ -741,12 +741,12 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
         <button id="关闭冲突浮层按钮" class="关闭按钮">✖</button>
       </div>
       <div class="设置主体" style="max-height: 60vh; overflow-y: auto;">
-        <p>检测到以下记忆与现有记忆相似，请选择处理方式：</p>
+        <p>检测到以下记忆与现有记忆相似,请选择处理方式:</p>
         <div class="冲突内容对比" style="margin: 1rem 0;"></div>
         <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
           <button class="冲突合并按钮" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">合并</button>
           <button class="冲突替换按钮" style="background: #e67e22; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">替换旧记忆</button>
-          <button class="冲突跳过按钮" style="background: #95a5a6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">跳过（不添加）</button>
+          <button class="冲突跳过按钮" style="background: #95a5a6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">跳过(不添加)</button>
         </div>
       </div>
     </div>
@@ -798,13 +798,13 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
         }).then(() => {
           console.log('[调试服务器] 连接成功');
         }).catch(() => {
-          console.warn('[调试服务器] 未启动，日志将只输出到控制台');
+          console.warn('[调试服务器] 未启动,日志将只输出到控制台');
           console.warn('[调试服务器] 启动命令: node debug-server.js');
         });
       }, 1000);
     });
   </script>
-<!-- ===== 语音通话浮层（豆包原版完整搬入） ===== -->
+<!-- ===== 语音通话浮层(豆包原版完整搬入) ===== -->
 <div id="语音通话浮层" style="display:none">
   <div class="call-bg"></div>
 
@@ -824,7 +824,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
   </div>
 
 
-  
+
 
   <div class="hero-area">
     <div class="live2d-container" id="live2dContainer"><canvas id="live2dCanvas"></canvas></div>
@@ -876,15 +876,15 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
     </div>
   </div>
 
-  
 
-  
+
+
     <div class="rename-btns">
       <button class="rename-cancel" id="renameCancel">取消</button>
       <button class="rename-save" id="renameSave">保存</button>
     </div>
     <button class="rename-reset" id="renameReset">恢复默认名字</button>
-  
+
   <div class="chat-history-panel" id="chatPanel">
     <div class="chat-panel-header"><span class="chat-panel-title">对话记录</span><div><span class="chat-panel-clear" id="clearChatBtn">清空</span><span class="chat-panel-hide" id="hideChatBtn">隐藏</span></div></div>
     <div class="chat-history-list" id="chatList"></div>
@@ -916,7 +916,7 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
 
 </div>
 
-<!-- 豆宝遗留DOM占位（流云记不需要但JS引用不崩溃） -->
+<!-- 豆宝遗留DOM占位(流云记不需要但JS引用不崩溃) -->
 <div id="charSelect" class="hidden" style="display:none;"></div>
 <div id="charGrid" style="display:none;"></div>
 <div class="input-panel" id="inputPanel">
@@ -961,14 +961,14 @@ html,body { width:100%; height:100%; overflow:hidden; font-family:-apple-system,
         }).then(() => {
           console.log('[调试服务器] 连接成功');
         }).catch(() => {
-          console.warn('[调试服务器] 未启动，日志将只输出到控制台');
+          console.warn('[调试服务器] 未启动,日志将只输出到控制台');
           console.warn('[调试服务器] 启动命令: node debug-server.js');
         });
       }, 1000);
     });
   </script>
 
-  
+<script>
 // ================================================================
 //  豆宝 · 多角色 Live2D 语音通话
 //  技术栈: PixiJS v6 + pixi-live2d-display 0.4.0 + Cubism Core
@@ -1011,8 +1011,8 @@ var l2d = window.l2d = {
   }
 };
 
-// 白藤参数映射（逐参数实测校准，exp编号→实际效果）
-// 纯面部表情（鸿州实测修正 0511）
+// 白藤参数映射(逐参数实测校准,exp编号→实际效果)
+// 纯面部表情(鸿州实测修正 0511)
 var _rattanExprMap = {
   '':       [],
   '加载':    [{'id':'Param84','val':1}],        // exp3  → 加载图标
@@ -1023,33 +1023,33 @@ var _rattanExprMap = {
   '哭':      [{'id':'Param90','val':1}],        // exp8  → 哭脸
   '汗':      [{'id':'Param95','val':1}],        // exp9  → 汗滴
   '脸红':    [{'id':'Param97','val':1}],        // exp10 → 脸红
-  '白眼':    [{'id':'Param98','val':1}],        // exp11 → 白眼（原标晕，实测是翻白眼）
-  // Param99 无可视效果，Param119 无可视效果
+  '白眼':    [{'id':'Param98','val':1}],        // exp11 → 白眼(原标晕,实测是翻白眼)
+  // Param99 无可视效果,Param119 无可视效果
   // 配件/装饰
   '话筒':    [{'id':'Param101','val':1}],       // exp2  → 手持话筒
-  '爪':      [{'id':'Param107','val':1}],       // exp13 → 爪子（原标耳环，实测是爪）
-  '耳环':    [{'id':'Param108','val':1}],       // exp14 → 耳环（原标爪，实测是耳环）
-  '马尾':    [{'id':'Param109','val':1}],       // exp15 → 马尾（原标遮挡，实测是马尾）
-  '头纱':    [{'id':'Param110','val':1}],       // exp16 → 头纱（原标头环，实测是头纱）
-  '头环':    [{'id':'Param116','val':1}],       // exp17 → 头环（原标头纱，实测是头环）
-  '遮挡':    [{'id':'Param122','val':1}],       // exp18 → 遮挡物（原标马尾，实测是遮挡）
-  // 身体变换（危险！会改变体型/断肢）
+  '爪':      [{'id':'Param107','val':1}],       // exp13 → 爪子(原标耳环,实测是爪)
+  '耳环':    [{'id':'Param108','val':1}],       // exp14 → 耳环(原标爪,实测是耳环)
+  '马尾':    [{'id':'Param109','val':1}],       // exp15 → 马尾(原标遮挡,实测是马尾)
+  '头纱':    [{'id':'Param110','val':1}],       // exp16 → 头纱(原标头环,实测是头纱)
+  '头环':    [{'id':'Param116','val':1}],       // exp17 → 头环(原标头纱,实测是头环)
+  '遮挡':    [{'id':'Param122','val':1}],       // exp18 → 遮挡物(原标马尾,实测是遮挡)
+  // 身体变换(危险!会改变体型/断肢)
   '变小':    [{'id':'Param120','val':1},{'id':'Param127','val':1}],  // exp1 → 缩小
   '飞头':    [{'id':'Param111','val':1}],       // exp20 → 只剩头
   'Loli':    [{'id':'Param120','val':0.8},{'id':'Param127','val':0.82}],   // 实测0.8是小体型
   'Custom':  [{'id':'Param120','val':0.3},{'id':'Param127','val':0.42}]    // 实测0.3是中等体型
 };
-// 需要复位的参数：只含面部表情参数（不含危险的身体变换参数）
+// 需要复位的参数:只含面部表情参数(不含危险的身体变换参数)
 var _rattanResetIds = [
   'Param84','Param86','Param87','Param88','Param89','Param90',
   'Param95','Param97','Param98','Param99','Param101','Param119'
 ];
-// 配件参数（表情切换时也需要复位，但单独管理）
+// 配件参数(表情切换时也需要复位,但单独管理)
 var _rattanAccessoryResetIds = [
   'Param107','Param108','Param109','Param110','Param111','Param116','Param120','Param122','Param127'
 ];
 
-// 白藤当前激活的表情参数（beforeModelUpdate 事件写入，时序正确）
+// 白藤当前激活的表情参数(beforeModelUpdate 事件写入,时序正确)
 var _rattanActiveExpr = '';  // 当前激活的表情名
 var _exprHookFn = null;
 
@@ -1062,14 +1062,14 @@ function hookExprToTicker() {
     if (!core) return;
     var char = getCharacter(currentCharacterId);
     if (!char || char.id !== 'rattan') return;
-    // 先停止引擎内部表情队列（防止叠加）
+    // 先停止引擎内部表情队列(防止叠加)
     try {
       var mgr = model.internalModel.motionManager;
       if (mgr && mgr.expressionManager) {
         mgr.expressionManager.stopAllExpressions();
       }
     } catch(e) {}
-    // 先复位所有参数（表情+配件）
+    // 先复位所有参数(表情+配件)
     for (var i = 0; i < _rattanResetIds.length; i++) {
       try { core.setParameterValueById(_rattanResetIds[i], 0); } catch(e) {}
     }
@@ -1097,15 +1097,15 @@ function unhookExprFromTicker() {
   _exprHookFn = null;
 }
 
-// 表情切换：白藤用 ticker hook 每帧写入，其他角色用 model.expression
+// 表情切换:白藤用 ticker hook 每帧写入,其他角色用 model.expression
 function _setExpressionWithReset(id) {
   if (!model || !model.internalModel) return;
   var char = getCharacter(currentCharacterId);
-  
-  // 白藤：只更新 _rattanActiveExpr，ticker hook 负责每帧写入参数
+
+  // 白藤:只更新 _rattanActiveExpr,ticker hook 负责每帧写入参数
   if (char && char.id === 'rattan') {
     _rattanActiveExpr = id || '';
-    // 同时也停止引擎内部的表达式队列（防止叠加）
+    // 同时也停止引擎内部的表达式队列(防止叠加)
     try {
       var mgr = model.internalModel.motionManager;
       if (mgr && mgr.expressionManager) {
@@ -1114,7 +1114,7 @@ function _setExpressionWithReset(id) {
     } catch(e) {}
     return;
   }
-  
+
   // 其他角色保持原样
   if (!id || id === '') return;
   if (model.expression) {
@@ -1135,12 +1135,12 @@ let characters = [];
 
 async function loadCharacters() {
   diag('loadCharacters() called');
-  // === 优先使用内嵌数据（避免 HarmonyOS WebView 中 fetch file:// 悬挂） ===
+  // === 优先使用内嵌数据(避免 HarmonyOS WebView 中 fetch file:// 悬挂) ===
   if (window.__EMBEDDED_CHARACTERS__ && window.__EMBEDDED_CHARACTERS__.length > 0) {
     characters = window.__EMBEDDED_CHARACTERS__;
     diag('Using embedded characters: ' + characters.length + ' chars: ' + characters.map(c=>c.id).join(','));
   } else {
-    // 桌面端浏览器：回退到 fetch
+    // 桌面端浏览器:回退到 fetch
     try {
       const resp = await fetch('./characters.json');
       diag('characters.json status: ' + resp.status);
@@ -1151,10 +1151,10 @@ async function loadCharacters() {
       console.warn('characters.json not found, using defaults');
       diag('fetch failed: ' + (e.message || 'unknown') + ', using defaults');
       characters = [
-        { id:'haru', name:'Haru', title:'活泼小助理', modelPath:'./Haru/Haru.model3.json', defaultExpression:'F00', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'你好呀！我是 Haru，很高兴见到你~', systemPrompt:'你是一个名叫 Haru 的活泼可爱的女生...', ttsVoiceId:'p13', accentColor:'#3b82f6', tags:['温柔','元气'] },
-        { id:'hiyori', name:'Hiyori', title:'知性学姐', modelPath:'./Hiyori/Hiyori.model3.json', defaultExpression:'F00', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'你好呀，我是 Hiyori，很高兴认识你~', systemPrompt:'你是一个名叫 Hiyori 的知性温柔的学姐...', ttsVoiceId:'p13', accentColor:'#8b5cf6', tags:['知性','温柔'] },
-        { id:'mark', name:'Mark', title:'阳光少年', modelPath:'./Mark/Mark.model3.json', defaultExpression:'F00', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'嘿！我是 Mark，来吧，想聊什么都可以！', systemPrompt:'你是一个名叫 Mark 的阳光开朗的少年...', ttsVoiceId:'p13', accentColor:'#22c55e', tags:['阳光','开朗'] },
-        { id:'natori', name:'Natori', title:'神秘少女', modelPath:'./Natori/Natori.model3.json', defaultExpression:'Normal', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'...你好，我是 Natori。', systemPrompt:'你是一个名叫 Natori 的神秘内敛的少女...', ttsVoiceId:'p13', accentColor:'#ec4899', tags:['神秘','内敛'] }
+        { id:'haru', name:'Haru', title:'活泼小助理', modelPath:'./Haru/Haru.model3.json', defaultExpression:'F00', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'你好呀!我是 Haru,很高兴见到你~', systemPrompt:'你是一个名叫 Haru 的活泼可爱的女生...', ttsVoiceId:'p13', accentColor:'#3b82f6', tags:['温柔','元气'] },
+        { id:'hiyori', name:'Hiyori', title:'知性学姐', modelPath:'./Hiyori/Hiyori.model3.json', defaultExpression:'F00', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'你好呀,我是 Hiyori,很高兴认识你~', systemPrompt:'你是一个名叫 Hiyori 的知性温柔的学姐...', ttsVoiceId:'p13', accentColor:'#8b5cf6', tags:['知性','温柔'] },
+        { id:'mark', name:'Mark', title:'阳光少年', modelPath:'./Mark/Mark.model3.json', defaultExpression:'F00', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'嘿!我是 Mark,来吧,想聊什么都可以!', systemPrompt:'你是一个名叫 Mark 的阳光开朗的少年...', ttsVoiceId:'p13', accentColor:'#22c55e', tags:['阳光','开朗'] },
+        { id:'natori', name:'Natori', title:'神秘少女', modelPath:'./Natori/Natori.model3.json', defaultExpression:'Normal', defaultMotion:'Idle', blinkParam:'ParamEyeLOpen', greeting:'...你好,我是 Natori。', systemPrompt:'你是一个名叫 Natori 的神秘内敛的少女...', ttsVoiceId:'p13', accentColor:'#ec4899', tags:['神秘','内敛'] }
       ];
     }
   }
@@ -1173,7 +1173,7 @@ function getCharacter(id) {
 }
 
 // ================================================================
-//  角色重命名（localStorage 持久化 + 提示词同步）
+//  角色重命名(localStorage 持久化 + 提示词同步)
 // ================================================================
 
 function loadCharNames() {
@@ -1212,12 +1212,12 @@ function getPatchedSystemPrompt(char) {
   var prompt = char.systemPrompt;
   if (oldName && oldName !== newName) { prompt = prompt.split(oldName).join(newName); }
 
-  // === 追加表情/动作标记协议（动态注入当前角色可用标签） ===
+  // === 追加表情/动作标记协议(动态注入当前角色可用标签) ===
   var tags = (typeof _getCharActionTags === 'function') ? _getCharActionTags() : '';
   if (tags) {
-    prompt += '\n\n[动作指令] 你可以在回复中用方括号指定表情和动作，格式 [emo:标签] 或 [mot:标签]。\n可用: ' + tags + '\n示例："[emo:happy] 恭喜！" 或 "[mot:nod] 我同意～"\n标记放句首或句尾，无特别需要可不加。';
+    prompt += '\n\n[动作指令] 你可以在回复中用方括号指定表情和动作,格式 [emo:标签] 或 [mot:标签]。\n可用: ' + tags + '\n示例:"[emo:happy] 恭喜!" 或 "[mot:nod] 我同意~"\n标记放句首或句尾,无特别需要可不加。';
   } else {
-    prompt += '\n\n[动作指令] 可用表情: [emo:happy] [emo:sad] [emo:surprise] [emo:shy] [emo:thinking]\n可用动作: [mot:wave] [mot:nod] [mot:shake] [mot:bow] [mot:sigh]\n标记放句首或句尾，无需必加。';
+    prompt += '\n\n[动作指令] 可用表情: [emo:happy] [emo:sad] [emo:surprise] [emo:shy] [emo:thinking]\n可用动作: [mot:wave] [mot:nod] [mot:shake] [mot:bow] [mot:sigh]\n标记放句首或句尾,无需必加。';
   }
 
   return prompt;
@@ -1336,7 +1336,7 @@ function showAddCharPanel() {
     // 重置表单
     document.getElementById('addCharName').value = '';
     document.getElementById('addCharTitle').value = '';
-    document.getElementById('addCharGreeting').value = '你好，我是新角色~';
+    document.getElementById('addCharGreeting').value = '你好,我是新角色~';
     document.getElementById('addCharPrompt').value = '';
     document.getElementById('addCharColor').value = '#6366f1';
     document.getElementById('addCharAvatarPreview').style.display = 'none';
@@ -1378,8 +1378,8 @@ function saveAddChar() {
     defaultExpression: '',
     defaultMotion: '',
     blinkParam: '',
-    systemPrompt: document.getElementById('addCharPrompt').value.trim() || '你是一个名叫' + name + '的虚拟角色，正在和用户进行语音通话。请用口语化、简短的句子回复（30字以内），自然亲切。不要用表情符号，不要说网络用语，不要说自己是AI。保持对话流畅自然。',
-    greeting: document.getElementById('addCharGreeting').value.trim() || '你好呀，我是' + name + '~',
+    systemPrompt: document.getElementById('addCharPrompt').value.trim() || '你是一个名叫' + name + '的虚拟角色,正在和用户进行语音通话。请用口语化、简短的句子回复(30字以内),自然亲切。不要用表情符号,不要说网络用语,不要说自己是AI。保持对话流畅自然。',
+    greeting: document.getElementById('addCharGreeting').value.trim() || '你好呀,我是' + name + '~',
     ttsVoiceId: 'p13',
     accentColor: color,
     description: '',
@@ -1558,8 +1558,8 @@ function selectCharacter(id) {
     window.__nativeBridge__.switchCharacter(id);
   }
 
-  // 隐藏角色选择页，显示通话页
-  // 流云记适配：无角色选择页
+  // 隐藏角色选择页,显示通话页
+  // 流云记适配:无角色选择页
   // $('charSelect').classList.add('hidden');
 
   // 更新UI主题
@@ -1574,14 +1574,14 @@ function selectCharacter(id) {
   const lt = $('loadingOverlay').querySelector('.loading-text');
   if (lt) lt.textContent = '正在加载 ' + char.name + '...';
 
-  // 延迟加载模型，确保DOM布局完成后再获取容器尺寸
+  // 延迟加载模型,确保DOM布局完成后再获取容器尺寸
   requestAnimationFrame(() => requestAnimationFrame(() => loadModel()));
   // 清空旧缓存并刷新表情动作面板
   if (window._rebuildActionPanelForUI) window._rebuildActionPanelForUI();
 }
 
 function _returnToVerification() {
-  // 返回验证浮层（替代原来的角色选择页）
+  // 返回验证浮层(替代原来的角色选择页)
   if (connected) {
     connected = false; stopTimer();
     if (isRecording) { stopNativeAsr(); stopRecordingUI(); }
@@ -1589,7 +1589,7 @@ function _returnToVerification() {
     $('micWaveBars').classList.remove('active');
   }
   document.getElementById('语音通话浮层').style.display = 'none';
-  document.getElementById('通话验证浮层').style.display = 'flex';
+  // love-helper 无验证浮层 DOM,跳过
 }
 
 function removeModel() {
@@ -1604,7 +1604,7 @@ function removeModel() {
     console.warn('removeModel error:', e);
     model = null;
   }
-  // 不销毁 PIXI Application，保留 WebGL 上下文
+  // 不销毁 PIXI Application,保留 WebGL 上下文
   $('loadingOverlay').classList.remove('hide');
   const lt = $('loadingOverlay').querySelector('.loading-text');
   if (lt) lt.textContent = '切换角色中...';
@@ -1658,7 +1658,7 @@ function nativeTtsSpeak(text, pitch, speed) {
     else
       window.__nativeBridge__.ttsSpeak(text);
   } else if (typeof speechSynthesis !== 'undefined') {
-    // 桌面端降级：Web Speech API
+    // 桌面端降级:Web Speech API
     try {
       speechSynthesis.cancel();
       var utter = new SpeechSynthesisUtterance(text);
@@ -1680,7 +1680,7 @@ function nativeTtsStop() {
 window.handleNativeEvent = function(type, data) {
   switch (type) {
     case 'onTtsStart':
-      // TTS开始播放 -> 启动嘴巴（除非已被 interruptTts 打断）
+      // TTS开始播放 -> 启动嘴巴(除非已被 interruptTts 打断)
       if (_stopRequested) { break; }
       _ttsActive = true;
       if (!mouthAnimId && !mouthInterval && connected) {
@@ -1688,14 +1688,14 @@ window.handleNativeEvent = function(type, data) {
       }
       break;
     case 'onTtsData':
-      // 鸿蒙端传回实时电平 (0~1)，仅活跃时写入
+      // 鸿蒙端传回实时电平 (0~1),仅活跃时写入
       if (!_ttsActive || _stopRequested) break;
       const level = parseFloat(data);
       if (!isNaN(level) && connected) setMouth(level);
       break;
     case 'onTtsComplete':
       // TTS完毕 → 按字数算最小嘴型时长(200ms/字+500ms)
-      // 打断时可能也触发 Complete，需检查
+      // 打断时可能也触发 Complete,需检查
       if (_stopRequested) { _stopRequested = false; _ttsActive = false; closeMouth(); break; }
       _ttsActive = false;
       var charCount = _lastSpeakText ? _lastSpeakText.length : 5;
@@ -1713,14 +1713,14 @@ window.handleNativeEvent = function(type, data) {
       if (_stopRequested) { _stopRequested = false; _ttsActive = false; closeMouth(); break; }
       _ttsActive = false;
       closeMouth();
-      finishTtsUI();  // TTS 出错也要走收尾，触发自动对话
+      finishTtsUI();  // TTS 出错也要走收尾,触发自动对话
       break;
     case 'onTtsStop':
-      // 打断触发的 stop → 不走 finishTtsUI，避免自动录音重新启动
+      // 打断触发的 stop → 不走 finishTtsUI,避免自动录音重新启动
       if (_stopRequested) { _stopRequested = false; _ttsActive = false; closeMouth(); break; }
       _ttsActive = false;
       closeMouth();
-      finishTtsUI();  // 非打断的正常 stop → 走收尾，触发自动对话
+      finishTtsUI();  // 非打断的正常 stop → 走收尾,触发自动对话
       break;
     case 'onAsrStart':
       break;
@@ -1751,17 +1751,17 @@ function handleAsrResult(text) {
 
 function toggleRecording() {
   if (!connected) return;
-  // 如果刚打断了 AI（pointerdown 触发），松手后立即开始录音
+  // 如果刚打断了 AI(pointerdown 触发),松手后立即开始录音
   if (_interruptThenRecord) {
     _interruptThenRecord = false;
-    // 延迟 300ms 等 TTS 音频彻底停止，防止喇叭回声被麦克风收入
+    // 延迟 300ms 等 TTS 音频彻底停止,防止喇叭回声被麦克风收入
     setTimeout(function() {
       startRecordingUI();
       startNativeAsr();
     }, 300);
     return;
   }
-  // 兜底：如果 AI 仍在说话，先打断
+  // 兜底:如果 AI 仍在说话,先打断
   if (_ttsActive) { interruptTts(); }
   // 正常 toggle
   if (isRecording) { stopNativeAsr(); stopRecordingUI(); }
@@ -1774,7 +1774,7 @@ function startRecordingUI() {
   $('micWaveBars').classList.add('active');
   $('roleStatus').textContent = '🎤 正在听你说...';
   $('roleStatus').className = 'role-status recording';
-  $('interimCaption').textContent = '👆 按住说话，松开发送';
+  $('interimCaption').textContent = '👆 按住说话,松开发送';
   $('interimCaption').style.display = 'block';
   setMouth(0.08);
 }
@@ -1806,7 +1806,7 @@ function stopRecordingUI() {
 
 
 // ================================================================
-//  Live2D 模型加载（动态，根据当前角色）
+//  Live2D 模型加载(动态,根据当前角色)
 // ================================================================
 
 async function loadModel() {
@@ -1820,7 +1820,7 @@ async function loadModel() {
     const h = container.clientHeight || 500;
     diag('loadModel: container size=' + w + 'x' + h);
 
-    // 只在第一次创建 PIXI Application，之后复用（避免WebGL上下文丢失）
+    // 只在第一次创建 PIXI Application,之后复用(避免WebGL上下文丢失)
     if (!app) {
       canvas.style.width = '100%';
       canvas.style.height = '100%';
@@ -1843,13 +1843,13 @@ async function loadModel() {
 
     $('roleStatus').textContent = '加载模型中...';
 
-    // 复用 app 时先清空 stage（避免旧模型残留覆盖）
+    // 复用 app 时先清空 stage(避免旧模型残留覆盖)
     if (app.stage.children.length > 0) {
       diag('Clearing ' + app.stage.children.length + ' existing children from stage');
       app.stage.removeChildren();
     }
 
-    // 在 file:// 协议下构建绝对路径（鸿蒙兼容）
+    // 在 file:// 协议下构建绝对路径(鸿蒙兼容)
     let modelUrl = char.modelPath;
     if (location.protocol === 'file:') {
       const base = location.href.substring(0, location.href.lastIndexOf('/'));
@@ -1865,25 +1865,25 @@ async function loadModel() {
     window._model = model;  // 暴露给控制台调试
     app.stage.addChild(model);
 
-    // 用 model.width/height 直接计算（不用 internalModel.originalWidth，鸿蒙 file:// 下可能为0）
+    // 用 model.width/height 直接计算(不用 internalModel.originalWidth,鸿蒙 file:// 下可能为0)
     const s = Math.min(w / (model.width || 300), h / (model.height || 500)) * 0.85;
     diag('computed scale: ' + s.toFixed(3) + ' (container=' + w + 'x' + h + ', model=' + (model.width || 0).toFixed(0) + 'x' + (model.height || 0).toFixed(0) + ')');
 
-    // 底部中心锚点（昨天 v0.1 验证有效的方案）
+    // 底部中心锚点(昨天 v0.1 验证有效的方案)
     model.anchor.set(0.5, 1);
     model.scale.set(s);
     model.x = w / 2;
     model.y = h - 10;
-    // 保存原始容器尺寸，resize() 恢复时以此为基准
-    // 保存模型原始像素尺寸，resize()/applyFaceZoom() 以此为基准
+    // 保存原始容器尺寸,resize() 恢复时以此为基准
+    // 保存模型原始像素尺寸,resize()/applyFaceZoom() 以此为基准
     window._origW = model.width / model.scale.x;
     window._origH = model.height / model.scale.y;
     window._faceZoomBaseS = s;  // 面部聚焦缩放基准
 
-    // 移除鼠标追踪：model.focus() 对白藤标准参数写入无效，且会干扰动作播放
+    // 移除鼠标追踪:model.focus() 对白藤标准参数写入无效,且会干扰动作播放
 
     try { model.motion(char.defaultMotion || 'Idle'); } catch(e) {}
-    // 加载默认表情（含动态口型初始化）
+    // 加载默认表情(含动态口型初始化)
     try {
       if (char.defaultExpression) {
         applyExpression(char.defaultExpression);
@@ -1894,10 +1894,10 @@ async function loadModel() {
       hookMouthToTicker();
       hookExprToTicker();
     } catch(e) {}
-    
-    // ★ 视线跟踪：手指/鼠标位置 → 模型注视 + 4秒无交互回正
+
+    // ★ 视线跟踪:手指/鼠标位置 → 模型注视 + 4秒无交互回正
     initGazeTracking(model, container);
-    
+
     // 口型 hook 已在前面统一初始化
 
     $('loadingOverlay').classList.add('hide');
@@ -1921,19 +1921,19 @@ async function loadModel() {
 
     console.log('✅ Live2D 加载成功:', char.name, '| pos:', model.x, model.y, 'scale:', model.scale.x, '| orig:', window._origW + 'x' + window._origH, '| container:', w + 'x' + h);
 
-    // 扫描角色参数能力（多角色通用）
-    setTimeout(function() { 
+    // 扫描角色参数能力(多角色通用)
+    setTimeout(function() {
       if (window._scanCharCapabilities) { window._scanCharCapabilities(); }
       else { console.warn('[CAPS] scan/window not ready'); }
     }, 800);
 
-    // 鸿蒙兼容：强制检查 canvas 尺寸和可见性
+    // 鸿蒙兼容:强制检查 canvas 尺寸和可见性
     if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
-      console.warn('⚠️ canvas 尺寸为0，尝试二次修正');
+      console.warn('⚠️ canvas 尺寸为0,尝试二次修正');
       app.renderer.resize(container.clientWidth || 400, container.clientHeight || 500);
     }
 
-    // 调试：1秒后检查模型是否可见
+    // 调试:1秒后检查模型是否可见
     setTimeout(() => {
       if (model && app && app.stage) {
         console.log('[DIAG] 1s后: model.pos=(' + model.x.toFixed(1) + ',' + model.y.toFixed(1) + ')',
@@ -1948,7 +1948,7 @@ async function loadModel() {
   } catch(err) {
     console.error('❌ 加载失败:', err, err.stack);
     diag('LOAD_ERROR: ' + (err.message || err) + ' | ' + (err.stack || '').substring(0,300));
-    // 恢复界面，防止卡在加载状态
+    // 恢复界面,防止卡在加载状态
     $('loadingOverlay').classList.add('hide');
     $('statusText').textContent = '角色加载异常';
     $('roleStatus').textContent = '可重试或返回重选';
@@ -1963,11 +1963,11 @@ async function loadModel() {
 }
 
 // ================================================================
-//  嘴型同步 — 双轨实时电平驱动
+//  嘴型同步 - 双轨实时电平驱动
 // ================================================================
-// 桌面端：Web Audio API AnalyserNode 读取电平
-// 鸿蒙端：TTS onData 回调传入电平数据
-// 统一输出：setMouth(level)
+// 桌面端:Web Audio API AnalyserNode 读取电平
+// 鸿蒙端:TTS onData 回调传入电平数据
+// 统一输出:setMouth(level)
 
 let audioCtx = null;
 let audioAnalyser = null;
@@ -1983,15 +1983,15 @@ function initAudioCtx() {
 }
 
 // ================================================================
-//  实时口型同步 — 零 Fade 多档表情切换方案
-//  原理：所有 F01/F02/F03 表情文件的 FadeIn/FadeOut 已改为 0
+//  实时口型同步 - 零 Fade 多档表情切换方案
+//  原理:所有 F01/F02/F03 表情文件的 FadeIn/FadeOut 已改为 0
 //  setMouth(level) 根据电平值选择合适档位即时切换表情
-//  零 Fade 确保切换即时生效，无延迟
+//  零 Fade 确保切换即时生效,无延迟
 // ================================================================
-let _mouthActive = false;     // 是否正在说话（驱动ing）
+let _mouthActive = false;     // 是否正在说话(驱动ing)
 let mouthInterval = null;
 
-// 电平值(0~1)映射到表情文件 — 基于电平分3档
+// 电平值(0~1)映射到表情文件 - 基于电平分3档
 // F00=闭(Overwrite MouthOpenY=0, 纯粹闭嘴)
 // F01=微笑半闭(各角色定义的F01表情)
 // F02=张嘴(各角色定义的F02表情)
@@ -2008,28 +2008,28 @@ function getMouthExpr(level) {
   return mouthMap.open;
 }
 
-// 初始化动态口型（预留，目前无需额外初始化）
+// 初始化动态口型(预留,目前无需额外初始化)
 function initMouthMotion() {
   return true;
 }
 
-// 判断当前角色是否使用参数写入式口型（非表情切换式）
+// 判断当前角色是否使用参数写入式口型(非表情切换式)
 function usesParamMouth() {
   const char = getCharacter(currentCharacterId);
   return char && char.mouthParams && char.mouthParams.length > 0;
 }
 
-// setMouth: 设置目标电平值（0~1）
-// 对表情切换式角色：切表情 F00/F01/F02
-// 对参数写入式角色：写 ParamMouthOpenY
+// setMouth: 设置目标电平值(0~1)
+// 对表情切换式角色:切表情 F00/F01/F02
+// 对参数写入式角色:写 ParamMouthOpenY
 function setMouth(level) {
   const clamped = Math.min(1, Math.max(0, level));
   if (!model || !model.internalModel) return;
-  
+
   _lastMouthLevel = clamped;
-  
+
   if (usesParamMouth()) {
-    // 参数写入式：直接写 ParamMouthOpenY
+    // 参数写入式:直接写 ParamMouthOpenY
     try {
       model.internalModel.coreModel.setParameterValueById('ParamMouthOpenY', clamped);
     } catch(e) {}
@@ -2043,21 +2043,21 @@ function setMouth(level) {
   }
 }
 
-// ★ 视线跟踪系统：手指/鼠标 → 模型注视，4秒无交互回正，预留陀螺仪接口
+// ★ 视线跟踪系统:手指/鼠标 → 模型注视,4秒无交互回正,预留陀螺仪接口
 var _gazeTimer = null;
 var _gazeEnabled = true;
 var _GYRO_TIMEOUT = 4000; // 4秒无交互回正
 
 function initGazeTracking(mdl, container) {
   if (!mdl || !mdl.internalModel || !mdl.internalModel.focusController) return;
-  
-  // 设置 autoInteract=false，手动控制 focus
+
+  // 设置 autoInteract=false,手动控制 focus
   mdl.autoInteract = false;
-  
+
   // 监听 pointer 事件
   container.addEventListener('pointermove', _onGazePointerMove);
   container.addEventListener('pointerdown', _onGazePointerDown);
-  
+
   // 初始回正
   mdl.internalModel.focusController.focus(0, 0, true);
 }
@@ -2072,38 +2072,38 @@ function _onGazePointerMove(e) {
 
 function _updateGaze(e) {
   if (!_gazeEnabled || !model || !model.internalModel || !model.internalModel.focusController) return;
-  
+
   // 重置4秒定时器
   if (_gazeTimer) clearTimeout(_gazeTimer);
   _gazeTimer = setTimeout(_gazeResetToCenter, _GYRO_TIMEOUT);
-  
-  // 获取容器内相对坐标，归一化到 [-1, 1]
+
+  // 获取容器内相对坐标,归一化到 [-1, 1]
   var rect = e.currentTarget.getBoundingClientRect();
   var rx = (e.clientX - rect.left) / rect.width;   // 0~1
   var ry = (e.clientY - rect.top) / rect.height;   // 0~1
   var fx = rx * 2 - 1;   // -1~1
-  var fy = -(ry * 2 - 1);  // -1~1, Y轴取反：屏幕下方→负值→角色向下看
-  
-  // 直接设置 focusController target（保留距离信息，不像 model.focus() 用 atan2 归一化）
+  var fy = -(ry * 2 - 1);  // -1~1, Y轴取反:屏幕下方→负值→角色向下看
+
+  // 直接设置 focusController target(保留距离信息,不像 model.focus() 用 atan2 归一化)
   model.internalModel.focusController.focus(fx, fy);
 }
 
-// 视线回正（4秒无交互触发）
+// 视线回正(4秒无交互触发)
 function _gazeResetToCenter() {
   if (!model || !model.internalModel || !model.internalModel.focusController) return;
-  // 平滑回正：将 target 设为 (0,0)，FocusController 的 update 会自动插值
+  // 平滑回正:将 target 设为 (0,0),FocusController 的 update 会自动插值
   model.internalModel.focusController.focus(0, 0);
 }
 
-// ★ 陀螺仪接口（预留）：外部调用此函数传入设备倾斜角
-// ax, ay: 归一化方向值 [-1, 1]，例如 ax=左倾负/右倾正
+// ★ 陀螺仪接口(预留):外部调用此函数传入设备倾斜角
+// ax, ay: 归一化方向值 [-1, 1],例如 ax=左倾负/右倾正
 function setGazeFromGyroscope(ax, ay) {
   if (!_gazeEnabled || !model || !model.internalModel || !model.internalModel.focusController) return;
-  
+
   // 重置4秒定时器
   if (_gazeTimer) clearTimeout(_gazeTimer);
   _gazeTimer = setTimeout(_gazeResetToCenter, _GYRO_TIMEOUT);
-  
+
   // 直接设置 focusController target
   model.internalModel.focusController.focus(ax, ay);
 }
@@ -2130,9 +2130,9 @@ function hookMouthToTicker() {
 }
 
 var _tickerHook = null, _lastMouthLevel = 0, _ttsActive = false, _stopRequested = false;
-var _autoRecTimer = null;  // 自动对话：录音启动定时器，打断/关闭时必须 clearTimeout
+var _autoRecTimer = null;  // 自动对话:录音启动定时器,打断/关闭时必须 clearTimeout
 var _lastSpeakText = '', _lastSpeakTime = 0;
-var _lastActions = [];  // AI 动作记录，用于 onTtsComplete 复位
+var _lastActions = [];  // AI 动作记录,用于 onTtsComplete 复位
 
 // softCloseMouth: 柔和淡出闭嘴
 var _fadeTimer = null;
@@ -2161,14 +2161,14 @@ function closeMouth() {
 }
 
 // TTS结束后清理UI
-// 自动对话：TTS播放完毕后自动启动录音
+// 自动对话:TTS播放完毕后自动启动录音
 function _autoStartRec() {
   clearTimeout(_autoRecTimer);
   if (!_S.a || !connected || _S.p || _S.l) return;
   _autoRecTimer = setTimeout(function() {
     _autoRecTimer = null;
-    if (!_S.a || !connected || _S.p || _S.l) return;  // 二次检查，防止定时器期间状态变化
-    // 先停后启，确保 ASR 资源释放干净
+    if (!_S.a || !connected || _S.p || _S.l) return;  // 二次检查,防止定时器期间状态变化
+    // 先停后启,确保 ASR 资源释放干净
     try { stopNativeAsr(); } catch(e) {}
     startNativeAsr();
     isRecording = true;
@@ -2184,20 +2184,20 @@ function finishTtsUI() {
   $('roleStatus').className = 'role-status listening';
   var lastAiText = $('aiCaption').textContent;
   if (lastAiText) addChat('ai', lastAiText);
-  // ★ 自动对话：AI 说完后自动开始录音
+  // ★ 自动对话:AI 说完后自动开始录音
   _autoStartRec();
 }
 
-// 打断 TTS：用户点击 mic 时立即停止 AI 说话
+// 打断 TTS:用户点击 mic 时立即停止 AI 说话
 function interruptTts() {
   if (!_ttsActive) return;
   console.log('[INTERRUPT] 打断 AI 说话');
   _stopRequested = true;  // 防止 onTtsStart 回调重新激活嘴型
-  // ★ 清除自动录音定时器，防止打断后又自动开始录音
+  // ★ 清除自动录音定时器,防止打断后又自动开始录音
   clearTimeout(_autoRecTimer); _autoRecTimer = null;
-  // 停止鸿蒙端 TTS（双重保险：stop + 空内容刷新队列）
+  // 停止鸿蒙端 TTS(双重保险:stop + 空内容刷新队列)
   nativeTtsStop();
-  // 鸿蒙 TTS 的 stop() 可能不会立即中断硬件缓冲区，送一个空字符串强制刷新
+  // 鸿蒙 TTS 的 stop() 可能不会立即中断硬件缓冲区,送一个空字符串强制刷新
   if (hasNativeBridge()) {
     nativeTtsSpeak('', 1, 1);
   }
@@ -2215,18 +2215,18 @@ function interruptTts() {
   $('aiCaption').style.display = 'none';
   $('roleStatus').textContent = '🎤 请说话';
   $('roleStatus').className = 'role-status';
-  // 将被中断的 AI 文本加入聊天记录（标记为打断）
+  // 将被中断的 AI 文本加入聊天记录(标记为打断)
   var lastAiText = $('aiCaption').textContent || (_lastSpeakText || '');
   if (lastAiText) addChat('ai', '⏸ ' + lastAiText);
 }
 
-// 手动表情切换// 手动表情切换（与动态口型复用同一路径，互不冲突）
+// 手动表情切换// 手动表情切换(与动态口型复用同一路径,互不冲突)
 function applyExpression(id) {
   if (!model?.expression) return Promise.resolve(false);
   return Promise.resolve(model.expression(id));
 }
 
-// 桌面端：从 AudioContext AnalyserNode 读电平驱动嘴巴
+// 桌面端:从 AudioContext AnalyserNode 读电平驱动嘴巴
 function startLevelLoop() {
   if (!audioAnalyser) return;
   const bufferLength = audioAnalyser.fftSize;
@@ -2242,7 +2242,7 @@ function startLevelLoop() {
       sum += v * v;
     }
     const rms = Math.sqrt(sum / bufferLength);
-    // 阈值过滤静音噪音，映射到 0.08~1.0
+    // 阈值过滤静音噪音,映射到 0.08~1.0
     const level = rms < 0.03 ? 0.08 : Math.min(1, rms * 2.5 + 0.05);
     setMouth(level);
     mouthAnimId = requestAnimationFrame(readLevel);
@@ -2250,7 +2250,7 @@ function startLevelLoop() {
   readLevel();
 }
 
-// 桌面端：创建 AudioContext -> 挂到用户播放的音频上
+// 桌面端:创建 AudioContext -> 挂到用户播放的音频上
 function attachAnalyserToAudio(audioElement) {
   initAudioCtx();
   try {
@@ -2265,7 +2265,7 @@ function attachAnalyserToAudio(audioElement) {
   }
 }
 
-// 桌面端后备：sin 波形嘴型（audio 元素不好挂 Analyzer 时的兜底）
+// 桌面端后备:sin 波形嘴型(audio 元素不好挂 Analyzer 时的兜底)
 function startSinMouth() {
   if (mouthInterval) clearInterval(mouthInterval);
   if (_fadeTimer) { clearTimeout(_fadeTimer); _fadeTimer = null; }
@@ -2279,13 +2279,13 @@ function startSinMouth() {
 }
 
 // ================================================================
-//  AI 说话（带 TTS 语音 + 嘴型）
+//  AI 说话(带 TTS 语音 + 嘴型)
 // ================================================================
 
 function aiSpeak(text) {
-  // ★ 空内容异常自愈：防止自动对话死循环
+  // ★ 空内容异常自愈:防止自动对话死循环
   if (!text || !text.replace(/\[(emo|mot):\w+\]/gi, '').trim()) {
-    console.warn('[aiSpeak] 收到空回复，走 finishTtsUI 避免卡住');
+    console.warn('[aiSpeak] 收到空回复,走 finishTtsUI 避免卡住');
     _ttsActive = false;
     finishTtsUI();
     return;
@@ -2297,7 +2297,7 @@ function aiSpeak(text) {
     return '';
   }).replace(/\s+/g, ' ').trim();
 
-  // === 立即执行表情和动作（TTS 开始前） ===
+  // === 立即执行表情和动作(TTS 开始前) ===
   for (var i = 0; i < actions.length; i++) {
     var a = actions[i];
     if (a.type === 'emo') executeEmotionTag(a.tag);
@@ -2313,77 +2313,77 @@ function aiSpeak(text) {
   $('roleStatus').className = 'role-status speaking';
   _lastSpeakText = cleanText; _lastSpeakTime = Date.now();
   _stopRequested = false;
-  _ttsActive = true;  // 立即标记，不等 onTtsStart 回调（鸿蒙端可能延迟）
+  _ttsActive = true;  // 立即标记,不等 onTtsStart 回调(鸿蒙端可能延迟)
   // === 加载当前角色的 TTS 音调/语速 ===
   var tts = loadTtsSettings(currentCharacterId);
   nativeTtsSpeak(cleanText, tts.pitch, tts.speed);
 
   if (!hasNativeBridge()) {
-    // 桌面端：用 TTS API 自动播放音频
-    // 方案A（推荐）：创建 Audio 元素播放 TTS（纯浏览器 SpeechSynthesis 或 API 返回音频 URL）
-    // 方案B（兜底）：电平驱动暂时不可用，先用 sin 波形
+    // 桌面端:用 TTS API 自动播放音频
+    // 方案A(推荐):创建 Audio 元素播放 TTS(纯浏览器 SpeechSynthesis 或 API 返回音频 URL)
+    // 方案B(兜底):电平驱动暂时不可用,先用 sin 波形
     startSinMouth();
     const dur = Math.max(1500, cleanText.length * 80);
     setTimeout(() => {
       _ttsActive = false;
       closeMouth();
-      finishTtsUI();  // ★ 桌面端也走统一收尾，触发自动对话
+      finishTtsUI();  // ★ 桌面端也走统一收尾,触发自动对话
     }, dur);
   }
-  // 鸿蒙端：onTtsStart/onTtsComplete 回调控制嘴巴
+  // 鸿蒙端:onTtsStart/onTtsComplete 回调控制嘴巴
   // 回调已在上方 handleNativeEvent 中实现
 }
 
 
 // ================================================================
-//  AI 对话 — 流云记适配
-//  通过 window.发送消息 桥接，复用流云记的API和提示词体系
-//  发送消息内部已处理TTS分流（播报通话TTS + 添加通话对话）
+//  AI 对话 - 流云记适配
+//  通过 window.发送消息 桥接,复用流云记的API和提示词体系
+//  发送消息内部已处理TTS分流(播报通话TTS + 添加通话对话)
 // ================================================================
 async function callDeepSeek(userMsg) {
   chatHistory.push({ role: 'user', content: userMsg });
   $('roleStatus').textContent = 'AI思考中...';
   $('roleStatus').className = 'role-status speaking';
-  
+
   if (_lastActions && _lastActions.length > 0) {
     try { stopAllAiMotions(); } catch(e) {}
   }
 
   try {
-    // 流云记适配：使用 window.发送消息（已内置TTS分流）
+    // 流云记适配:使用 window.发送消息(已内置TTS分流)
     if (typeof window.发送消息 === 'function') {
-      // 发送消息是异步的，会自动调用 window.播报通话TTS 和 window.添加通话对话
-      // 我们需要等待它完成，然后从对话历史中获取AI回复
+      // 发送消息是异步的,会自动调用 window.播报通话TTS 和 window.添加通话对话
+      // 我们需要等待它完成,然后从对话历史中获取AI回复
       window.发送消息(userMsg);
-      
-      // 等待AI回复：轮询对话历史变化
+
+      // 等待AI回复:轮询对话历史变化
       const prevLen = chatHistory.length;
       const maxWait = 30000; // 最多等30秒
       const startWait = Date.now();
-      
+
       return new Promise((resolve) => {
         const check = setInterval(() => {
-          // 检查是否收到了AI回复（通过 window.添加通话对话 的调用来判断）
+          // 检查是否收到了AI回复(通过 window.添加通话对话 的调用来判断)
           if (Date.now() - startWait > maxWait) {
             clearInterval(check);
             $('roleStatus').textContent = 'AI回复超时';
             $('roleStatus').className = 'role-status';
-            resolve('抱歉，我刚才走神了，能再说一次吗？');
+            resolve('抱歉,我刚才走神了,能再说一次吗?');
             return;
           }
           // 发送消息内部会在完成后调用播报通话TTS/添加通话对话
-          // 所以我们不需要手动获取回复——TTS会自动播放
+          // 所以我们不需要手动获取回复--TTS会自动播放
         }, 200);
-        
-        // 简化：直接返回，TTS由发送消息内部处理
+
+        // 简化:直接返回,TTS由发送消息内部处理
         clearInterval(check);
         $('roleStatus').textContent = '通话中';
         $('roleStatus').className = 'role-status';
-        resolve(''); // 回复由TTS分流处理，不需要返回值
+        resolve(''); // 回复由TTS分流处理,不需要返回值
       });
     }
-    
-    // 兜底：DeepSeek API 直连
+
+    // 兜底:DeepSeek API 直连
     const apiKey = localStorage.getItem('deepseek_api_key') || '';
     if (!apiKey) {
       $('roleStatus').textContent = '⚙ 未连接AI服务';
@@ -2391,7 +2391,7 @@ async function callDeepSeek(userMsg) {
       return '';
     }
     const currentChar = getCharacter(currentCharacterId);
-    const systemPromptText = currentChar ? getPatchedSystemPrompt(currentChar) : '你是一个活泼可爱的AI伙伴，正在和用户语音通话。请用简短自然的口语回复（30字以内）。';
+    const systemPromptText = currentChar ? getPatchedSystemPrompt(currentChar) : '你是一个活泼可爱的AI伙伴,正在和用户语音通话。请用简短自然的口语回复(30字以内)。';
     const systemPrompt = { role: 'system', content: systemPromptText };
     const messages = [systemPrompt, ...chatHistory.slice(-16)];
     const resp = await fetch('https://api.deepseek.com/chat/completions', {
@@ -2410,7 +2410,7 @@ async function callDeepSeek(userMsg) {
     console.error('AI 对话 error:', err);
     $('roleStatus').textContent = '连接失败';
     $('roleStatus').className = 'role-status';
-    return '网络好像有点问题，稍等一下再试试吧～';
+    return '网络好像有点问题,稍等一下再试试吧~';
   }
 }
 
@@ -2431,8 +2431,8 @@ async function userListen(userText) {
     finishTtsUI();
     return;
   }
-  // 回复不为空时才手动播TTS（DeepSeek直连兜底路径）
-  // 流云记API路径：发送消息内部已处理TTS分流，reply为空
+  // 回复不为空时才手动播TTS(DeepSeek直连兜底路径)
+  // 流云记API路径:发送消息内部已处理TTS分流,reply为空
   if (reply && reply.trim()) {
     aiSpeak(reply);
   }
@@ -2443,7 +2443,7 @@ function startConv() {
   const char = getCharacter(currentCharacterId);
   setTimeout(() => {
     if (!connected) return;
-    aiSpeak(char ? getPatchedGreeting(char) : "你好呀！我是 Haru，很高兴见到你~");
+    aiSpeak(char ? getPatchedGreeting(char) : "你好呀!我是 Haru,很高兴见到你~");
   }, 800);
 }
 
@@ -2477,7 +2477,7 @@ function resize() {
 }
 
 // ================================================================
-//  面部聚焦缩放（左侧按钮 + 竖向无级滑块）
+//  面部聚焦缩放(左侧按钮 + 竖向无级滑块)
 // ================================================================
 var FACE_RATIO = 0.28;
 var faceZoomLevel = 0;
@@ -2535,7 +2535,7 @@ document.addEventListener('pointerdown', function(e) {
 //  事件绑定
 // ================================================================
 
-// ===== 滑动交互：按住录音，滑动到取消/模式/锁定 =====
+// ===== 滑动交互:按住录音,滑动到取消/模式/锁定 =====
 var _S = { p:false, l:false, iC:false, iL:false, iA:false, a:false, st:null, ti:null, d:0 };
 var _MX = 60;
 var _D = { vb: $('micBtn'), kb: $('keyboardBtn'), sb2: $('settingsBtn'), hb: $('hangupBtn'), rs: $('roleStatus') };
@@ -2607,7 +2607,7 @@ function _onPD(e){
   // 锁定状态下点击mic → 发送锁定录音
   if(_S.l){ e.preventDefault(); _finishLk(); _D.vb.className='main-mic'; _D.vb.classList.remove('locked-recording','recording','mode-active','btn-hidden'); return; }
   if(_S.p) return;
-  // 自动模式开启时，点击mic关闭
+  // 自动模式开启时,点击mic关闭
   if(_S.a){ e.preventDefault(); _toggleAM(); _D.vb.className='main-mic'; _D.rs.textContent='等待说话'; _D.rs.className='role-status listening'; $('micWaveBars').classList.remove('active'); return; }
   if(e.type==='touchstart') e.preventDefault();
   // 打断TTS
@@ -2725,12 +2725,12 @@ function _toggleAM(){
     _D.sb2.innerHTML='<span style="font-size:13px;font-weight:600;-webkit-user-select:none;user-select:none">自动</span>';
     _D.kb.classList.add('btn-hidden');_D.hb.classList.add('btn-hidden');_D.vb.classList.add('mode-active');
     $('micWaveBars').classList.add('active');
-    // 自动模式：先打断 TTS 再启动 ASR，防止录到 AI 回声
+    // 自动模式:先打断 TTS 再启动 ASR,防止录到 AI 回声
     if (_ttsActive) interruptTts();
     startNativeAsr(); isRecording=true;
     _D.rs.textContent='自动对话中'; _D.rs.className='role-status speaking';
   } else {
-    // ★ 关闭自动模式：清除定时器 + 停止录音
+    // ★ 关闭自动模式:清除定时器 + 停止录音
     clearTimeout(_autoRecTimer); _autoRecTimer = null;
     _D.sb2.classList.remove('on');_D.sb2.classList.remove('mode-highlight','on');
     _D.vb.classList.remove('locked-recording','mode-active');
@@ -2754,7 +2754,7 @@ _D.vb.addEventListener('touchcancel', _onPC);
 _D.vb.addEventListener('mousedown', _onPD);
 document.addEventListener('mousemove', function(e){ if(!_S.p) return; e.preventDefault(); _checkZ({x:e.clientX,y:e.clientY}); });
 document.addEventListener('mouseup', _onPE);
-// action按钮点击事件（录音模式下）
+// action按钮点击事件(录音模式下)
 _D.kb.addEventListener('click', function(e){ if(_S.p){ e.stopPropagation(); _S.iC=true; _onPE({preventDefault:function(){}}); } });
 _D.sb2.addEventListener('click', function(e){ if(_S.p){ e.stopPropagation(); _S.iA=true; _onPE({preventDefault:function(){}}); } });
 _D.hb.addEventListener('click', function(e){ if(_S.p||_S.l){ e.stopPropagation(); if(_S.l) _finishLk(); else { _S.iL=true; _onPE({preventDefault:function(){}}); } } });
@@ -2780,7 +2780,7 @@ $('hangupBtn').addEventListener('click', () => {
   $('interimCaption').style.display = 'none';
   $('userCaption').style.display = 'none';
   setMouth(0);
-  addChat('ai', '通话已结束，下次再聊~');
+  addChat('ai', '通话已结束,下次再聊~');
   // 3秒后显示角色选择
   setTimeout(_returnToVerification, 2000);
 });
@@ -2792,7 +2792,7 @@ $('toggleChatBtn').addEventListener('click', () => {
 
 $('clearChatBtn').addEventListener('click', () => { $('chatList').innerHTML = ''; addChat('ai', '对话记录已清空'); });
 $('hideChatBtn').addEventListener('click', () => { $('chatPanel').classList.remove('open'); });
-// 流云记适配：设置按钮打开设置浮层
+// 流云记适配:设置按钮打开设置浮层
 function openSettingsOverlay() {
   var 浮层 = document.getElementById('设置浮层');
   if (浮层) { 浮层.style.display = 'flex'; return; }
@@ -2835,7 +2835,7 @@ function hideInputPanel() {
   if ($('inputPanel')) $('inputPanel').style.display = 'none';
   // 恢复容器高度
   container.style.height = ($('inputPanel') && $('inputPanel')._kbOrigHeight) || '';
-  // 立即同步恢复视图（键盘已收起，container高度已恢复）
+  // 立即同步恢复视图(键盘已收起,container高度已恢复)
   resize();
 }
 
@@ -2883,59 +2883,59 @@ var _rattanMotions = [
     {name:'打招呼', file:'wave.motion3.json',  color:'#6aa', desc:'侧身打招呼'},
     {name:'歪头', file:'tilt.motion3.json',     color:'#a88', desc:'歪头疑惑'},
     {name:'惊吓', file:'surprise.motion3.json', color:'#f88', desc:'身体后仰惊吓'},
-    {name:'前倾', file:'leanfwd.motion3.json',  color:'#8a8', desc:'身体前倾（BY-10）'},
-    {name:'后仰', file:'leanbak.motion3.json',  color:'#a8a', desc:'身体后仰（BY+10）'},
+    {name:'前倾', file:'leanfwd.motion3.json',  color:'#8a8', desc:'身体前倾(BY-10)'},
+    {name:'后仰', file:'leanbak.motion3.json',  color:'#a8a', desc:'身体后仰(BY+10)'},
     {name:'摇摆', file:'sway.motion3.json',     color:'#f8f', desc:'身体左右轻摆'},
   ];
 
-  // === 角色专属动作名映射（key: 角色id, value: {filename: 显示名}） ===
+  // === 角色专属动作名映射(key: 角色id, value: {filename: 显示名}) ===
   var _charMotionNames = {
     haru: {
       'haru_g_m26.motion3.json': '含羞',
       'haru_g_m06.motion3.json': '认真',
       'haru_g_m20.motion3.json': '伤心',
-      'haru_g_m09.motion3.json': '没关系（承蒙关照）',
+      'haru_g_m09.motion3.json': '没关系(承蒙关照)',
     },
     hiyori: {
-      'Hiyori_m01.motion3.json': '嗯～',
-      'Hiyori_m02.motion3.json': '喜欢你（害羞）',
+      'Hiyori_m01.motion3.json': '嗯~',
+      'Hiyori_m02.motion3.json': '喜欢你(害羞)',
       'Hiyori_m03.motion3.json': '高兴',
       'Hiyori_m05.motion3.json': '喜欢',
       'Hiyori_m06.motion3.json': '害羞的喜欢',
     },
     mark: {
       'mark_m01.motion3.json': '晃头',
-      'mark_m02.motion3.json': '左右摆摆脚，开心',
-      'mark_m03.motion3.json': '嗯～',
+      'mark_m02.motion3.json': '左右摆摆脚,开心',
+      'mark_m03.motion3.json': '嗯~',
       'mark_m04.motion3.json': '无奈',
-      'mark_m05.motion3.json': '都是男生，我懂你哦',
+      'mark_m05.motion3.json': '都是男生,我懂你哦',
       'mark_m06.motion3.json': '跳一下',
     },
     natori: {
-      'mtn_03.motion3.json': '拿出我的专属金色怀表～',
+      'mtn_03.motion3.json': '拿出我的专属金色怀表~',
       'mtn_04.motion3.json': '装逼的扶一次镜框',
       'mtn_05.motion3.json': '伸出左手表示确定',
-      'mtn_06.motion3.json': '承蒙关照（不客气）～',
-      'mtn_07.motion3.json': '不对哦～',
+      'mtn_06.motion3.json': '承蒙关照(不客气)~',
+      'mtn_07.motion3.json': '不对哦~',
     },
     mao: {
       'mtn_02.motion3.json': '嗯嗯嗯',
       'mtn_03.motion3.json': '闭上眼睛享受',
-      'mtn_04.motion3.json': '嗯哼～傲娇',
+      'mtn_04.motion3.json': '嗯哼~傲娇',
       'special_01.motion3.json': '空中挥舞魔法棒画个比心',
-      'special_02.motion3.json': '空中挥舞魔法棒画个比心失败了，尴尬～',
-      'special_03.motion3.json': '给你看看我魔法帽上的小兔子是我用魔法变得哦，展示给你看～',
+      'special_02.motion3.json': '空中挥舞魔法棒画个比心失败了,尴尬~',
+      'special_03.motion3.json': '给你看看我魔法帽上的小兔子是我用魔法变得哦,展示给你看~',
     },
     gothic: {
       // 待补充
     },
   };
 
-  // === 通用动作注册表（多角色共享，自动按参数能力过滤） ===
-  // requiredParams: 该动作需要的 moc3 参数，缺少任一则对当前角色隐藏
-  // motion: 可选，关联的 motion3.json 文件（需角色自带该文件）
+  // === 通用动作注册表(多角色共享,自动按参数能力过滤) ===
+  // requiredParams: 该动作需要的 moc3 参数,缺少任一则对当前角色隐藏
+  // motion: 可选,关联的 motion3.json 文件(需角色自带该文件)
   var _allActions = [
-    // ── A组：眉眼（需要 Brow/Eye 参数）──
+    // ── A组:眉眼(需要 Brow/Eye 参数)──
     {id:'sad',      name:'😢难过',   group:'A组·眉眼', color:'#689', dur:2.0, pars:[['ParamBrowLForm',0,1,0],['ParamBrowRForm',0,1,0]],       requiredParams:['ParamBrowLForm','ParamBrowRForm'], desc:'八字眉忧伤'},
     {id:'browUp',   name:'😲挑眉',   group:'A组·眉眼', color:'#f80', dur:1.2, pars:[['ParamBrowLY',0,1,0],['ParamBrowRY',0,1,0]],             requiredParams:['ParamBrowLY','ParamBrowRY'], desc:'眉毛上挑惊讶'},
     {id:'winkL',    name:'😉左Wink', group:'A组·眉眼', color:'#f6a', dur:0.7, pars:[['ParamEyeLOpen',1,0,1],['ParamEyeLSmile',0,0.8,0]],       requiredParams:['ParamEyeLOpen','ParamEyeLSmile'], desc:'左眼单眨'},
@@ -2943,35 +2943,35 @@ var _rattanMotions = [
     {id:'lookL',    name:'👀左看',   group:'A组·眉眼', color:'#8af', dur:1.2, pars:[['ParamEyeBallX',0,-1,0]],                                  requiredParams:['ParamEyeBallX'], desc:'眼球转向左'},
     {id:'lookR',    name:'👀右看',   group:'A组·眉眼', color:'#8af', dur:1.2, pars:[['ParamEyeBallX',0,1,0]],                                   requiredParams:['ParamEyeBallX'], desc:'眼球转向右'},
     {id:'smileEye', name:'😊笑眼',   group:'A组·眉眼', color:'#fa8', dur:1.5, pars:[['ParamEyeLSmile',0,1,0],['ParamEyeRSmile',0,1,0]],        requiredParams:['ParamEyeLSmile','ParamEyeRSmile'], desc:'双眼笑弧'},
-    // ── B组：嘴型（白藤专属高级参数，其他角色通常缺失）──
+    // ── B组:嘴型(白藤专属高级参数,其他角色通常缺失)──
     {id:'pout',     name:'😗嘟嘴',   group:'B组·嘴型', color:'#f8a', dur:1.2, pars:[['ParamFunnel',0,1,0]],                                      requiredParams:['ParamFunnel'], desc:'嘟起小嘴'},
     {id:'oMouth',   name:'😮O嘴',    group:'B组·嘴型', color:'#a8f', dur:1.0, pars:[['ParamMouthForm',0,1,0]],                                   requiredParams:['ParamMouthForm'], desc:'惊讶O型嘴'},
     {id:'puff',     name:'😤鼓腮',   group:'B组·嘴型', color:'#f88', dur:1.0, pars:[['ParamCheekPuff',0,1,0]],                                   requiredParams:['ParamCheekPuff'], desc:'鼓起腮帮子'},
     {id:'yawn',     name:'🥱哈欠',   group:'B组·嘴型', color:'#aa8', dur:2.2, pars:[['ParamJawOpen',0,1,0],['ParamMouthOpenY',0,0.7,0]],         requiredParams:['ParamJawOpen','ParamMouthOpenY'], desc:'打一个大哈欠'},
     {id:'frownM',   name:'😕撇嘴',   group:'B组·嘴型', color:'#a8a', dur:1.0, pars:[['ParamPressLipOpen',0,1,0]],                                requiredParams:['ParamPressLipOpen'], desc:'嘴角向下'},
-    // ── C组：身体（通用 ParamBodyAngleY，所有角色都有）──
+    // ── C组:身体(通用 ParamBodyAngleY,所有角色都有)──
     {id:'bounce',   name:'🫧弹跳',   group:'C组·身体', color:'#8f8', dur:0.5, shape:'bounce', pars:[['ParamBodyAngleY',0,-10,0]],                requiredParams:['ParamBodyAngleY'], desc:'身体弹跳'},
     {id:'jump',     name:'⬆️起跳',   group:'C组·身体', color:'#ff8', dur:0.5, shape:'bounce', pars:[['ParamBodyAngleY',0,-10,0],['ParamBodyAngleZ',0,4,0],['ParamAngleY',0,-8,0]], requiredParams:['ParamBodyAngleY'], desc:'弹跳+起跳'},
     {id:'leanTalk', name:'🗣️前倾说', group:'C组·身体', color:'#8aa', dur:1.0, shape:'hold',   pars:[['ParamBodyAngleY',0,-5,0]],                   requiredParams:['ParamBodyAngleY'], desc:'微微前倾说话'},
     {id:'tiltQ',    name:'🤔歪头惑', group:'C组·身体', color:'#aa8', dur:1.5, shape:'hold',   motion:'tilt.motion3.json',  pars:[['ParamBrowLY',0,0.6,0]], requiredParams:['ParamBrowLY'], desc:'歪头+挑眉'},
     {id:'scareBack',name:'😱吓后退', group:'C组·身体', color:'#f88', dur:0.7, shape:'hold',   pars:[['ParamBodyAngleY',0,10,0],['ParamAngleY',0,-10,0]], requiredParams:['ParamBodyAngleY'], desc:'惊吓后退+仰头'},
-    // ── D组：复合（motion文件 + 参数叠加，motion需角色自带）──
+    // ── D组:复合(motion文件 + 参数叠加,motion需角色自带)──
     {id:'waveSmile',name:'😊笑招呼', group:'D组·复合', color:'#6af', dur:1.2, shape:'hold',   motion:'wave.motion3.json', pars:[['ParamEyeLSmile',0,0.8,0],['ParamEyeRSmile',0,0.8,0]], requiredParams:['ParamEyeLSmile','ParamEyeRSmile'], desc:'打招呼+笑眼'},
     {id:'surpBrow', name:'😲惊愕',   group:'D组·复合', color:'#f8f', dur:1.2, shape:'hold',   motion:'surprise.motion3.json', pars:[['ParamBrowLY',0,0.8,0],['ParamBrowRY',0,0.8,0]], requiredParams:['ParamBrowLY','ParamBrowRY'], desc:'惊吓+挑眉'},
     {id:'sighSmile',name:'😌舒叹',   group:'D组·复合', color:'#aaf', dur:2.5, shape:'hold',   motion:'sigh.motion3.json', pars:[['ParamEyeLSmile',0,0.5,0]], requiredParams:['ParamEyeLSmile'], desc:'叹气+眯眼'},
-    // ── E组：角色专属（自动按 requiredParams 过滤）──
-    {id:'handWaveR', name:'🖐️挥右手', group:'E组·专属', color:'#f96', dur:1.0, shape:'hold',   pars:[['Param106',0,20,0]],                                           requiredParams:['Param106'], desc:'右手挥动（小懵专属）'},
-    {id:'handWaveL', name:'🖐️挥左手', group:'E组·专属', color:'#f96', dur:1.0, shape:'hold',   pars:[['Param107',0,-20,0]],                                          requiredParams:['Param107'], desc:'左手挥动（小懵专属）'},
-    {id:'leanAJQQ',  name:'🙇前倾',   group:'E组·专属', color:'#6cf', dur:1.2, shape:'hold',   pars:[['AJQQ',0,1,0]],                                                requiredParams:['AJQQ'], desc:'身体前倾（小悦专属）'},
-    {id:'handL',     name:'✋左手势',  group:'E组·专属', color:'#c6f', dur:1.0, shape:'hold',   pars:[['AJZSS1',0,1,0]],                                              requiredParams:['AJZSS1'], desc:'左手比划（小悦专属）'},
-    {id:'handR',     name:'✋右手势',  group:'E组·专属', color:'#c6f', dur:1.0, shape:'hold',   pars:[['AJYSS1',0,1,0]],                                              requiredParams:['AJYSS1'], desc:'右手比划（小悦专属）'},
+    // ── E组:角色专属(自动按 requiredParams 过滤)──
+    {id:'handWaveR', name:'🖐️挥右手', group:'E组·专属', color:'#f96', dur:1.0, shape:'hold',   pars:[['Param106',0,20,0]],                                           requiredParams:['Param106'], desc:'右手挥动(小懵专属)'},
+    {id:'handWaveL', name:'🖐️挥左手', group:'E组·专属', color:'#f96', dur:1.0, shape:'hold',   pars:[['Param107',0,-20,0]],                                          requiredParams:['Param107'], desc:'左手挥动(小懵专属)'},
+    {id:'leanAJQQ',  name:'🙇前倾',   group:'E组·专属', color:'#6cf', dur:1.2, shape:'hold',   pars:[['AJQQ',0,1,0]],                                                requiredParams:['AJQQ'], desc:'身体前倾(小悦专属)'},
+    {id:'handL',     name:'✋左手势',  group:'E组·专属', color:'#c6f', dur:1.0, shape:'hold',   pars:[['AJZSS1',0,1,0]],                                              requiredParams:['AJZSS1'], desc:'左手比划(小悦专属)'},
+    {id:'handR',     name:'✋右手势',  group:'E组·专属', color:'#c6f', dur:1.0, shape:'hold',   pars:[['AJYSS1',0,1,0]],                                              requiredParams:['AJYSS1'], desc:'右手比划(小悦专属)'},
   ];
 
   // === 参数动画引擎 ===
-  // 关键：参数写入必须在 beforeModelUpdate 事件中执行，而非 rAF
-  // 原因：idle_body.motion3.json 动画了 24 个参数（含眉/眼/体），
-  // motionManager 在模型更新周期中处理，rAF 写入会被 idle 覆盖。
-  // beforeModelUpdate 在 motionManager 之后触发 — 我们的值盖过 idle。
+  // 关键:参数写入必须在 beforeModelUpdate 事件中执行,而非 rAF
+  // 原因:idle_body.motion3.json 动画了 24 个参数(含眉/眼/体),
+  // motionManager 在模型更新周期中处理,rAF 写入会被 idle 覆盖。
+  // beforeModelUpdate 在 motionManager 之后触发 - 我们的值盖过 idle。
   var _paramAnimState = null;  // {action, startTime, core}
 
   function _easeInOut(t) { return t < 0.5 ? 2*t*t : -1 + (4-2*t)*t; }
@@ -2990,17 +2990,17 @@ var _rattanMotions = [
     var shapeType = s.action.shape || 'triangle';
     var shape;
     if (shapeType === 'hold') {
-      // 梯形：rise(0→0.15)→hold(0.15→0.65)→fall(0.65→1.0)
+      // 梯形:rise(0→0.15)→hold(0.15→0.65)→fall(0.65→1.0)
       if (t < 0.15) shape = _easeInOut(t / 0.15);
       else if (t < 0.65) shape = 1;
       else shape = _easeInOut(1 - (t - 0.65) / 0.35);
     } else if (shapeType === 'bounce') {
-      // 弹跳：快蹲(0→0.2)→弹簧反弹(0.2→0.4，允许负值越过)→回稳(0.4→1.0)
+      // 弹跳:快蹲(0→0.2)→弹簧反弹(0.2→0.4,允许负值越过)→回稳(0.4→1.0)
       if (t < 0.2) shape = _easeInOut(t / 0.2);
       else if (t < 0.4) shape = 1 - 1.3 * _easeInOut((t - 0.2) / 0.2);
       else shape = -0.3 * (1 - _easeInOut((t - 0.4) / 0.6));
     } else {
-      // 默认三角波形：0→1→0
+      // 默认三角波形:0→1→0
       shape = t < 0.5 ? _easeInOut(t * 2) : _easeInOut(2 - t * 2);
     }
     for (var i = 0; i < s.action.pars.length; i++) {
@@ -3016,7 +3016,7 @@ var _rattanMotions = [
     var core = model.internalModel.coreModel;
     if (!core) return console.log('[PARAM] no coreModel');
 
-    // 如果有关联 motion 文件，同步播放（复合动作 = motion + param）
+    // 如果有关联 motion 文件,同步播放(复合动作 = motion + param)
     if (action.motion) {
       var mm = model.internalModel.motionManager;
       if (mm && mm.definitions) {
@@ -3037,14 +3037,14 @@ var _rattanMotions = [
       }
     }
 
-    // 如果只有 motion 没有 pars（纯 motion 动作），不挂 hook
+    // 如果只有 motion 没有 pars(纯 motion 动作),不挂 hook
     if (!action.pars || action.pars.length === 0) {
       console.log('[PARAM]', action.name, '(motion only)');
       return;
     }
 
     _paramAnimState = { action: action, startTime: Date.now(), core: core };
-    // 挂在 beforeModelUpdate 上（在 idle motion 之后执行，确保参数覆盖）
+    // 挂在 beforeModelUpdate 上(在 idle motion 之后执行,确保参数覆盖)
     model.internalModel.on('beforeModelUpdate', _paramAnimTick);
     console.log('[PARAM]', action.name, action.desc || '');
   }
@@ -3057,7 +3057,7 @@ var _rattanMotions = [
   }
 
   function _finishParamAnim2(state) {
-    // 移除监听器，让 idle motion 自然接管 — 不手动复位参数，避免闪烁
+    // 移除监听器,让 idle motion 自然接管 - 不手动复位参数,避免闪烁
     try { model.internalModel.off('beforeModelUpdate', _paramAnimTick); } catch(e) {}
     _paramAnimState = null;
   }
@@ -3068,7 +3068,7 @@ var _rattanMotions = [
     var mm = model.internalModel.motionManager;
     if (!mm) return console.log('[MOTION] no motionManager');
     if (!mm.definitions) return console.log('[MOTION] no definitions');
-    // 在所有非 Idle 的 motion 组中搜索（若仅 Idle 组则包含它）
+    // 在所有非 Idle 的 motion 组中搜索(若仅 Idle 组则包含它)
     var hasOther = false;
     for (var g in mm.definitions) { if (g !== 'Idle' && mm.definitions[g] && mm.definitions[g].length) hasOther = true; }
     for (var group in mm.definitions) {
@@ -3115,7 +3115,7 @@ var _rattanMotions = [
     var charId = currentCharacterId;
     if (!charId) return;
     var caps = { params: new Set(), motions: new Set() };
-    // 扫描 moc3 参数（多路径尝试 coreModel）
+    // 扫描 moc3 参数(多路径尝试 coreModel)
     var core = null;
     if (model && model.internalModel) {
       core = model.internalModel.coreModel || model.internalModel._coreModel;
@@ -3170,7 +3170,7 @@ var _rattanMotions = [
     return true;
   }
 
-  // === 重建统一表情动作面板（新版） ===
+  // === 重建统一表情动作面板(新版) ===
   function _rebuildActionPanelForUI() {
     var exprContainer = document.getElementById('actionExprBtns');
     var motionContainer = document.getElementById('actionMotionBtns');
@@ -3178,13 +3178,13 @@ var _rattanMotions = [
     // 清空
     while (exprContainer.firstChild) exprContainer.removeChild(exprContainer.firstChild);
     while (motionContainer.firstChild) motionContainer.removeChild(motionContainer.firstChild);
-    
+
     var charId = currentCharacterId;
     var char = charId ? getCharacter(charId) : null;
-    
+
     // ===== 表情区 =====
     if (charId === 'rattan') {
-      // 白藤：显示 _rattanExprMap 的全部非空表情
+      // 白藤:显示 _rattanExprMap 的全部非空表情
       var exprNames = Object.keys(_rattanExprMap).filter(function(k) { return k !== ''; });
       // 先加复位按钮
       var rstBtn = document.createElement('button');
@@ -3194,7 +3194,7 @@ var _rattanMotions = [
       rstBtn.style.background = 'rgba(255,255,255,0.08)';
       rstBtn.onclick = function() { _setExpressionWithReset(''); console.log('[EXPR] 白藤复位'); };
       exprContainer.appendChild(rstBtn);
-      
+
       exprNames.forEach(function(name) {
         var b = document.createElement('button');
         b.className = 'action-expr-btn';
@@ -3211,7 +3211,7 @@ var _rattanMotions = [
         exprContainer.appendChild(b);
       });
     } else if (char && char.mouthExpressions) {
-      // 非白藤角色：显示 mouthExpressions 键
+      // 非白藤角色:显示 mouthExpressions 键
       var exprKeys = Object.keys(char.mouthExpressions);
       exprKeys.forEach(function(key) {
         var b = document.createElement('button');
@@ -3233,8 +3233,8 @@ var _rattanMotions = [
         exprContainer.appendChild(resetBtn);
       }
     }
-    
-    // 通用口型工具：放表情区尾部
+
+    // 通用口型工具:放表情区尾部
     var mouthToolsDiv = document.createElement('div');
     mouthToolsDiv.style.cssText = 'width:100%;display:flex;gap:6px;flex-direction:column;margin-top:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);';
     var openBtn = document.createElement('button');
@@ -3247,7 +3247,7 @@ var _rattanMotions = [
     closeBtn.textContent = '👄 闭嘴';
     closeBtn.onclick = function() { setMouth(0); };
     mouthToolsDiv.appendChild(closeBtn);
-    // F02按钮：仅对有expressionManager的角色显示（白藤等自定义表情系统角色没有F02文件）
+    // F02按钮:仅对有expressionManager的角色显示(白藤等自定义表情系统角色没有F02文件)
     if (charId !== 'rattan' && char && char.mouthExpressions && char.mouthExpressions.open) {
       var expr02Btn = document.createElement('button');
       expr02Btn.className = 'action-expr-btn';
@@ -3256,7 +3256,7 @@ var _rattanMotions = [
       mouthToolsDiv.appendChild(expr02Btn);
     }
     exprContainer.appendChild(mouthToolsDiv);
-    
+
     // ===== 动作区 =====
     var caps = _charCaps[charId];
     if (!caps) {
@@ -3266,7 +3266,7 @@ var _rattanMotions = [
       motionContainer.appendChild(hint);
       return;
     }
-    
+
     // Motion 文件动作
     var known = {};
     if (typeof _rattanMotions !== 'undefined') {
@@ -3292,7 +3292,7 @@ var _rattanMotions = [
       motionContainer.appendChild(b);
       hasMotion = true;
     });
-    
+
     // 参数动作
     var filtered = [];
     for (var i = 0; i < _allActions.length; i++) {
@@ -3320,7 +3320,7 @@ var _rattanMotions = [
         motionContainer.appendChild(b);
       }
     }
-    
+
     if (!hasMotion && filtered.length === 0) {
       var hint = document.createElement('div');
       hint.className = 'action-empty-tip';
@@ -3331,7 +3331,7 @@ var _rattanMotions = [
 
   // ================================================================
   // ================================================================
-  //  表情/动作标签 → Live2D 操作映射（AI 驱动 · 按角色分层）
+  //  表情/动作标签 → Live2D 操作映射(AI 驱动 · 按角色分层)
   // ================================================================
 
   var _charActionMap = {
@@ -3375,7 +3375,7 @@ var _rattanMotions = [
         thinking: { action: 'tiltQ', label: '歪头思考' },
       },
       mot: {
-        nod:  { motion: 'Hiyori_m01.motion3.json', label: '嗯～点头' },
+        nod:  { motion: 'Hiyori_m01.motion3.json', label: '嗯~点头' },
         wave: { motion: 'Hiyori_m03.motion3.json', label: '高兴挥手' },
         sigh: { action: 'sad', label: '叹息' },
       },
@@ -3406,7 +3406,7 @@ var _rattanMotions = [
       },
       mot: {
         nod:  { motion: 'mtn_05.motion3.json', label: '伸出左手确定' },
-        sigh: { motion: 'mtn_07.motion3.json', label: '不对哦～' },
+        sigh: { motion: 'mtn_07.motion3.json', label: '不对哦~' },
         bow:  { motion: 'mtn_06.motion3.json', label: '承蒙关照' },
       },
       tags: 'happy sad surprise shy thinking | mot: nod sigh bow',
@@ -3534,7 +3534,7 @@ var _rattanMotions = [
     // 停止参数动画
     if (typeof _stopParamAnim === 'function') _stopParamAnim();
 
-    // 表情式角色：切换到默认表情
+    // 表情式角色:切换到默认表情
     if (char.defaultExpression && charId !== 'rattan') {
       if (model && model.expression) {
         model.expression(char.defaultExpression);
@@ -3542,13 +3542,13 @@ var _rattanMotions = [
       }
     }
 
-    // 白藤：清空 rattan 表情 hook
+    // 白藤:清空 rattan 表情 hook
     if (charId === 'rattan') {
       _rattanActiveExpr = '';
       if (typeof unhookExprFromTicker === 'function') unhookExprFromTicker();
     }
 
-    // 参数式复位：将常用表情参数归零
+    // 参数式复位:将常用表情参数归零
     var resetParams = ['ParamEyeLSmile', 'ParamEyeRSmile', 'ParamBrowLForm', 'ParamBrowRForm',
                        'ParamBrowLY', 'ParamBrowRY', 'ParamBodyAngleY'];
     if (model && model.internalModel && model.internalModel.coreModel) {
@@ -3576,7 +3576,7 @@ var _rattanMotions = [
   window._getCharActionTags = _getCharActionTags;
 
   console.log('🔧 控制台工具就绪: _rebuildActionPanelForUI() | _scanCharCapabilities() | _playMotion() | _playParamAnim()');
-  
+
 });
 
 
@@ -3584,15 +3584,15 @@ var _rattanMotions = [
 // ================================================================
 
 
-// ===== "语"按钮 — 点击进入语音通话模式 =====
+// ===== "语"按钮 - 点击进入语音通话模式 =====
 (function() {
   var 语按钮 = document.getElementById('电话预留按钮');
   if (语按钮) {
     语按钮.addEventListener('click', function() {
-      // 检查当前智能体是否有关联 Live2D 角色，未绑定则默认 Haru
+      // 检查当前智能体是否有关联 Live2D 角色,未绑定则默认 Haru
       var 当前智能体 = window.获取当前智能体配置 ? window.获取当前智能体配置() : null;
       var 角色ID = 当前智能体 && 当前智能体.live2dModelId ? 当前智能体.live2dModelId : 'haru';
-      
+
       // 进入通话模式
       if (window.进入通话模式) {
         window.进入通话模式(角色ID);
@@ -3600,20 +3600,41 @@ var _rattanMotions = [
         console.error('[语音通话] 通话管理模块未加载');
       }
     });
+    // 诊断:全局捕获点击回调的异常
+    语按钮.addEventListener('click', function _diag(e) {
+      try {
+        var 当前智能体 = window.获取当前智能体配置 ? window.获取当前智能体配置() : null;
+        var 角色ID = 当前智能体 && 当前智能体.live2dModelId ? 当前智能体.live2dModelId : 'haru';
+        if (window.进入通话模式) {
+          window.进入通话模式(角色ID);
+        } else {
+          console.error('[诊断] ❌ window.进入通话模式 未定义');
+        }
+      } catch(err) {
+        console.error('[诊断] ❌ 语按钮点击异常:', err.message);
+        console.error('[诊断] 堆栈:', err.stack);
+      }
+    });
   }
-  console.log('[语音通话] 语按钮绑定就绪');
+  console.log('[语音通话] 语按钮绑定就绪(含诊断)');
 })();
 
 //  流云记验证浮层接口适配
 // ================================================================
 window.进入通话模式 = function(charId) {
-  // 先显示通话浮层（loadModel 需要容器可见才能获取正确尺寸）
-  document.getElementById('通话验证浮层').style.display = 'none';
-  document.getElementById('语音通话浮层').style.display = 'flex';
-  
-  // 延迟一帧让浏览器完成布局，再加载模型
+  console.log('[语音通话] 进入通话模式, charId=' + charId);
+  var el = document.getElementById('语音通话浮层');
+  if (!el) { console.error('[语音通话] ❌ 语音通话浮层 DOM 不存在'); return; }
+  console.log('[语音通话] 显示语音通话浮层, display=' + el.style.display);
+  el.style.display = 'flex';
+  console.log('[语音通话] 浮层已显示, display=' + el.style.display);
+
+  // 延迟一帧让浏览器完成布局,再加载模型
+  console.log('[语音通话] 注册 requestAnimationFrame 加载模型');
   requestAnimationFrame(function() {
+    console.log('[语音通话] rAF 触发, charId=' + charId + ', currentCharacterId=' + currentCharacterId);
     if (charId) {
+      console.log('[语音通话] 调用 selectCharacter(' + charId + ')');
       selectCharacter(charId);
     } else if (!currentCharacterId) {
       selectCharacter('haru');
@@ -3641,8 +3662,10 @@ window.挂断通话 = function() {
     setMouth && setMouth(0);
   }
   document.getElementById('语音通话浮层').style.display = 'none';
-  document.getElementById('通话验证浮层').style.display = 'flex';
 };
+
+// love-helper 无 通话验证浮层 DOM,此函数保持空操作
+var _通话验证浮层显示 = function() {};
 
 window.添加通话对话 = function(role, text) {
   // 仅在通话模式激活时添加到通话记录
