@@ -243,3 +243,9 @@ v7.1.0-call-overlay-layout-fix — 完整修复（3 个元素全部处理）
 | v7.2.3 | 页面加载时提前播放招呼语修复 |
 | v7.2.4~7.2.5 | 对话记录面板覆盖 action-bar 修复 |
 | v7.2.6 | 锁定模式桌面端触发挂断修复（补 _D.hb mousedown） |
+
+## v7.2.9 — 2026-05-14
+### 智能体编辑面板 TTS 语音参数
+- **智能体编辑面板.js**: Live2D 角色字段后追加"TTS 语音参数"字段，含音调(pitch 0.5-2.0)和语速(speed 0.5-2.0)滑块，滑动结束自动保存到智能体配置
+- **智能体编辑面板-样式.css**: 追加 `.智能体编辑-tts参数`、`.tts-slider-row`、滑块样式
+- **index.html**: `aiSpeak` TTS 参数读取改为优先从智能体配置(`获取当前智能体配置()`)取 `ttsPitch`/`ttsSpeed`，fallback 到 `loadTtsSettings(currentCharacterId)`
