@@ -1598,6 +1598,9 @@ function _returnToVerification() {
     $('micWaveBars').classList.remove('active');
   }
   document.getElementById('语音通话浮层').style.display = 'none';
+  // 恢复通话前 UI 状态
+  var header = document.querySelector('header.顶部栏');
+  if (header) { header.style.display = 'flex'; }
   // love-helper 无验证浮层 DOM,跳过
 }
 
