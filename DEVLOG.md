@@ -249,3 +249,15 @@ v7.1.0-call-overlay-layout-fix — 完整修复（3 个元素全部处理）
 - **智能体编辑面板.js**: Live2D 角色字段后追加"TTS 语音参数"字段，含音调(pitch 0.5-2.0)和语速(speed 0.5-2.0)滑块，滑动结束自动保存到智能体配置
 - **智能体编辑面板-样式.css**: 追加 `.智能体编辑-tts参数`、`.tts-slider-row`、滑块样式
 - **index.html**: `aiSpeak` TTS 参数读取改为优先从智能体配置(`获取当前智能体配置()`)取 `ttsPitch`/`ttsSpeed`，fallback 到 `loadTtsSettings(currentCharacterId)`
+
+## v7.3.1 (2026-05-14)
+- 动作指令增强：中文标签+白藤专属表情+持久表情+参考时长
+- `_charActionMap` 重构：白藤新增16个专属表情/配件（expr类型），其他角色删冗余tags字段
+- `_getCharActionTags()` 改为动态生成带中文描述格式（如 `[emo:happy] 开心弹跳`）
+- 新增 `_findActionDesc()` 辅助函数
+- `_execActionDesc` 支持 `desc.expr` → `_setExpressionWithReset()`
+- 新增 `_persistentActions` + `_clearPersistentActions`：持久表情机制
+- `callDeepSeek` 开头先清持久表情再 stopAllAiMotions
+- `aiSpeak` 解析标记时记录 persist 信息
+- 系统提示词注入格式更新（加规则说明）
+- 对话管理.js 同步更新
